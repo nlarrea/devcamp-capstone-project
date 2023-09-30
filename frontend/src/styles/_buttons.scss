@@ -1,0 +1,70 @@
+@use './variables' as var;
+
+
+@mixin text-btn(
+    $bg-color: var.$lapis-lazuli,
+    $hover-bg-color: var.$oxford-blue,
+    $color: var.$off-white
+) {
+    height: 40px;
+    padding: 20px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    text-transform: uppercase;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: bold;
+    font-family: 'Montserrat', sans-serif;
+
+    color: $color;
+    cursor: pointer;
+
+    border: none;
+    border-radius: 24px;
+    background-color: $bg-color;
+
+    box-shadow: 0 0 8px rgba(black, 0.3);
+    transition: 0.3s;
+
+    &:hover, &:focus {
+        outline: none;
+        background-color: $hover-bg-color;
+    }
+}
+
+
+@mixin icon-btn(
+    $color: var.$charcoal,
+    $bg-color: transparent,
+    $hover-bg-color: var.$oxford-blue,
+    $hover-text-color: var.$off-white
+) {
+    width: 32px;
+    height: 32px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid $color;
+    border-radius: 50%;
+    background-color: transparent;
+    color: $color;
+
+    transition: 0.3s;
+    cursor: pointer;
+
+    i {
+        pointer-events: none;
+    }
+
+    &:hover, &:focus {
+        outline: none;
+        background-color: $hover-bg-color;
+        border-color: $hover-bg-color;
+        color: $hover-text-color;
+    }
+}

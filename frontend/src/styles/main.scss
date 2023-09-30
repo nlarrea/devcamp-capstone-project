@@ -1,0 +1,33 @@
+@use './variables';
+@use './buttons';
+@use './welcomePage';
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Gluten:wght@600&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body, .App {
+    width: 100vw;
+    height: 100vh;
+    margin: 0 auto;
+
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: variables.$charcoal;
+    background-color: variables.$off-white;
+}
+
+.container {
+    width: 100vw;
+    max-width: 2000px;
+    height: 100vh;
+    margin: 0 auto;
+
+    &.nav-page {
+        height: calc(100vh - 84px);
+    }
+}

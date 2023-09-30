@@ -1,5 +1,18 @@
 import React, { useState } from "react";
 import { Routes, Route } from "react-router-dom";
+import { library } from "@fortawesome/fontawesome-svg-core";
+import {
+  faMagnifyingGlass,
+  faArrowRightFromBracket,
+  faRightToBracket,
+  faChevronRight,
+  faChevronLeft,
+  faSpinner,
+  faUser,
+  faAt,
+  faLock,
+  faLockOpen
+} from '@fortawesome/free-solid-svg-icons';
 
 import WelcomePage from "./components/pages/WelcomePage";
 import NotFoundPage from "./components/pages/NotFoundPage";
@@ -8,6 +21,19 @@ import RegisterPage from "./components/forms/RegisterPage";
 import BlogsList from './components/pages/blogs/BlogsList';
 import BlogPage from './components/pages/blogs/BlogPage';
 import UserPage from "./components/pages/users/UserPage";
+
+library.add(
+  faMagnifyingGlass,
+  faArrowRightFromBracket,
+  faRightToBracket,
+  faChevronRight,
+  faChevronLeft,
+  faSpinner,
+  faUser,
+  faAt,
+  faLock,
+  faLockOpen
+)
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);

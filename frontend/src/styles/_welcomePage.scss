@@ -1,0 +1,124 @@
+@use './variables' as var;
+@use './buttons' as btn;
+
+#welcome-page {
+    position: relative;
+
+    h1 {
+        position: absolute;
+        top: 80px;
+        left: 40%;
+        transform: translateX(-50%);
+        font-size: 64px;
+        font-family: Gluten, 'Open Sans', 'Helvetica Neue', sans-serif;
+    }
+
+    nav {
+        position: absolute;
+        top: 32px;
+        right: 48px;
+        z-index: 1;
+
+        a,
+        button {
+            color: var.$charcoal;
+            text-decoration: none;
+            
+            border: none;
+            background-color: transparent;
+            font-size: 16px;
+
+            cursor: pointer;
+            transition: all 0.3s;
+
+            &:hover, &:focus {
+                color: var.$blue;
+            }
+        }
+    }
+}
+
+.carousel-wrapper {
+    height: 100vh;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+
+    .prev-button,
+    .next-button {
+        @include btn.icon-btn(
+            $hover-bg-color: var.$lapis-lazuli
+        );
+
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 1;
+
+        width: 18px;
+        height: 18px;
+        font-size: 0.5rem;
+    }
+
+    .prev-button {left: 16px;}
+
+    .next-button {right: 16px;}
+
+    section {
+        padding: 48px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+
+        position: relative;
+
+        p {
+            height: 100px;
+            text-align: center;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 18px;
+        }
+
+        .carousel-active-item-indicators {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+
+            .carousel-indicator {
+                width: 8px;
+                height: 8px;
+                
+                border: none;
+                border-radius: 50%;
+                background-color: var.$light-grey;
+                cursor: pointer;
+                transition: all 0.3s;
+
+                &:hover, &:focus {
+                    background-color: var.$grey;
+                }
+
+                &.active-indicator {
+                    background-color: var.$oxford-blue;
+
+                    &:hover, &:focus {
+                        background-color: var.$charcoal;
+                    }
+                }
+            }
+        }
+
+        .welcome-button {
+            @include btn.text-btn;
+            align-self: flex-end;
+        }
+            
+        img {
+            width: 70%;
+            height: auto;
+            max-height: 500px;
+        }
+    }
+}
