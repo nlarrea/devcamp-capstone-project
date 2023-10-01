@@ -6,7 +6,7 @@ import { LoginButton, LogoutButton } from './LogLinks';
 
 const NavBar = ({ isAuthenticated, user }) => {
     return (
-        <nav>
+        <nav id='navbar-component-wrapper'>
             <div className='left-nav-side'>
                 <div className='link-wrapper'>
                     <NavLink to='/'>Home</NavLink>

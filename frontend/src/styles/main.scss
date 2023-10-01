@@ -1,5 +1,7 @@
 @use './variables' as var;
+@use './mixins' as mix;
 @use './buttons' as btn;
+@use './forms';
 @use './welcomePage';
 
 @import url('https://fonts.googleapis.com/css2?family=Montserrat&display=swap');
@@ -38,7 +40,7 @@ body, .App {
 }
 
 
-nav {
+nav#navbar-component-wrapper {
     width: 100vw;
     height: var.$nav-height;
     padding: 0 32px;
@@ -77,6 +79,17 @@ nav {
     .left-nav-side {
         display: flex;
     }
+}
+
+
+div.input-label-wrapper {
+    @include mix.input-icon-label(
+        $bg-color: var.$light-grey,
+        $color: var.$charcoal,
+        $placeholder-color: var.$grey,
+        $highlight-color: var.$blue,
+        $border-color: var.$lapis-lazuli
+    );
 }
 
 

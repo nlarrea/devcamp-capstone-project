@@ -1,0 +1,96 @@
+@use './variables' as var;
+
+@mixin input-icon-label($bg-color, $border-color, $highlight-color, $placeholder-color, $color) {
+    width: fit-content;
+    height: fit-content;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+
+    .input-field {
+        width: 100%;
+        min-width: 250px;
+        height: 36px;
+
+        padding: 0 16px;
+        padding-right: calc(16px * 2 + 8px);
+
+        outline: none;
+        display: block;
+
+        border: none;
+        border-bottom: 2px solid rgba($border-color, 0.3);
+        border-radius: 5px;
+        background-color: $bg-color;
+        color: $color;
+
+        box-shadow: 0 0 3px rgba(0, 0, 0, 0.18);
+        
+        caret-color: $highlight-color;
+        font-family: inherit;
+        font-size: 0.9rem;
+
+        transition: border 0.3s;
+
+        &:hover, &:focus {
+            border-color: $highlight-color;
+        }
+
+        /* placeholder notes:
+        placeholder's transition = 0.9s
+            - this makes placeholder appear slowly
+        input:hover::placeholder's transition = 0s
+            - this makes placeholder disappear fast
+        */
+
+        &::placeholder {
+            color: $placeholder-color;
+            transition: 1.5s;
+        }
+    
+        &:hover::placeholder,
+        &:focus::placeholder {
+            color: transparent;
+            transition: 0s;
+        }
+    }
+
+    .input-label {
+        position: absolute;
+        top: 50%;
+        left: 16px;
+        transform: translateY(calc(-50% - 1px));
+        font-size: 0.9rem;
+        color: $placeholder-color;
+        opacity: 0;
+        pointer-events: none;
+        transition: 0.5s;
+    }
+
+    .input-icon {
+        position: absolute;
+        right: 16px;
+
+        color: $placeholder-color;
+
+        pointer-events: none;
+        transition: 0.5s;
+    }
+
+    .input-field:hover + .input-label,
+    .input-field:focus + .input-label,
+    .input-field:not(:placeholder-shown) + .input-label {
+        top: -8px;
+        left: 0;
+        font-size: 0.7rem;
+        opacity: 1;
+        transition: 0.3s;
+    }
+
+    .input-field:hover + .input-label + .input-icon,
+    .input-field:focus + .input-label + .input-icon {
+        color: rgba($color, 0.7);
+    }
+}

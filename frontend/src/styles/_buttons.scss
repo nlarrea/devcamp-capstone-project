@@ -51,7 +51,7 @@
 
     border: 1px solid $color;
     border-radius: 50%;
-    background-color: transparent;
+    background-color: $bg-color;
     color: $color;
 
     transition: 0.3s;
@@ -68,6 +68,43 @@
         color: $hover-text-color;
     }
 }
+
+
+@mixin icon-text-btn(
+    $color: var.$charcoal,
+    $bg-color: transparent,
+    $hover-bg-color: var.$oxford-blue,
+    $hover-text-color: var.$off-white
+) {
+    width: fit-content;
+    height: 32px;
+    padding: 0 8px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    border: 1px solid $color;
+    border-radius: 16px;
+    background-color: $bg-color;
+    color: $color;
+
+    transition: 0.3s;
+    cursor: pointer;
+
+    i {
+        pointer-events: none;
+    }
+
+    &:hover, &:focus {
+        outline-color: none;
+        background-color: $hover-bg-color;
+        border-color: $hover-bg-color;
+        color: $hover-text-color;
+    }
+}
+
 
 @mixin nav-link() {
     line-height: 24px;
@@ -94,9 +131,28 @@
         outline: none;
         border-bottom: 1px solid var.$lapis-lazuli;
     }
+}
 
-    span {
-        display: table-cell;
-        vertical-align: bottom;
+
+@mixin form-btn($bg-color) {
+    width: 100px;
+    height: 36px;
+
+    border: none;
+    border-radius: 5px;
+    background-color: $bg-color;
+    color: var.$off-white;
+
+    text-transform: uppercase;
+    box-shadow: 0 0 8px rgba(black, 0.3);
+
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 1rem;
+    transition: background-color 0.3s;
+
+    &:hover, &:focus {
+        outline: none;
+        background-color: rgba($bg-color, 0.85);
+        cursor: pointer;
     }
 }
