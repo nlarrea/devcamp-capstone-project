@@ -163,7 +163,7 @@ const RegisterPage = () => {
                             id='register-password'
                             className={`input-field ${passError ? 'input-error' : ''}`}
                             ref={pass1Ref}
-                            onChange={handleChange}
+                            onChange={() => handleChange(pass1Ref.current.id)}
                             placeholder='123_abCD'
                             required
                             type={viewPass1 ? 'text' : "password"}
@@ -196,7 +196,7 @@ const RegisterPage = () => {
                             id='register-password-2'
                             className={`input-field ${passError ? 'input-error' : ''}`}
                             ref={pass2Ref}
-                            onChange={handleChange}
+                            onChange={() => handleChange(pass1Ref.current.id)}
                             placeholder='123_abCD'
                             required
                             type={viewPass2 ? 'text' : "password"}
