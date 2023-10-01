@@ -135,7 +135,7 @@
         }
 
         section {
-            background:linear-gradient(rgba(var.$charcoal, 0.3), rgba(var.$charcoal, 0.3)), url('../static/images/forms/login.svg');
+            background: linear-gradient(rgba(var.$charcoal, 0.3), rgba(var.$charcoal, 0.3)), url('../static/images/forms/login.svg');
             background-repeat: no-repeat;
             background-size: cover;
             background-position: center;
@@ -174,7 +174,7 @@
     }
 
     #register-page-wrapper > section {
-        background:linear-gradient(rgba(var.$charcoal, 0.3), rgba(var.$charcoal, 0.3)), url('../static/images/forms/register.svg');
+        background: linear-gradient(rgba(var.$charcoal, 0.3), rgba(var.$charcoal, 0.3)), url('../static/images/forms/register.svg');
         background-repeat: no-repeat;
         background-size: cover;
         background-position: center;

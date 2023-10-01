@@ -49,12 +49,19 @@
                 font-size: 32px;
                 align-self: center;
                 justify-self: center;
+                transition: 0.3s;
             }
 
             p {
                 max-width: 200px;
                 justify-self: center;
                 text-align: center;
+            }
+
+            &:hover {
+                svg {
+                    transform: scale(1.25);
+                }
             }
         }
     }
@@ -149,6 +156,87 @@
                 height: auto;
                 max-height: 400px;
             }
+        }
+    }
+}
+
+
+@media (max-width: 1010px) {
+    #welcome-page {
+        #navbar-component-wrapper {
+            background-color: var.$off-white;
+        }
+
+        .carousel-wrapper {
+            height: 450px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: linear-gradient(rgba(var.$charcoal, 0.3), rgba(var.$charcoal, 0.3)), url('../static/images/welcomePage/welcomeSvg1.svg');
+            background-position: center;
+            background-size: cover;
+
+            section.image-section {
+                display: none;
+            }
+            
+            section.text-section {
+                width: 80vw;
+                height: 400px;
+                margin: 0 auto;
+                padding: 48px;
+
+                background-color: var.$off-white;
+                box-shadow: 0 0 25px rgba(var.$charcoal, 0.8);
+                
+                header {
+                    padding: 0;
+                }
+
+                p {
+                    height: 100px;
+                }
+            }
+        }
+    }
+}
+
+
+@media (max-width: 775px) {
+    #welcome-page {
+        .carousel-wrapper {
+            height: 500px;
+
+            .prev-button,
+            .next-button {
+                @include btn.icon-btn(
+                    $bg-color: var.$off-white,
+                    $hover-bg-color: var.$oxford-blue
+                );
+
+                width: 18px;
+                height: 18px;
+                font-size: 0.5rem;
+            }
+
+            section.text-section {
+                height: 450px;
+
+                header {
+                    padding-bottom: 18px;
+                }
+
+                p {
+                    height: 180px;
+                }
+            }
+        }
+
+        section.summary-section {
+            display: flex;
+            flex-direction: column;
         }
     }
 }
