@@ -48,7 +48,7 @@ const Carousel = ({ isAuthenticated }) => {
             </button>
 
             <section className='text-section'>
-                <header>
+                <header className='welcome-page-title'>
                     <h1>Welcome</h1>
                 </header>
                 

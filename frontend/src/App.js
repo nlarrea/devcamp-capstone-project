@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import {
+  faPaperPlane,
   faMagnifyingGlass,
   faRightFromBracket,
   faRightToBracket,
@@ -28,6 +29,7 @@ import BlogPage from './components/pages/blogs/BlogPage';
 import UserPage from "./components/pages/users/UserPage";
 
 library.add(
+  faPaperPlane,
   faMagnifyingGlass,
   faRightFromBracket,
   faRightToBracket,

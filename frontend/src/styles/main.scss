@@ -2,7 +2,7 @@
 @use './mixins' as mix;
 @use './buttons' as btn;
 @use './notFoundPage';
-@use './navbar';
+@use './navigation';
 @use './forms';
 @use './welcomePage';
 
@@ -42,6 +42,26 @@ body, .App {
 }
 
 
+.link-wrapper {
+    padding: 0 16px;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    &:not(:last-child) {
+        border-right: 1px solid var.$oxford-blue;
+    }
+
+    .login-btn,
+    .logout-btn,
+    a {
+        @include btn.nav-link();
+    }
+}
+
+
 div.input-label-wrapper {
     @include mix.input-icon-label(
         $bg-color: var.$light-grey,
@@ -55,17 +75,16 @@ div.input-label-wrapper {
 
 ::-webkit-scrollbar {
     width: 8px;
-    background: transparent;
 }
 
 ::-webkit-scrollbar-track {
-    background: transparent;
+    background: var.$light-grey;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: var.$light-grey;
+    background: var.$grey;
 
     &:hover {
-        background: var.$grey;
+        background: var.$charcoal;
     }
 }

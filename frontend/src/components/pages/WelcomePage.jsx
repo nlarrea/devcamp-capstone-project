@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import Carousel from '../pure/Carousel';
 import NavBar from '../pure/NavBar';
+import Footer from '../pure/Footer';
 
 const WelcomePage = ({ isAuthenticated, user }) => {
     return (
@@ -28,9 +29,7 @@ const WelcomePage = ({ isAuthenticated, user }) => {
                 </div>
             </section>
 
-            <footer>
-                
-            </footer>
+            <Footer />
         </div>
     );
 };

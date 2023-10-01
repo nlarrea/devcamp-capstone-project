@@ -15,25 +15,6 @@ nav#navbar-component-wrapper {
 
     background-color: var.$light-grey;
     box-shadow: 0 0 8px rgba(var.$charcoal, 0.6);
-    
-    .link-wrapper {
-        padding: 0 16px;
-        
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-
-        &:not(:last-child) {
-            border-right: 1px solid var.$oxford-blue;
-        }
-
-        .login-btn,
-        .logout-btn,
-        a {
-            @include btn.nav-link();
-        }
-    }
 
     // user data
     .nav-user-data-wrapper {
@@ -108,5 +89,33 @@ nav#navbar-component-wrapper {
                 display: none;
             }
         }
+    }
+}
+
+
+// FOOTER
+
+#footer-component-wrapper {
+    width: 100vw;
+    height: calc(var.$nav-height * 2.5);
+
+    background-color: var.$light-grey;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+
+    header {
+        text-align: center;
+    }
+
+    nav {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+
     }
 }
