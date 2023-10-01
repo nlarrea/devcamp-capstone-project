@@ -68,3 +68,35 @@
         color: $hover-text-color;
     }
 }
+
+@mixin nav-link() {
+    line-height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    font-family: 'Titillium Web', sans-serif;
+    font-size: 16px;
+    text-decoration: none;
+    text-transform: uppercase;
+    color: var.$charcoal;
+
+    border: none;
+    border-bottom: 1px solid transparent;
+    background-color: transparent;
+
+    cursor: pointer;
+    transition: all 0.5s;
+
+    &:hover, &:focus,
+    &.active {
+        outline: none;
+        border-bottom: 1px solid var.$lapis-lazuli;
+    }
+
+    span {
+        display: table-cell;
+        vertical-align: bottom;
+    }
+}

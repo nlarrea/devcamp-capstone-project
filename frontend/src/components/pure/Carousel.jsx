@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { HOME_CONTENT } from '../../models/constants';
@@ -47,7 +47,11 @@ const Carousel = ({ isAuthenticated }) => {
                 <FontAwesomeIcon icon='chevron-right' fixedWidth />
             </button>
 
-            <section>
+            <section className='text-section'>
+                <header>
+                    <h1>Welcome</h1>
+                </header>
+                
                 <p>{HOME_CONTENT[index].text}</p>
                 
                 <div className='carousel-active-item-indicators' ref={carouselIndicatorRef}>
@@ -62,10 +66,6 @@ const Carousel = ({ isAuthenticated }) => {
                     <button
                         className='carousel-indicator'
                         onClick={() => updateActiveIndicator(2)}
-                    />
-                    <button
-                        className='carousel-indicator'
-                        onClick={() => updateActiveIndicator(3)}
                     />
                 </div>
                 

@@ -1,38 +1,36 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import Carousel from '../pure/Carousel';
-import { LoginButton, LogoutButton } from '../pure/LogLinks';
+import NavBar from '../pure/NavBar';
 
 const WelcomePage = ({ isAuthenticated, user }) => {
     return (
         <div id='welcome-page' className='container'>
-            <header>
-                <h1>Welcome</h1>
-            </header>
-
-            <nav>
-                {
-                    isAuthenticated ? (
-                        <>
-                            <NavLink to={`/users/${user.nickname}`} className='user-link'>
-                                <img
-                                    src={user?.picture}
-                                    alt={user?.nickname}
-                                    id='logged-user-nav-img'
-                                />
-                                <span>{user.nickname}</span>
-                            </NavLink>
-
-                            <LogoutButton />
-                        </>
-                    ) : (
-                        <LoginButton type='iconText' />
-                    )
-                }
-            </nav>
+            <NavBar isAuthenticated={isAuthenticated} user={user} />
 
             <Carousel />
+
+            <section className='summary-section'>
+                <div>
+                    <FontAwesomeIcon icon='mobile' fixedWidth />
+                    <p>Bring out the writer in you <strong>from anywhere</strong>.</p>
+                </div>
+
+                <div>
+                    <FontAwesomeIcon icon='rocket' fixedWidth />
+                    <p>Let your <strong>imagination</strong> run wild with stories <strong>from all over the galaxy</strong>!</p>
+                </div>
+
+                <div>
+                    <FontAwesomeIcon icon='newspaper' fixedWidth />
+                    <p>Always be <strong>up to date</strong> with the latest news.</p>
+                </div>
+            </section>
+
+            <footer>
+                
+            </footer>
         </div>
     );
 };

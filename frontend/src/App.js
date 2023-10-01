@@ -3,7 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import {
   faMagnifyingGlass,
-  faArrowRightFromBracket,
+  faRightFromBracket,
   faRightToBracket,
   faChevronRight,
   faChevronLeft,
@@ -11,7 +11,10 @@ import {
   faUser,
   faAt,
   faLock,
-  faLockOpen
+  faLockOpen,
+  faMobile,
+  faRocket,
+  faNewspaper,
 } from '@fortawesome/free-solid-svg-icons';
 
 import WelcomePage from "./components/pages/WelcomePage";
@@ -24,7 +27,7 @@ import UserPage from "./components/pages/users/UserPage";
 
 library.add(
   faMagnifyingGlass,
-  faArrowRightFromBracket,
+  faRightFromBracket,
   faRightToBracket,
   faChevronRight,
   faChevronLeft,
@@ -32,11 +35,14 @@ library.add(
   faUser,
   faAt,
   faLock,
-  faLockOpen
+  faLockOpen,
+  faMobile,
+  faRocket,
+  faNewspaper
 )
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
 
 
   /**
@@ -120,7 +126,11 @@ function App() {
           <Route
             exact
             path='/'
-            element={<WelcomePage />}
+            element={
+              <WelcomePage
+                isAuthenticated={isAuthenticated}
+              />
+            }
           />
 
           {

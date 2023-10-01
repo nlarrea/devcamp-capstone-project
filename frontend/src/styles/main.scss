@@ -1,9 +1,10 @@
-@use './variables';
-@use './buttons';
+@use './variables' as var;
+@use './buttons' as btn;
 @use './welcomePage';
 
 @import url('https://fonts.googleapis.com/css2?family=Montserrat&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Gluten:wght@600&display=swap');
+
 
 * {
     margin: 0;
@@ -11,23 +12,87 @@
     box-sizing: border-box;
 }
 
+
 body, .App {
     width: 100vw;
     height: 100vh;
-    margin: 0 auto;
 
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: variables.$charcoal;
-    background-color: variables.$off-white;
+    color: var.$charcoal;
+    background-color: var.$off-white;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-gutter: stable;
 }
 
+
 .container {
-    width: 100vw;
     max-width: 2000px;
-    height: 100vh;
+    min-height: 100vh;
     margin: 0 auto;
 
     &.nav-page {
         height: calc(100vh - 84px);
+    }
+}
+
+
+nav {
+    width: 100vw;
+    height: var.$nav-height;
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    position: sticky;
+    top: 0;
+    z-index: 2;
+
+    background-color: var.$light-grey;
+
+    box-shadow: 0 0 8px rgba(var.$charcoal, 0.6);
+    
+    .link-wrapper {
+        padding: 0 16px;
+        
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+
+        &:not(:last-child) {
+            border-right: 1px solid var.$oxford-blue;
+        }
+
+        .login-btn,
+        .logout-btn,
+        a {
+            @include btn.nav-link();
+        }
+    }
+
+    .right-nav-side,
+    .left-nav-side {
+        display: flex;
+    }
+}
+
+
+::-webkit-scrollbar {
+    width: 8px;
+    background: transparent;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var.$light-grey;
+
+    &:hover {
+        background: var.$grey;
     }
 }
