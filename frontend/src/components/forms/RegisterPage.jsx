@@ -18,7 +18,8 @@ const RegisterPage = () => {
 
     const emailRef = useRef();
 
-    const [viewPasswords, setViewPasswords] = useState(false);
+    const [viewPass1, setViewPass1] = useState(false);
+    const [viewPass2, setViewPass2] = useState(false);
 
 
     const checkUsername = () => {
@@ -42,6 +43,10 @@ const RegisterPage = () => {
 
     const checkPasswords = () => {
         const passRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[,.*_&])[A-z\d,.*_&]{8,}$/;
+        const hasUpper = /(?=.*[A-Z]{1,})/.test(pass1Ref.current.value);
+        const hasLower = /(?=.*[a-z]{1,})/.test(pass1Ref.current.value);
+        const hasNumber = /(?=.*\d){1,}/.test(pass1Ref.current.value);
+        const hasSpecial = /(?=.*[.,*_&])/.test(pass1Ref.current.value);
 
         if (pass1Ref.current.value !== pass2Ref.current.value) {
             setPassError(true);
@@ -54,7 +59,13 @@ const RegisterPage = () => {
         } else if (!passRegex.test(pass1Ref.current.value)) {
             setPassError(true);
             setPassErrorMsg('Password doesn\'t meet the conditions.');
-            alert('Password must include at least:\n- 1 upper char\n- 1 lower char\n- 1 numeric char\n- One of these: . , * _ &');
+            alert(
+                `Password must include at least:\n\
+                - 1 upper char ${hasUpper ? '' : ' - (Not inserted)'}\n\
+                - 1 lower char ${hasLower ? '' : ' - (Not inserted)'}\n\
+                - 1 numeric char ${hasNumber ? '' : ' - (Not inserted)'}\n\
+                - One of these: . , * _ & ${hasSpecial ? '' : ' - (Not inserted)'}`
+            );
             return false;
         }
 
@@ -155,22 +166,22 @@ const RegisterPage = () => {
                             onChange={handleChange}
                             placeholder='123_abCD'
                             required
-                            type={viewPasswords ? 'text' : "password"}
+                            type={viewPass1 ? 'text' : "password"}
                         />
                         <label htmlFor='register-password' className='input-label'>
                             Password
                         </label>
                         {
-                            viewPasswords ? (
+                            viewPass1 ? (
                                 <FontAwesomeIcon
-                                    onClick={() => setViewPasswords(!viewPasswords)}
+                                    onClick={() => setViewPass1(!viewPass1)}
                                     icon='lock-open'
                                     className='input-icon icon-btn'
                                     fixedWidth
                                 />
                             ) : (
                                 <FontAwesomeIcon
-                                    onClick={() => setViewPasswords(!viewPasswords)}
+                                    onClick={() => setViewPass1(!viewPass1)}
                                     icon='lock'
                                     className='input-icon icon-btn'
                                     fixedWidth
@@ -188,22 +199,22 @@ const RegisterPage = () => {
                             onChange={handleChange}
                             placeholder='123_abCD'
                             required
-                            type={viewPasswords ? 'text' : "password"}
+                            type={viewPass2 ? 'text' : "password"}
                         />
                         <label htmlFor='register-password-2' className='input-label'>
                             Confirm password
                         </label>
                         {
-                            viewPasswords ? (
+                            viewPass2 ? (
                                 <FontAwesomeIcon
-                                    onClick={() => setViewPasswords(!viewPasswords)}
+                                    onClick={() => setViewPass2(!viewPass2)}
                                     icon='lock-open'
                                     className='input-icon icon-btn'
                                     fixedWidth
                                 />
                             ) : (
                                 <FontAwesomeIcon
-                                    onClick={() => setViewPasswords(!viewPasswords)}
+                                    onClick={() => setViewPass2(!viewPass2)}
                                     icon='lock'
                                     className='input-icon icon-btn'
                                     fixedWidth

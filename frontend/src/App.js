@@ -15,6 +15,8 @@ import {
   faMobile,
   faRocket,
   faNewspaper,
+  faCheck,
+  faXmark
 } from '@fortawesome/free-solid-svg-icons';
 
 import WelcomePage from "./components/pages/WelcomePage";
@@ -38,7 +40,9 @@ library.add(
   faLockOpen,
   faMobile,
   faRocket,
-  faNewspaper
+  faNewspaper,
+  faCheck,
+  faXmark
 )
 
 function App() {
