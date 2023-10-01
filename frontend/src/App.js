@@ -46,7 +46,7 @@ library.add(
 )
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
 
 
   /**

@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 
+import avatar from '../../static/images/avatars/male_avatar.svg';
 import { TYPES } from '../../models/constants';
 import { LoginButton, LogoutButton } from './LogLinks';
 
@@ -28,14 +29,21 @@ const NavBar = ({ isAuthenticated, user }) => {
                 {
                     isAuthenticated ? (
                         <>
-                            <div className='link-wrapper'>
-                                <NavLink to={`/users/me`} className='user-link'>
+                            <NavLink to={`/users/me`} className='nav-user-data-wrapper'>
+                                <div className='nav-user-img-wrapper'>
+                                    <span className='nav-user-circle-out' />
+                                    <span className='nav-user-circle-in' />
                                     <img
-                                        src={user?.picture || ''}
+                                        src={user?.picture || avatar}
                                         alt={user?.nickname || 'user'}
                                         id='logged-user-nav-img'
-                                        />
-                                    <span>{user?.nickname || 'my name'}</span>
+                                    />
+                                </div>
+                            </NavLink>
+
+                            <div className='link-wrapper nav-username-link'>
+                                <NavLink to={'/users/me'}>
+                                    {user?.nickname || 'my username'}
                                 </NavLink>
                             </div>
 

@@ -1,0 +1,112 @@
+@use './variables' as var;
+@use './buttons' as btn;
+
+nav#navbar-component-wrapper {
+    width: 100vw;
+    height: var.$nav-height;
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    position: sticky;
+    top: 0;
+    z-index: 2;
+
+    background-color: var.$light-grey;
+    box-shadow: 0 0 8px rgba(var.$charcoal, 0.6);
+    
+    .link-wrapper {
+        padding: 0 16px;
+        
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+
+        &:not(:last-child) {
+            border-right: 1px solid var.$oxford-blue;
+        }
+
+        .login-btn,
+        .logout-btn,
+        a {
+            @include btn.nav-link();
+        }
+    }
+
+    // user data
+    .nav-user-data-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+    
+        // user image - avatar
+        .nav-user-img-wrapper {
+            position: relative;
+            width: 58px;
+
+            .nav-user-circle-out {
+                width: 58px;
+                height: 58px;
+                border-radius: 50%;
+                background-color: var.$blue;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+
+            .nav-user-circle-in {
+                width: 54px;
+                height: 54px;
+                border-radius: 50%;
+                background-color: var.$oxford-blue;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+
+            img {
+                width: 50px;
+                height: 50px;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+        }
+    }
+
+    .right-nav-side,
+    .left-nav-side {
+        display: flex;
+    }
+}
+
+
+@media (max-width: 1010px) {
+    nav#navbar-component-wrapper {
+        .right-nav-side {
+            .nav-username-link {
+                display: none;
+            }
+        }
+    }
+}
+
+
+@media (max-width: 775px) {
+    nav#navbar-component-wrapper {
+        padding: 0 8px;
+        
+        .right-nav-side {
+            .login-btn,
+            .logout-btn {
+                display: none;
+            }
+        }
+    }
+}

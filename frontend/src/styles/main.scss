@@ -1,6 +1,7 @@
 @use './variables' as var;
 @use './mixins' as mix;
 @use './buttons' as btn;
+@use './navbar';
 @use './forms';
 @use './welcomePage';
 
@@ -36,48 +37,6 @@ body, .App {
 
     &.nav-page {
         height: calc(100vh - 84px);
-    }
-}
-
-
-nav#navbar-component-wrapper {
-    width: 100vw;
-    height: var.$nav-height;
-    padding: 0 32px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    position: sticky;
-    top: 0;
-    z-index: 2;
-
-    background-color: var.$light-grey;
-
-    box-shadow: 0 0 8px rgba(var.$charcoal, 0.6);
-    
-    .link-wrapper {
-        padding: 0 16px;
-        
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-
-        &:not(:last-child) {
-            border-right: 1px solid var.$oxford-blue;
-        }
-
-        .login-btn,
-        .logout-btn,
-        a {
-            @include btn.nav-link();
-        }
-    }
-
-    .right-nav-side,
-    .left-nav-side {
-        display: flex;
     }
 }
 
