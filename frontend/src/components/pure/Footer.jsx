@@ -2,11 +2,13 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 
 const Footer = () => {
+    const getYear = new Date().getUTCFullYear();
+
     return (
         <footer id='footer-component-wrapper'>
             <header>
                 <h2>Blog Voyage</h2>
-                <p>Copyright &copy; 2023 Blog Voyage, Inc.</p>
+                <p>Copyright &copy; {getYear} Blog Voyage, Inc.</p>
             </header>
 
             <nav>
