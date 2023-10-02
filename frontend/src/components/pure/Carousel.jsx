@@ -52,7 +52,19 @@ const Carousel = ({ isAuthenticated }) => {
                     <h1>Welcome</h1>
                 </header>
                 
-                <p>{HOME_CONTENT[index].text}</p>
+                {/* <p>{HOME_CONTENT[index].text}</p> */}
+                <div className='carousel-text-wrapper'>
+                    {
+                        HOME_CONTENT.map(({text}, idx) => (
+                            <p 
+                                key={text}
+                                className={`carousel-text ${idx === index && 'active-text'}`}
+                            >
+                                {text}
+                            </p>
+                        ))
+                    }
+                </div>
                 
                 <div className='carousel-active-item-indicators' ref={carouselIndicatorRef}>
                     <button
@@ -76,7 +88,17 @@ const Carousel = ({ isAuthenticated }) => {
             </section>
 
             <section className='image-section'>
-                <img src={HOME_CONTENT[index].image} alt="carousel item"/>
+                {/* <img src={HOME_CONTENT[index].image} alt="carousel item"/> */}
+                {
+                    HOME_CONTENT.map(({image}, idx) => (
+                        <img
+                            key={image}
+                            src={image}
+                            className={`carousel-img ${idx === index && 'active-img'}`}
+                            alt='carousel item'
+                        />
+                    ))
+                }
             </section>
         </div>
     );

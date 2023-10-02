@@ -107,12 +107,23 @@
             padding-left: 48px;
             position: relative;
     
-            p {
+            div.carousel-text-wrapper {
                 max-width: 700px;
                 height: 120px;
-                text-align: center;
-                font-family: 'Montserrat', sans-serif;
-                font-size: 18px;
+
+                display: flex;
+                overflow: hidden;
+
+                p.active-text {
+                    text-align: center;
+                    font-family: 'Montserrat', sans-serif;
+                    font-size: 18px;
+                    animation: slide-in-right 0.5s 0.2s ease-in-out both;
+                }
+
+                p:not(.active-text) {
+                    animation: slide-out-left 0.5s ease-in-out both;
+                }
             }
     
             .carousel-active-item-indicators {
@@ -151,11 +162,23 @@
             }
         }
 
-        &.image-section {            
+        &.image-section {
+            display: flex;
+            flex-direction: row;
+            overflow: hidden;
+
             img {
                 width: 60%;
                 height: auto;
                 max-height: 400px;
+            }
+
+            img.active-img {
+                animation: fade-in 0.5s 0.2s ease-in-out both;
+            }
+
+            img:not(.active-img) {
+                animation: fade-out 0.5s ease-in-out both;
             }
         }
     }
@@ -196,7 +219,7 @@
                     padding: 0;
                 }
 
-                p {
+                div.carousel-text-wrapper {
                     height: 100px;
                 }
             }
@@ -229,7 +252,7 @@
                     padding-bottom: 18px;
                 }
 
-                p {
+                div.carousel-text-wrapper {
                     height: 180px;
                 }
             }
@@ -239,5 +262,60 @@
             display: flex;
             flex-direction: column;
         }
+    }
+}
+
+
+@keyframes slide-out-left {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    to {
+        transform: translateX(-1000px);
+        opacity: 0;
+        display: none;
+    }
+}
+
+@keyframes slide-in-right {
+    from {
+        transform: translateX(1000px);
+        opacity: 0;
+        display: none;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+        display: block;
+    }
+}
+
+
+@keyframes fade-out {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+        width: 0;
+        height: 0;
+        display: none;
+    }
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+        width: 0;
+        height: 0;
+        display: none;
+    }
+
+    to {
+        opacity: 1;
     }
 }
