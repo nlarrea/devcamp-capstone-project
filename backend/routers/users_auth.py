@@ -144,7 +144,7 @@ async def read_users():
 
 
 # Define the endpoint to create a new user
-@router.post("/users", status_code=201)
+@router.post("/register", status_code=201)
 async def create_user_endpoint(user: UserDB):
     hashed_password = crypt.hash(user.password)
     print(f"User: {user.username}, {user.email}, {hashed_password}")

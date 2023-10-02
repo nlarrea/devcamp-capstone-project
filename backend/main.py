@@ -16,4 +16,4 @@ async def add_cors_header(request, call_next):
 
 @app.get("/")
 async def root():
-    return "Tu puta madre"
+    return "something"
