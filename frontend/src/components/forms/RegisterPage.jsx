@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-// import axios from 'axios';
+import axios from 'axios';
 
 import registerImg from '../../static/images/forms/register.svg';
 
@@ -85,15 +85,15 @@ const RegisterPage = () => {
                 password: pass1Ref.current.value
             };
 
-            /* axios.post(
+            axios.post(
                 'http://127.0.0.1:8000/register',
                 newUser,
-                { withCredentials: true }
+                // { withCredentials: true }
             ).then(response => {
-                    console.log(response.data);
+                console.log(response.data);
             }).catch(error => {
                 console.log(error);
-            }); */
+            });
         }
     }
 

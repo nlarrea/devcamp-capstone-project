@@ -5,10 +5,10 @@ import Carousel from '../pure/Carousel';
 import NavBar from '../pure/NavBar';
 import Footer from '../pure/Footer';
 
-const WelcomePage = ({ isAuthenticated, user }) => {
+const WelcomePage = ({ user }) => {
     return (
         <div id='welcome-page' className='container'>
-            <NavBar isAuthenticated={isAuthenticated} user={user} />
+            <NavBar user={user} />
 
             <Carousel />
 

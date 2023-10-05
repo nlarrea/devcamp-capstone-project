@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import AuthContext from '../../context/authContext';
 import { DISPLAY_TYPE } from '../../models/constants';
 
 export const LoginButton = ({ type='text' }) => {
@@ -22,10 +23,11 @@ export const LoginButton = ({ type='text' }) => {
 
 export const LogoutButton = ({ type='text-icon' }) => {
     const setIcon = type === 'textIcon' || type === 'iconText';
+    const { setIsAuthenticated } = useContext(AuthContext);
 
     return (
         <button
-            // onClick={} -> isAuthenticated = false
+            onClick={() => setIsAuthenticated(false)}
             className={`logout-btn ${setIcon && 'icon-text-wrapper'}`}
         >
             {

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Routes, Route } from "react-router-dom";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import {
@@ -15,9 +15,7 @@ import {
   faLockOpen,
   faMobile,
   faRocket,
-  faNewspaper,
-  faCheck,
-  faXmark
+  faNewspaper
 } from '@fortawesome/free-solid-svg-icons';
 
 import WelcomePage from "./components/pages/WelcomePage";
@@ -27,6 +25,7 @@ import RegisterPage from "./components/forms/RegisterPage";
 import BlogsList from './components/pages/blogs/BlogsList';
 import BlogPage from './components/pages/blogs/BlogPage';
 import UserPage from "./components/pages/users/UserPage";
+import AuthContext from "./context/authContext";
 
 library.add(
   faPaperPlane,
@@ -42,14 +41,11 @@ library.add(
   faLockOpen,
   faMobile,
   faRocket,
-  faNewspaper,
-  faCheck,
-  faXmark
+  faNewspaper
 )
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
 
   /**
    * Function that stores some paths and their elements that are available
@@ -128,42 +124,42 @@ function App() {
   return (
     <div className="App">
       <>
-        <Routes>
-          <Route
-            exact
-            path='/'
-            element={
-              <WelcomePage
-                isAuthenticated={isAuthenticated}
-              />
+        <AuthContext.Provider value={{isAuthenticated, setIsAuthenticated}}>
+          <Routes>
+            <Route
+              exact
+              path='/'
+              element={
+                <WelcomePage />
+              }
+            />
+
+            {
+              isAuthenticated ? (
+                pathsWhenLogged.map(({path, element}) => (
+                  <Route
+                    key={path}
+                    path={path}
+                    element={element}
+                  />
+                ))
+              ) : (
+                pathsWhenNotLogged.map(({path, element}) => (
+                  <Route
+                    key={path}
+                    path={path}
+                    element={element}
+                  />
+                ))
+              )
             }
-          />
 
-          {
-            isAuthenticated ? (
-              pathsWhenLogged.map(({path, element}) => (
-                <Route
-                  key={path}
-                  path={path}
-                  element={element}
-                />
-              ))
-            ) : (
-              pathsWhenNotLogged.map(({path, element}) => (
-                <Route
-                  key={path}
-                  path={path}
-                  element={element}
-                />
-              ))
-            )
-          }
-
-          <Route
-            path='*'
-            element={<NotFoundPage />}
-          />
-        </Routes>
+            <Route
+              path='*'
+              element={<NotFoundPage />}
+            />
+          </Routes>
+        </AuthContext.Provider>
       </>
     </div>
   );

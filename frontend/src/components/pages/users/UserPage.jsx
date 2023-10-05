@@ -2,8 +2,8 @@ import React from 'react';
 
 const UserPage = () => {
     return (
-        <div>
-            User Page
+        <div id='user-page-wrapper' className='container'>
+            
         </div>
     );
 };
