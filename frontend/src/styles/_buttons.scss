@@ -90,11 +90,17 @@
     background-color: $bg-color;
     color: $color;
 
+    font-size: 1rem;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     transition: 0.3s;
     cursor: pointer;
 
     i {
         pointer-events: none;
+    }
+
+    span {
+        line-height: 0;
     }
 
     &:hover, &:focus {
@@ -103,6 +109,8 @@
         border-color: $hover-bg-color;
         color: $hover-text-color;
     }
+
+    @content;
 }
 
 

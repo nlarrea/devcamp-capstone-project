@@ -2,17 +2,16 @@ import React, { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import AuthContext from '../../context/authContext';
+import { TYPES } from '../../models/constants';
 import { DISPLAY_TYPE } from '../../models/constants';
 
-export const LoginButton = ({ type='text' }) => {
+export const LoginButton = ({ type=TYPES.text }) => {
     const history = useNavigate();
-
-    const setIcon = type === 'textIcon' || type === 'iconText';
 
     return (
         <button
             onClick={() => history('/login')}
-            className={`login-btn ${setIcon && 'icon-text-wrapper'}`}
+            className={'login-btn'}
         >
             {
                 DISPLAY_TYPE('Login')[type]
@@ -21,14 +20,13 @@ export const LoginButton = ({ type='text' }) => {
     );
 };
 
-export const LogoutButton = ({ type='text-icon' }) => {
-    const setIcon = type === 'textIcon' || type === 'iconText';
+export const LogoutButton = ({ type=TYPES.textIcon, addClass='' }) => {
     const { setIsAuthenticated } = useContext(AuthContext);
 
     return (
         <button
             onClick={() => setIsAuthenticated(false)}
-            className={`logout-btn ${setIcon && 'icon-text-wrapper'}`}
+            className={`logout-btn ${addClass}`}
         >
             {
                 DISPLAY_TYPE('Log out', 'right-from-bracket')[type]

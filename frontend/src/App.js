@@ -1,21 +1,27 @@
-import React, { useState, useContext } from "react";
-import { Routes, Route } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import {
+  // Page Icon
   faPaperPlane,
+  // Searching
   faMagnifyingGlass,
+  // Navigation
   faRightFromBracket,
   faRightToBracket,
   faChevronRight,
   faChevronLeft,
   faSpinner,
+  // Auth form
   faUser,
   faAt,
   faLock,
   faLockOpen,
+  // Others
   faMobile,
   faRocket,
-  faNewspaper
+  faNewspaper,
+  faPencil
 } from '@fortawesome/free-solid-svg-icons';
 
 import WelcomePage from "./components/pages/WelcomePage";
@@ -28,24 +34,39 @@ import UserPage from "./components/pages/users/UserPage";
 import AuthContext from "./context/authContext";
 
 library.add(
+  // Page Icon
   faPaperPlane,
+  // Searching
   faMagnifyingGlass,
+  // Navigation
   faRightFromBracket,
   faRightToBracket,
   faChevronRight,
   faChevronLeft,
   faSpinner,
+  // Auth form
   faUser,
   faAt,
   faLock,
   faLockOpen,
+  // Others
   faMobile,
   faRocket,
-  faNewspaper
+  faNewspaper,
+  faPencil
 )
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const history = useNavigate();
+
+  /* TODO when database is done */
+  useEffect (() => {
+    if (!isAuthenticated) {
+      history('/');
+    }
+    // if is false -> reset user data (remove it or something)
+  }, [isAuthenticated, history]);
 
   /**
    * Function that stores some paths and their elements that are available

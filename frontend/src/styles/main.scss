@@ -5,6 +5,7 @@
 @use './navigation';
 @use './forms';
 @use './welcomePage';
+@use './userPage';
 
 @import url('https://fonts.googleapis.com/css2?family=Montserrat&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Gluten:wght@600&display=swap');
@@ -59,6 +60,11 @@ body, .App {
     a {
         @include btn.nav-link();
     }
+}
+
+
+.icon-text-btn {
+    @include btn.icon-text-btn();
 }
 
 
