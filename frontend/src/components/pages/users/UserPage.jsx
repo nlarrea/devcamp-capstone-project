@@ -11,13 +11,7 @@ const UserPage = () => {
     /* Use the useEffect Hook to call the database and bring minimum the first
     15-20 blogs of this user (infinite scroll to get more blogs) */
     const user = {};    // remove this
-    const blogsList = [{
-        id: 1,
-        title: 'My blog',
-        text: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Cumque dolorum perferendis hic optio in sunt quis cupiditate laborum? Et, harum laboriosam. Harum veritatis iure qui magni assumenda illo possimus nihil laborum sunt. Architecto vitae dolorum, non rerum, similique dolorem debitis impedit, repellat fugiat asperiores quo nulla ratione numquam labore voluptas.',
-        // text: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Nostrum vitae fuga impedit consectetur, nesciunt ullam error, ipsum corporis praesentium velit modi porro voluptas! Eos, quos!',
-        image: 'https://mdbootstrap.com/img/new/standard/nature/184.webp'
-    }];
+    const blogsList = [];
 
     return (
         <div id='user-page-wrapper' className='container'>
@@ -51,11 +45,23 @@ const UserPage = () => {
                 </section>
 
                 <section className='user-blogs-wrapper'>
-                    {
-                        blogsList.map(blog => (
-                            <BlogItem key={blog?.id} blog={blog} />
-                        ))
-                    }
+                    <header>
+                        <h3>Your Blogs</h3>
+                    </header>
+
+                    <div className='blog-items-wrapper'>
+                        {
+                            blogsList.length > 0 ? (
+                                blogsList.map(blog => (
+                                    <BlogItem key={blog?.id} blog={blog} />
+                                ))
+                            ) : (
+                                <p className='no-blogs-message'>
+                                    You didn't write Blogs yet!
+                                </p>
+                            )
+                        }
+                    </div>
                 </section>
             </main>
         </div>
