@@ -7,6 +7,7 @@ const BlogItem = ({ blog }) => {
         id,
         title,
         text,
+        // userId,
         image
     } = blog;
 
@@ -23,6 +24,10 @@ const BlogItem = ({ blog }) => {
                 <p>{text}</p>
             
                 <nav>
+                    {/* <NavLink to={`/blogs/${userId}`} className='icon-btn'>
+                        <FontAwesomeIcon icon='user' />
+                    </NavLink> */}
+
                     <NavLink to={`/blogs/edit-blog/${id}`} className='icon-btn'>
                         <FontAwesomeIcon icon='pencil' />
                     </NavLink>

@@ -3,6 +3,7 @@
 
 nav#navbar-component-wrapper {
     width: 100vw;
+    max-width: 2000px;
     height: var.$nav-height;
     padding: 0 32px;
     display: flex;

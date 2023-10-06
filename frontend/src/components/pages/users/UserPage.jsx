@@ -57,7 +57,7 @@ const UserPage = () => {
                                 ))
                             ) : (
                                 <p className='no-blogs-message'>
-                                    You didn't write Blogs yet!
+                                    You haven't written any Blog yet!
                                 </p>
                             )
                         }

@@ -94,3 +94,21 @@
         color: rgba($color, 0.7);
     }
 }
+
+
+@mixin blog-items-grid($min-blog-width: 300px) {
+    height: fit-content;
+
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax($min-blog-width, 1fr));
+    place-items: center;
+    gap: 32px;
+
+    p.no-blogs-message {
+        color: var.$grey;
+    }
+
+    @media (max-width: 600px) {
+        grid-template-columns: 1fr;
+    }
+}
