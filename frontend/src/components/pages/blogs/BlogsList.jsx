@@ -1,6 +1,5 @@
 import React from 'react';
 
-import NavBar from '../../pure/NavBar';
 import BlogItem from '../../pure/BlogItem';
 
 const BlogsList = () => {
@@ -9,8 +8,6 @@ const BlogsList = () => {
 
     return (
         <div id="blogs-list-page-wrapper" className='container'>
-            <NavBar />
-
             <main className='blog-items-wrapper'>
                 {
                     blogs.length > 0 ? (

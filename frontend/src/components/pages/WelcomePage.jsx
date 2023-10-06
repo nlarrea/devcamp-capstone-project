@@ -2,14 +2,11 @@ import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import Carousel from '../pure/Carousel';
-import NavBar from '../pure/NavBar';
 import Footer from '../pure/Footer';
 
-const WelcomePage = ({ user }) => {
+const WelcomePage = () => {
     return (
         <div id='welcome-page' className='container'>
-            <NavBar user={user} />
-
             <Carousel />
 
             <section className='summary-section'>

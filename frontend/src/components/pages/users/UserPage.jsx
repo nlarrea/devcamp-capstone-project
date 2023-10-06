@@ -2,7 +2,6 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import NavBar from '../../pure/NavBar';
 import { TYPES } from '../../../models/constants';
 import { LogoutButton } from '../../pure/LogLinks';
 import BlogItem from '../../pure/BlogItem';
@@ -15,8 +14,6 @@ const UserPage = () => {
 
     return (
         <div id='user-page-wrapper' className='container'>
-            <NavBar />
-
             <main>
                 <section className='user-options-wrapper'>
                     <header>

@@ -34,6 +34,7 @@ import BlogPage from './components/pages/blogs/BlogPage';
 import WriteBlog from "./components/pages/blogs/WriteBlog";
 import UserPage from "./components/pages/users/UserPage";
 import UserEditPage from "./components/pages/users/UserEditPage";
+import NavBar from "./components/pure/NavBar";
 
 library.add(
   // Page Icon
@@ -148,6 +149,8 @@ function App() {
       <>
         <AuthContext.Provider value={{isAuthenticated, setIsAuthenticated}}>
           <UserContext.Provider value={{user, setUser}}>
+            <NavBar />
+
             <Routes>
               <Route
                 exact
