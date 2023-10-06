@@ -2,9 +2,10 @@
 
 
 @mixin text-btn(
+    $color: var.$off-white,
     $bg-color: var.$lapis-lazuli,
     $hover-bg-color: var.$oxford-blue,
-    $color: var.$off-white
+    $hover-text-color: $color
 ) {
     height: 40px;
     padding: 20px;
@@ -32,6 +33,7 @@
     &:hover, &:focus {
         outline: none;
         background-color: $hover-bg-color;
+        color: $hover-text-color;
     }
 }
 
@@ -40,7 +42,8 @@
     $color: var.$charcoal,
     $bg-color: transparent,
     $hover-bg-color: var.$oxford-blue,
-    $hover-text-color: var.$off-white
+    $hover-text-color: var.$off-white,
+    $border-color: $color
 ) {
     width: 32px;
     height: 32px;
@@ -49,7 +52,7 @@
     align-items: center;
     justify-content: center;
 
-    border: 1px solid $color;
+    border: 1px solid $border-color;
     border-radius: 50%;
     background-color: $bg-color;
     color: $color;

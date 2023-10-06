@@ -24,14 +24,16 @@ import {
   faPencil
 } from '@fortawesome/free-solid-svg-icons';
 
+import AuthContext, { UserContext } from "./context/authContext";
 import WelcomePage from "./components/pages/WelcomePage";
 import NotFoundPage from "./components/pages/NotFoundPage";
 import LoginPage from "./components/forms/LoginPage";
 import RegisterPage from "./components/forms/RegisterPage";
 import BlogsList from './components/pages/blogs/BlogsList';
 import BlogPage from './components/pages/blogs/BlogPage';
+import WriteBlog from "./components/pages/blogs/WriteBlog";
 import UserPage from "./components/pages/users/UserPage";
-import AuthContext from "./context/authContext";
+import UserEditPage from "./components/pages/users/UserEditPage";
 
 library.add(
   // Page Icon
@@ -58,15 +60,15 @@ library.add(
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(true);
-  const history = useNavigate();
+  const [user, setUser] = useState({});
 
   /* TODO when database is done */
-  useEffect (() => {
+  /* useEffect (() => {
     if (!isAuthenticated) {
-      history('/');
+      
     }
     // if is false -> reset user data (remove it or something)
-  }, [isAuthenticated, history]);
+  }, [isAuthenticated]); */
 
   /**
    * Function that stores some paths and their elements that are available
@@ -100,10 +102,9 @@ function App() {
         path: '/users/me',
         element: <UserPage />
       },
-      /*
       {
         path: '/users/me/edit',
-        element: <UserEditPage user={user} />
+        element: <UserEditPage />
       },
       {
         path: '/blogs/new-blog',
@@ -113,7 +114,7 @@ function App() {
         path: '/blogs/edit-blog/:blogId',
         element: <WriteBlog />
       }
-      */
+     
     ];
   }
 
@@ -146,40 +147,42 @@ function App() {
     <div className="App">
       <>
         <AuthContext.Provider value={{isAuthenticated, setIsAuthenticated}}>
-          <Routes>
-            <Route
-              exact
-              path='/'
-              element={
-                <WelcomePage />
+          <UserContext.Provider value={{user, setUser}}>
+            <Routes>
+              <Route
+                exact
+                path='/'
+                element={
+                  <WelcomePage />
+                }
+              />
+
+              {
+                isAuthenticated ? (
+                  pathsWhenLogged.map(({path, element}) => (
+                    <Route
+                      key={path}
+                      path={path}
+                      element={element}
+                    />
+                  ))
+                ) : (
+                  pathsWhenNotLogged.map(({path, element}) => (
+                    <Route
+                      key={path}
+                      path={path}
+                      element={element}
+                    />
+                  ))
+                )
               }
-            />
 
-            {
-              isAuthenticated ? (
-                pathsWhenLogged.map(({path, element}) => (
-                  <Route
-                    key={path}
-                    path={path}
-                    element={element}
-                  />
-                ))
-              ) : (
-                pathsWhenNotLogged.map(({path, element}) => (
-                  <Route
-                    key={path}
-                    path={path}
-                    element={element}
-                  />
-                ))
-              )
-            }
-
-            <Route
-              path='*'
-              element={<NotFoundPage />}
-            />
-          </Routes>
+              <Route
+                path='*'
+                element={<NotFoundPage />}
+              />
+            </Routes>
+          </UserContext.Provider>
         </AuthContext.Provider>
       </>
     </div>

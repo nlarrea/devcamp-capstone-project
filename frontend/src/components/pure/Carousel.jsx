@@ -1,10 +1,12 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
+import AuthContext from '../../context/authContext';
 import { HOME_CONTENT } from '../../models/constants';
 
-const Carousel = ({ isAuthenticated }) => {
+const Carousel = () => {
+    const { isAuthenticated } = useContext(AuthContext);
     const history = useNavigate();
     const [index, setIndex] = useState(0);
     const carouselIndicatorRef = useRef();

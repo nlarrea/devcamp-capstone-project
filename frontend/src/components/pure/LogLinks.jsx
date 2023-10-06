@@ -21,11 +21,17 @@ export const LoginButton = ({ type=TYPES.text }) => {
 };
 
 export const LogoutButton = ({ type=TYPES.textIcon, addClass='' }) => {
+    const history = useNavigate();
     const { setIsAuthenticated } = useContext(AuthContext);
+
+    const handleLogout = () => {
+        setIsAuthenticated(false);
+        history('/')
+    }
 
     return (
         <button
-            onClick={() => setIsAuthenticated(false)}
+            onClick={handleLogout}
             className={`logout-btn ${addClass}`}
         >
             {

@@ -5,8 +5,20 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import NavBar from '../../pure/NavBar';
 import { TYPES } from '../../../models/constants';
 import { LogoutButton } from '../../pure/LogLinks';
+import BlogItem from '../../pure/BlogItem';
 
-const UserPage = ({ user }) => {
+const UserPage = () => {
+    /* Use the useEffect Hook to call the database and bring minimum the first
+    15-20 blogs of this user (infinite scroll to get more blogs) */
+    const user = {};    // remove this
+    const blogsList = [{
+        id: 1,
+        title: 'My blog',
+        text: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Cumque dolorum perferendis hic optio in sunt quis cupiditate laborum? Et, harum laboriosam. Harum veritatis iure qui magni assumenda illo possimus nihil laborum sunt. Architecto vitae dolorum, non rerum, similique dolorem debitis impedit, repellat fugiat asperiores quo nulla ratione numquam labore voluptas.',
+        // text: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Nostrum vitae fuga impedit consectetur, nesciunt ullam error, ipsum corporis praesentium velit modi porro voluptas! Eos, quos!',
+        image: 'https://mdbootstrap.com/img/new/standard/nature/184.webp'
+    }];
+
     return (
         <div id='user-page-wrapper' className='container'>
             <NavBar />
@@ -39,7 +51,11 @@ const UserPage = ({ user }) => {
                 </section>
 
                 <section className='user-blogs-wrapper'>
-                    {/* create blog items first */}
+                    {
+                        blogsList.map(blog => (
+                            <BlogItem key={blog?.id} blog={blog} />
+                        ))
+                    }
                 </section>
             </main>
         </div>
