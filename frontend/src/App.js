@@ -24,7 +24,8 @@ import {
   faPencil
 } from '@fortawesome/free-solid-svg-icons';
 
-import AuthContext, { UserContext } from "./context/authContext";
+import { AuthContext, UserContext } from "./context/authContext";
+import { BlogDataContext } from "./context/blogContext";
 import WelcomePage from "./components/pages/WelcomePage";
 import NotFoundPage from "./components/pages/NotFoundPage";
 import LoginPage from "./components/forms/LoginPage";
@@ -35,6 +36,8 @@ import WriteBlog from "./components/pages/blogs/WriteBlog";
 import UserPage from "./components/pages/users/UserPage";
 import UserEditPage from "./components/pages/users/UserEditPage";
 import NavBar from "./components/pure/NavBar";
+import Carousel from "./components/pure/Carousel";
+import { LogoutButton } from "./components/pure/LogLinks";
 
 library.add(
   // Page Icon

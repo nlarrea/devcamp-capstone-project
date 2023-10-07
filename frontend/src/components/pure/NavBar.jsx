@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { NavLink } from 'react-router-dom';
 
 import avatar from '../../static/images/avatars/male_avatar.svg';
-import AuthContext from '../../context/authContext';
+import { AuthContext } from '../../context/authContext';
 import { TYPES } from '../../models/constants';
 import { LoginButton, LogoutButton } from './LogLinks';
 

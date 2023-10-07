@@ -1,7 +1,12 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { NavLink } from 'react-router-dom';
 
+import { AuthContext } from '../../context/authContext';
+import { TYPES } from '../../models/constants';
+import { LoginButton, LogoutButton } from './LogLinks';
+
 const Footer = () => {
+    const { isAuthenticated } = useContext(AuthContext);
     const getYear = new Date().getUTCFullYear();
 
     return (
@@ -25,7 +30,13 @@ const Footer = () => {
                 </div>
 
                 <div className='link-wrapper'>
-                    <NavLink to='/login'>Login</NavLink>
+                    {
+                        isAuthenticated ? (
+                            <LogoutButton type={TYPES.text} />
+                        ) : (
+                            <LoginButton type={TYPES.text} />
+                        )
+                    }
                 </div>
             </nav>
         </footer>

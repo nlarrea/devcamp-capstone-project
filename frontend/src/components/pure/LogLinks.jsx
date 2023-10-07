@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import AuthContext from '../../context/authContext';
+import { AuthContext } from '../../context/authContext';
 import { TYPES } from '../../models/constants';
 import { DISPLAY_TYPE } from '../../models/constants';
 

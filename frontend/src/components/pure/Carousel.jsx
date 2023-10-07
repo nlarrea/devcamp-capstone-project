@@ -2,7 +2,7 @@ import React, { useState, useRef, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import AuthContext from '../../context/authContext';
+import { AuthContext } from '../../context/authContext';
 import { HOME_CONTENT } from '../../models/constants';
 
 const Carousel = () => {
