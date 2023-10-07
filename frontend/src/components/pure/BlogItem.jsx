@@ -28,7 +28,7 @@ const BlogItem = ({ blog }) => {
                         <FontAwesomeIcon icon='user' />
                     </NavLink> */}
 
-                    <NavLink to={`/blogs/edit-blog/${id}`} className='icon-btn'>
+                    <NavLink to={`/edit-blog/${id}`} className='icon-btn'>
                         <FontAwesomeIcon icon='pencil' />
                     </NavLink>
                 </nav>

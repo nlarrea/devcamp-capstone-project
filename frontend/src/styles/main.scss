@@ -35,7 +35,7 @@ body, .App {
 
 .container {
     max-width: 2000px;
-    min-height: 100vh;
+    min-height: calc(100vh - var.$nav-height);
     margin: 0 auto;
 
     &.nav-page {
@@ -66,6 +66,14 @@ body, .App {
 
 .icon-text-btn {
     @include btn.icon-text-btn();
+}
+
+.text-btn {
+    @include btn.text-btn();
+}
+
+.form-btn {
+    @include btn.form-btn();
 }
 
 

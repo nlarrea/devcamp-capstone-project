@@ -27,7 +27,7 @@ const UserPage = () => {
 
 
                     <nav>
-                        <NavLink className='icon-text-btn' to='/blogs/new-blog'>
+                        <NavLink className='icon-text-btn' to='/new-blog'>
                             <FontAwesomeIcon icon='paper-plane' />
                             <span>Create new blog</span>
                         </NavLink>

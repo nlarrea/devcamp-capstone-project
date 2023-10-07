@@ -108,11 +108,11 @@ function App() {
         element: <UserEditPage />
       },
       {
-        path: '/blogs/new-blog',
+        path: '/new-blog',
         element: <WriteBlog />
       },
       {
-        path: '/blogs/edit-blog/:blogId',
+        path: '/edit-blog/:blogId',
         element: <WriteBlog />
       }
      

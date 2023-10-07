@@ -22,7 +22,7 @@ const NavBar = ({ user }) => {
                 {
                     isAuthenticated && (
                         <div className='link-wrapper'>
-                            <NavLink to='/blogs/new-blog'>New Blog</NavLink>
+                            <NavLink to='/new-blog'>New Blog</NavLink>
                         </div>
                     )
                 }

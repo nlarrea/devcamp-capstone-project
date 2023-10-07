@@ -2,8 +2,6 @@
 @use './buttons' as btn;
 @use './mixins' as mix;
 
-/* BLOG ITEM COMPONENT */
-
 #user-page-wrapper > main {
     section.user-options-wrapper {
         padding: 64px 32px;
@@ -97,18 +95,5 @@
         .blog-items-wrapper {
             @include mix.blog-items-grid();
         }
-    }
-}
-
-
-/* BLOGS LIST PAGE */
-
-#blogs-list-page-wrapper {
-    main.blog-items-wrapper {
-        padding: 32px;
-        
-        @include mix.blog-items-grid(
-            $min-blog-width: 500px
-        );
     }
 }

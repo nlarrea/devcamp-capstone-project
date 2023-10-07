@@ -145,9 +145,10 @@
 }
 
 
-@mixin form-btn($bg-color) {
+@mixin form-btn($bg-color: var.$blue) {
     width: 100px;
     height: 36px;
+    padding: 0 16px;
 
     border: none;
     border-radius: 5px;

@@ -1,7 +1,11 @@
 @use './variables' as var;
 @use './buttons' as btn;
+@use './mixins' as mix;
+
+/* BLOG ITEM COMPONENT */
 
 .blog-item-wrapper {
+    width: 100%;
     height: 300px;
 
     text-decoration: none;
@@ -68,8 +72,8 @@
 
         nav {
             position: absolute;
-            bottom: 8px;
-            right: 8px;
+            bottom: 12px;
+            right: 12px;
 
             display: flex;
             align-items: center;
@@ -85,6 +89,52 @@
                     $border-color: var.$gold
                 );
             }
+        }
+    }
+}
+
+
+/* BLOGS LIST PAGE */
+
+#blogs-list-page-wrapper {
+    main.blog-items-wrapper {
+        padding: 32px;
+        
+        @include mix.blog-items-grid(
+            $min-blog-width: 500px
+        );
+    }
+}
+
+
+/* WRITE BLOG PAGE */
+
+#write-blog-page-wrapper {
+    nav {
+        width: 100vw;
+        margin-top: 32px;
+        
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+
+        a {
+            color: var.$charcoal;
+
+            &:hover, &:focus {
+                color: var.$warning;
+                outline: none;
+            }
+        }
+
+        .form-btn {
+            @include btn.form-btn(
+                $bg-color: var.$accept
+            );
+
+            width: fit-content;
+            text-transform: capitalize;
         }
     }
 }

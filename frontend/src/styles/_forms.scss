@@ -120,7 +120,6 @@
             button {
                 @include btn.form-btn($bg-color: var.$blue);
                 width: fit-content;
-                padding: 0 16px;
             }
         }
     }

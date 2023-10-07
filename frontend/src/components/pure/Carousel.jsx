@@ -36,7 +36,7 @@ const Carousel = () => {
         if (!isAuthenticated) {
             history('/login');
         } else {
-            history('/blogs/new-blog')
+            history('/new-blog')
         }
     }
 
