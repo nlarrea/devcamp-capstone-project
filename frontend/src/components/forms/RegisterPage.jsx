@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from 'axios';
 
 import registerImg from '../../static/images/forms/register.svg';
+import { checkUsername, checkPasswords } from '../../models/auxFunctions';
 
 const RegisterPage = () => {
     const history = useNavigate();
@@ -21,62 +22,21 @@ const RegisterPage = () => {
     const [viewPass1, setViewPass1] = useState(false);
     const [viewPass2, setViewPass2] = useState(false);
 
-
-    const checkUsername = () => {
-        const forbiddenChars = /[@#$%^&*()=+,]/g
-        if (userRef.current.value.length < 6) {
-            setUserError(true);
-            setUserErrorMsg('Username must be at least 6 characters.');
-            return false;
-        } else if (userRef.current.value.length > 30) {
-            setUserError(true);
-            setUserErrorMsg('Username must be less than 30 characters.');
-            return false;
-        } else if (forbiddenChars.test(userRef.current.value)) {
-            setUserError(true);
-            setUserErrorMsg('Valid special characters: ".", "-", "_"');
-            return false;
-        }
-
-        return true;
-    }
-
-    const checkPasswords = () => {
-        const passRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[,.*_&])[A-z\d,.*_&]{8,}$/;
-        const hasUpper = /(?=.*[A-Z]{1,})/.test(pass1Ref.current.value);
-        const hasLower = /(?=.*[a-z]{1,})/.test(pass1Ref.current.value);
-        const hasNumber = /(?=.*\d){1,}/.test(pass1Ref.current.value);
-        const hasSpecial = /(?=.*[.,*_&])/.test(pass1Ref.current.value);
-
-        if (pass1Ref.current.value !== pass2Ref.current.value) {
-            setPassError(true);
-            setPassErrorMsg('Both passwords must be equals.');
-            return false;
-        } else if (pass1Ref.current.value.length < 8) {
-            setPassError(true);
-            setPassErrorMsg('Password must be at least 8 characters.');
-            return false;
-        } else if (!passRegex.test(pass1Ref.current.value)) {
-            setPassError(true);
-            setPassErrorMsg('Password doesn\'t meet the conditions.');
-            alert(
-                `Password must include at least:\n\
-                - 1 upper char ${hasUpper ? '' : ' - (Not inserted)'}\n\
-                - 1 lower char ${hasLower ? '' : ' - (Not inserted)'}\n\
-                - 1 numeric char ${hasNumber ? '' : ' - (Not inserted)'}\n\
-                - One of these: . , * _ & ${hasSpecial ? '' : ' - (Not inserted)'}`
-            );
-            return false;
-        }
-
-        return true;
-    }
-
     const handleSubmit = (event) => {
         event.preventDefault();
 
-        const correctUser = checkUsername();
-        const correctPassword = checkPasswords();
+        const correctUser = checkUsername(
+            userRef.current.value,
+            setUserError,
+            setUserErrorMsg
+        );
+        
+        const correctPassword = checkPasswords(
+            pass1Ref.current.value,
+            pass2Ref.current.value,
+            setPassError,
+            setPassErrorMsg
+        );
 
         if (correctUser && correctPassword) {
             const newUser = {
