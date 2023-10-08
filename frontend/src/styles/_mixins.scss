@@ -34,8 +34,13 @@
 
         transition: border 0.3s;
 
+        
         &:hover, &:focus {
             border-color: $highlight-color;
+        }
+        
+        &.input-error {
+            border-color: var.$warning;
         }
 
         /* placeholder notes:
@@ -79,6 +84,14 @@
         transition: 0.5s;
     }
 
+    .icon-btn {
+        pointer-events: all;
+
+        &:hover {
+            cursor: pointer;
+        }
+    }
+
     .input-field:hover + .input-label,
     .input-field:focus + .input-label,
     .input-field:not(:placeholder-shown) + .input-label {
@@ -92,6 +105,15 @@
     .input-field:hover + .input-label + .input-icon,
     .input-field:focus + .input-label + .input-icon {
         color: rgba($color, 0.7);
+    }
+
+    span.error-message {
+        color: var.$warning;
+        font-size: 0.7rem;
+
+        position: absolute;
+        bottom: -16px;
+        left: 16px;
     }
 }
 

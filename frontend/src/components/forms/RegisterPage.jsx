@@ -4,7 +4,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from 'axios';
 
 import registerImg from '../../static/images/forms/register.svg';
-import { checkUsername, checkPasswords } from '../../models/auxFunctions';
+import { checkUsername, checkPasswords, passCharConditions } from '../../models/auxFunctions';
+import PasswordCharTest from '../pure/PasswordCharTest';
 
 const RegisterPage = () => {
     const history = useNavigate();
@@ -12,8 +13,12 @@ const RegisterPage = () => {
     const [userErrorMsg, setUserErrorMsg] = useState('');
     const userRef = useRef();
 
-    const [passError, setPassError] = useState(false);
-    const [passErrorMsg, setPassErrorMsg] = useState('');
+    const [pass1Error, setPass1Error] = useState(false);
+    const [pass1ErrorMsg, setPass1ErrorMsg] = useState('');
+    const [pass2Error, setPass2Error] = useState(false);
+    const [pass2ErrorMsg, setPass2ErrorMsg] = useState('');
+    const [charConditions, setCharConditions] = useState();
+
     const pass1Ref = useRef();
     const pass2Ref = useRef();
 
@@ -22,53 +27,50 @@ const RegisterPage = () => {
     const [viewPass1, setViewPass1] = useState(false);
     const [viewPass2, setViewPass2] = useState(false);
 
+
+    const handlePassChange = () => {
+        checkPasswords(
+            pass1Ref.current.value,
+            pass2Ref.current.value,
+            setPass1Error,
+            setPass1ErrorMsg,
+            setPass2Error,
+            setPass2ErrorMsg
+        );
+
+        // Check if password has at least one of the char types
+        const newConditions = passCharConditions(
+            pass1Ref.current.value,
+            setPass1Error,
+            setPass1ErrorMsg
+        );
+        setCharConditions(newConditions);
+    }
+
+
     const handleSubmit = (event) => {
         event.preventDefault();
 
-        const correctUser = checkUsername(
-            userRef.current.value,
-            setUserError,
-            setUserErrorMsg
-        );
-        
-        const correctPassword = checkPasswords(
-            pass1Ref.current.value,
-            pass2Ref.current.value,
-            setPassError,
-            setPassErrorMsg
-        );
-
-        if (correctUser && correctPassword) {
-            const newUser = {
-                username: userRef.current.value,
-                email: emailRef.current.value,
-                password: pass1Ref.current.value
-            };
-
-            axios.post(
-                'http://127.0.0.1:8000/register',
-                newUser,
-                // { withCredentials: true }
-            ).then(response => {
-                console.log(response.data);
-            }).catch(error => {
-                console.log(error);
-            });
+        // create an emailError ??
+        if (userError || pass1Error || pass2Error) {
+            return;
         }
-    }
 
-    // Reset values
-    const handleChange = (inputId) => {
-        if (inputId === 'register-username') {
-            setUserError(false);
-            setUserErrorMsg('');
-        } else if (
-            inputId === 'register-password' ||
-            inputId === 'register-password-2'
-        ) {
-            setPassError(false);
-            setPassErrorMsg('');
-        }
+        const newUser = {
+            username: userRef.current.value,
+            email: emailRef.current.value,
+            password: pass1Ref.current.value
+        };
+
+        axios.post(
+            'http://127.0.0.1:8000/register',
+            newUser,
+            // { withCredentials: true }
+        ).then(response => {
+            console.log(response.data);
+        }).catch(error => {
+            console.log(error);
+        });
     }
 
 
@@ -91,7 +93,11 @@ const RegisterPage = () => {
                             id='register-username'
                             className={`input-field ${userError ? 'input-error' : ''}`}
                             ref={userRef}
-                            onChange={() => handleChange(userRef.current.id)}
+                            onChange={() => checkUsername(
+                                userRef.current.value,
+                                setUserError,
+                                setUserErrorMsg
+                            )}
                             placeholder='YourUsername'
                             required
                             type="text"
@@ -118,12 +124,12 @@ const RegisterPage = () => {
                         <FontAwesomeIcon icon='at' className='input-icon' fixedWidth />
                     </div>
 
-                    <div className='input-label-wrapper'>
+                    <div className='input-label-wrapper' id='password-wrapper'>
                         <input
                             id='register-password'
-                            className={`input-field ${passError ? 'input-error' : ''}`}
+                            className={`input-field ${pass1Error ? 'input-error' : ''}`}
                             ref={pass1Ref}
-                            onChange={() => handleChange(pass1Ref.current.id)}
+                            onChange={handlePassChange}
                             placeholder='123_abCD'
                             required
                             type={viewPass1 ? 'text' : "password"}
@@ -148,15 +154,15 @@ const RegisterPage = () => {
                                 />
                             )
                         }
-                        {passErrorMsg && <span className='error-message'>{passErrorMsg}</span>}
+                        {pass1ErrorMsg && <span className='error-message'>{pass1ErrorMsg}</span>}
                     </div>
 
                     <div className='input-label-wrapper'>
                         <input
                             id='register-password-2'
-                            className={`input-field ${passError ? 'input-error' : ''}`}
+                            className={`input-field ${pass2Error ? 'input-error' : ''}`}
                             ref={pass2Ref}
-                            onChange={() => handleChange(pass1Ref.current.id)}
+                            onChange={handlePassChange}
                             placeholder='123_abCD'
                             required
                             type={viewPass2 ? 'text' : "password"}
@@ -181,8 +187,15 @@ const RegisterPage = () => {
                                 />
                             )
                         }
-                        {passErrorMsg && <span className='error-message'>{passErrorMsg}</span>}
+                        {pass2ErrorMsg && <span className='error-message'>{pass2ErrorMsg}</span>}
                     </div>
+
+                    <PasswordCharTest
+                        hasUpper={charConditions.hasUpper || false}
+                        hasLower={charConditions.hasLower || false}
+                        hasNumber={charConditions.hasNumber || false}
+                        hasSpecial={charConditions.hasSpecial || false}
+                    />
 
                     <nav>
                         <p>
