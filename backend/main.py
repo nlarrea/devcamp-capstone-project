@@ -1,19 +1,33 @@
 from fastapi import FastAPI
-from routers import users_auth
+from fastapi.middleware.cors import CORSMiddleware
+from routers import users_auth_db
+
+# SQLite tutorial (Python, FastAPI and React connection)
+# https://www.youtube.com/watch?v=0zb2kohYZIM
+#
+# PostgreSQL with FastAPI documentation
+# https://medium.com/@arturocuicas/fastapi-with-postgresql-part-1-70a3960fb6ee
+#
+# User registration (FastAPI & React)
+# https://www.youtube.com/watch?v=O61aRPSuemE
 
 app = FastAPI()
 
+origins = ["*"]
+
 # Routers
-app.include_router(users_auth.router)
+app.include_router(users_auth_db.router)
 
-@app.middleware("http")
-async def add_cors_header(request, call_next):
-    response = await call_next(request)
-    response.headers["Access-Control-Allow-Origin"] = request.headers.get("Origin", "*")
-    response.headers["Access-Control-Allow-Credentials"] = "true"
-    return response
+app.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+        expose_headers=["*"]
+)
 
 
-@app.get("/")
+@app.get("/register")
 async def root():
     return "something"
