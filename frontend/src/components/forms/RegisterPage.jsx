@@ -6,9 +6,12 @@ import axios from 'axios';
 import registerImg from '../../static/images/forms/register.svg';
 import { checkUsername, checkPasswords, passCharConditions } from '../../models/auxFunctions';
 import PasswordCharTest from '../pure/PasswordCharTest';
+import { useHttp } from '../../hooks/useHttp';
 
 const RegisterPage = () => {
     const history = useNavigate();
+    const { isLoading, error, data, sendRequest } = useHttp();
+
     const [userError, setUserError] = useState(false);
     const [userErrorMsg, setUserErrorMsg] = useState('');
     const userRef = useRef();
@@ -71,7 +74,13 @@ const RegisterPage = () => {
         }).catch(error => {
             console.log(error);
         });
-    }
+
+        /* sendRequest(
+            'http://127.0.0.1:8000/register',
+            'POST',
+            newUser
+        ); */
+    };
 
 
     return (
@@ -191,10 +200,10 @@ const RegisterPage = () => {
                     </div>
 
                     <PasswordCharTest
-                        hasUpper={charConditions.hasUpper || false}
-                        hasLower={charConditions.hasLower || false}
-                        hasNumber={charConditions.hasNumber || false}
-                        hasSpecial={charConditions.hasSpecial || false}
+                        hasUpper={charConditions?.hasUpper || false}
+                        hasLower={charConditions?.hasLower || false}
+                        hasNumber={charConditions?.hasNumber || false}
+                        hasSpecial={charConditions?.hasSpecial || false}
                     />
 
                     <nav>

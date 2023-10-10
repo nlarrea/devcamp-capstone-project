@@ -3,9 +3,24 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import loginImg from '../../static/images/forms/login.svg';
+import useToken from '../../hooks/useToken';
 
 const LoginPage = () => {
     const history = useNavigate();
+    const { token, saveToken } = useToken();
+
+    const login = (email, password) => {
+        // petición a la API ??
+    }
+
+    const handleLogin = async (email, password) => {
+        try {
+            const newToken = await login(email, password);
+            saveToken(newToken);
+        } catch (error) {
+            console.error('Login failed:', error.message);
+        }
+    }
 
     return (
         <div id='login-page-wrapper' className='container'>
@@ -14,7 +29,7 @@ const LoginPage = () => {
             </section>
 
             <section>
-                <form>
+                <form onSubmit={handleLogin}>
                     <button className='icon-button go-back-button' onClick={() => history('/')}>
                         <FontAwesomeIcon icon='chevron-left' fixedWidth />
                         Go Back
