@@ -1,37 +1,51 @@
-import React, { useRef, useState } from 'react';
+import React, { useContext, useRef, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from 'axios';
 
+import { AuthContext, UserContext } from '../../context/authContext';
 import registerImg from '../../static/images/forms/register.svg';
 import { checkUsername, checkPasswords, passCharConditions } from '../../models/auxFunctions';
 import PasswordCharTest from '../pure/PasswordCharTest';
-import { useHttp } from '../../hooks/useHttp';
 
 const RegisterPage = () => {
+    // History and contexts
     const history = useNavigate();
-    const { isLoading, error, data, sendRequest } = useHttp();
+    const { setIsAuthenticated } = useContext(AuthContext);
+    const { setUser } = useContext(UserContext);
 
+    // Error states
     const [userError, setUserError] = useState(false);
     const [userErrorMsg, setUserErrorMsg] = useState('');
-    const userRef = useRef();
 
+    const [emailError, setEmailError] = useState(false);
+    const [emailErrorMsg, setEmailErrorMsg] = useState('');
+    
     const [pass1Error, setPass1Error] = useState(false);
     const [pass1ErrorMsg, setPass1ErrorMsg] = useState('');
     const [pass2Error, setPass2Error] = useState(false);
     const [pass2ErrorMsg, setPass2ErrorMsg] = useState('');
-    const [charConditions, setCharConditions] = useState();
-
+    
+    // Refs
+    const userRef = useRef();
+    const emailRef = useRef();
     const pass1Ref = useRef();
     const pass2Ref = useRef();
-
-    const emailRef = useRef();
-
+    
+    // Other states
+    const [charConditions, setCharConditions] = useState();
     const [viewPass1, setViewPass1] = useState(false);
     const [viewPass2, setViewPass2] = useState(false);
 
 
+    const resetEmailErrors = () => {
+        setEmailError(false);
+        setEmailErrorMsg('');
+    }
+
+
     const handlePassChange = () => {
+        // Check both's lengths and if they're equals
         checkPasswords(
             pass1Ref.current.value,
             pass2Ref.current.value,
@@ -67,19 +81,32 @@ const RegisterPage = () => {
 
         axios.post(
             'http://127.0.0.1:8000/register',
-            newUser,
-            // { withCredentials: true }
+            newUser
         ).then(response => {
-            console.log(response.data);
+            // Check if data is correct
+            // console.log(response.data);
+
+            // Login the user with the given credentials
+            setIsAuthenticated(true);
+            const userDb = response.data;
+            setUser(userDb);
+            history('/');
         }).catch(error => {
             console.log(error);
-        });
 
-        /* sendRequest(
-            'http://127.0.0.1:8000/register',
-            'POST',
-            newUser
-        ); */
+            const errorType = error.response.data.detail.type;
+            const errorMsg = error.response.data.detail.message;
+
+            if (errorType === 'username') {
+                setUserError(true);
+                setUserErrorMsg(errorMsg);
+            }
+
+            if (errorType === 'email') {
+                setEmailError(true);
+                setEmailErrorMsg(errorMsg);
+            }
+        });
     };
 
 
@@ -121,8 +148,9 @@ const RegisterPage = () => {
                     <div className='input-label-wrapper'>
                         <input
                             id='register-email'
-                            className='input-field'
+                            className={`input-field ${emailError ? 'input-error' : ''}`}
                             ref={emailRef}
+                            onChange={resetEmailErrors}
                             placeholder='your_email@example.com'
                             required
                             type="email"
@@ -131,6 +159,7 @@ const RegisterPage = () => {
                             Email
                         </label>
                         <FontAwesomeIcon icon='at' className='input-icon' fixedWidth />
+                        {emailErrorMsg && <span className='error-message'>{emailErrorMsg}</span>}
                     </div>
 
                     <div className='input-label-wrapper' id='password-wrapper'>

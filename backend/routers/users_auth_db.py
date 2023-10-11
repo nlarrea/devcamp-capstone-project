@@ -1,6 +1,5 @@
 import os
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import jwt, JWTError
 from passlib.context import CryptContext
@@ -26,10 +25,21 @@ crypt = CryptContext(schemes=["bcrypt"])
 
 @router.post("/register", response_model=User, status_code=status.HTTP_201_CREATED)
 async def user(user: UserDB):
-    if type(search_user("username", user.username)) == User or type(search_user("email", user.email)) == User:
+    if type(search_user("username", user.username)) == User:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="The user already exists!"
+            detail={
+                "type": "username",
+                "message": "This username already exists!"
+            }
+        )
+    elif type(search_user("email", user.email)) == User:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={
+                "type": "email",
+                "message": "This email already exists!"
+            }
         )
 
     # Hash the password
