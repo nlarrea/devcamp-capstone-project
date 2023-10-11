@@ -13,7 +13,10 @@ from routers import users_auth_db
 
 app = FastAPI()
 
-origins = ["*"]
+origins = [
+    "http://localhost:3000",
+    "localhost:3000"
+]
 
 # Routers
 app.include_router(users_auth_db.router)
@@ -24,10 +27,4 @@ app.add_middleware(
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
-        expose_headers=["*"]
 )
-
-
-@app.get("/register")
-async def root():
-    return "something"

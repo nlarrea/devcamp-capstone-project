@@ -3,7 +3,7 @@
 import os
 import psycopg2
 import psycopg2.extras
-from db.models.user import User
+from db.models.user import User, UserDB
 
 # Get the database connection details from environment variables
 db_host = os.environ.get("DB_HOST")
@@ -13,7 +13,7 @@ db_user = os.environ.get("DB_USER")
 db_password = os.environ.get("DB_PASSWORD")
 
 
-def get_users():
+def get_all_users():
     # Connect to the database
     conn = psycopg2.connect(
         host=db_host,
@@ -40,7 +40,10 @@ def get_users():
     return results
 
 
-def find_user(username):
+def find_user(table_field: str, value) -> dict | None:
+    """ Receives a field and the value of the received field and returns the
+     database info if it finds the data on it. """
+    
     # Connect to the database
     conn = psycopg2.connect(
         host=db_host,
@@ -54,23 +57,24 @@ def find_user(username):
     cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
     # Execute a query
-    cur.execute("SELECT * FROM users")
-    for record in cur.fetchall():
-        if record["users_username"] == username:
-            result = User(**record)
-            break
-    else:
-        result = None
+    cur.execute(f"SELECT * FROM users WHERE users_{table_field} = '{value}'")
+    record = cur.fetchone()
 
     # Close the cursor and connection
     cur.close()
     conn.close()
 
     # Return the result
-    return result
+    if record:
+        return dict(record)
+    
+    return None
 
 
-def create_user(username, email, password):
+def create_user(user: UserDB):
+    """ Connects to the database and creates a new record (user) with the
+     received data. """
+    
     # Connect to the database
     conn = psycopg2.connect(
         host=db_host,
@@ -85,8 +89,8 @@ def create_user(username, email, password):
 
     # Insert the user into the database
     cur.execute(
-        "INSERT INTO users (username, email, password) VALUES (%s, %s, %s)",
-        (username, email, password)
+        "INSERT INTO users (users_username, users_email, users_password) VALUES (%s, %s, %s)",
+        (user["username"], user["email"], user["password"])
     )
     conn.commit()
 
