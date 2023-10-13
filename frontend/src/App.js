@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
+import axios from "axios";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import {
   // Page Icon
@@ -37,6 +38,7 @@ import WriteBlog from "./components/pages/blogs/WriteBlog";
 import UserPage from "./components/pages/users/UserPage";
 import UserEditPage from "./components/pages/users/UserEditPage";
 import NavBar from "./components/pure/NavBar";
+import useToken from "./hooks/useToken";
 
 library.add(
   // Page Icon
@@ -66,14 +68,31 @@ library.add(
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState({});
+  const { token } = useToken();
 
   /* TODO when database is done */
-  /* useEffect (() => {
-    if (!isAuthenticated) {
-      
+  useEffect (() => {
+    const login = () => {
+      axios.get(
+        'http://127.0.0.1:8000/users/me', {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      ).then(response => {
+        setIsAuthenticated(true);
+        setUser(response.data);
+      }).catch(error => {
+        console.error(error);
+      })
     }
-    // if is false -> reset user data (remove it or something)
-  }, [isAuthenticated]); */
+
+    const storedToken = localStorage.getItem('token');
+    if (storedToken) {
+      login();
+    } else {
+      setIsAuthenticated(false);
+      setUser({});
+    }
+  }, [token, setIsAuthenticated, setUser]);
 
   /**
    * Function that stores some paths and their elements that are available
