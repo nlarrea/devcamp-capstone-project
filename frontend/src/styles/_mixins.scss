@@ -1,6 +1,12 @@
 @use './variables' as var;
 
-@mixin input-icon-label($bg-color, $border-color, $highlight-color, $placeholder-color, $color) {
+@mixin input-icon-label(
+    $color: var.$charcoal,
+    $bg-color: var.$light-grey,
+    $placeholder-color: var.$grey,
+    $highlight-color: var.$blue,
+    $border-color: var.$lapis-lazuli
+) {
     width: fit-content;
     height: fit-content;
 

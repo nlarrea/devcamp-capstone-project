@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState } from 'react';
+import React, { useContext, useRef, useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from 'axios';
@@ -8,12 +8,16 @@ import registerImg from '../../static/images/forms/register.svg';
 import { checkUsername, checkPasswords, passCharConditions } from '../../models/auxFunctions';
 import PasswordCharTest from '../pure/PasswordCharTest';
 import avatar from '../../static/images/avatars/user_avatar.svg';
+import useToken from '../../hooks/useToken';
 
 const RegisterPage = () => {
     // History and contexts
     const history = useNavigate();
     const { setIsAuthenticated } = useContext(AuthContext);
-    const { setUser } = useContext(UserContext);
+    const { user, setUser } = useContext(UserContext);
+    const { token, saveToken } = useToken();
+    const [isLoading, setIsLoading] = useState(false);
+
 
     // Error states
     const [userError, setUserError] = useState(false);
@@ -66,36 +70,17 @@ const RegisterPage = () => {
     }
 
 
-    const handleSubmit = (event) => {
-        event.preventDefault();
-
-        // create an emailError ??
-        if (userError || pass1Error || pass2Error) {
-            return;
-        }
-
-        const newUser = {
-            username: userRef.current.value,
-            email: emailRef.current.value,
-            password: pass1Ref.current.value,
-            image: avatar
-        };
-
-        axios.post(
-            'http://127.0.0.1:8000/register',
+    const createUser = async (newUser) => {
+        return await axios.post(
+            'http://127.0.0.1:8000/users/register',
             newUser
         ).then(response => {
             // Check if data is correct
             // console.log(response.data);
 
-            // Login the user with the given credentials
-            setIsAuthenticated(true);
-            const userDb = response.data;
-            setUser(userDb);
-            history('/');
+            // Return user's information
+            return Promise.resolve(response.data);
         }).catch(error => {
-            console.error(error);
-
             const errorType = error.response.data.detail.type;
             const errorMsg = error.response.data.detail.message;
 
@@ -108,9 +93,63 @@ const RegisterPage = () => {
                 setEmailError(true);
                 setEmailErrorMsg(errorMsg);
             }
-        });
-    };
 
+            return Promise.reject(error);
+        });
+    }
+
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+
+        if (userError || pass1Error || pass2Error) {
+            return;
+        }
+
+        setIsLoading(true);
+
+        // Set new user to database
+        const newUser = {
+            username: userRef.current.value,
+            email: emailRef.current.value,
+            password: pass1Ref.current.value,
+            image: avatar
+        };
+
+        const data = await createUser(newUser).then(data => {
+            return data;
+        }).catch(error => {
+            console.error('Create user error:', error);
+        });
+
+        if (!data) {
+            setIsLoading(false);
+            return
+        };
+
+        // Get and save new user's token
+        const loginUser = {
+            email: newUser.email,
+            password: newUser.password
+        }
+
+        axios.post(
+            'http://127.0.0.1:8000/users/login',
+            loginUser
+        ).then(response => {
+            // Login the user
+            setUser(data);
+            setIsAuthenticated(true);
+            // Save access token to localStorage
+            saveToken(response.data.access_token);
+            // Go to app's home page
+            history('/');
+        }).catch(error => {
+            console.error('Get token error:', error);
+        })
+
+        setIsLoading(false);
+    };
 
     return (
         <div id='register-page-wrapper' className='container'>
@@ -138,6 +177,7 @@ const RegisterPage = () => {
                             )}
                             placeholder='YourUsername'
                             required
+                            spellCheck={false}
                             type="text"
                         />
                         <label htmlFor='register-username' className='input-label'>
@@ -155,6 +195,7 @@ const RegisterPage = () => {
                             onChange={resetEmailErrors}
                             placeholder='your_email@example.com'
                             required
+                            spellCheck={false}
                             type="email"
                         />
                         <label htmlFor='register-email' className='input-label'>
@@ -242,7 +283,17 @@ const RegisterPage = () => {
                             Have an account? <NavLink to='/login'>Login</NavLink>
                         </p>
 
-                        <button type='submit'>Register</button>
+                        <button type='submit'>
+                            {
+                                isLoading ? (
+                                    <FontAwesomeIcon icon='spinner' fixedWidth spin />
+                                ) : (
+                                    <>
+                                        Register
+                                    </>
+                                )
+                            }
+                        </button>
                     </nav>
                 </form>
             </section>

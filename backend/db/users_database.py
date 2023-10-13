@@ -1,8 +1,7 @@
-# CÓDIGO DE EJEMPLO sobre cómo conectar con la base de datos
-
 import os
 import psycopg2
 import psycopg2.extras
+
 from db.models.user import User, UserDB
 
 # Get the database connection details from environment variables
@@ -27,7 +26,7 @@ def get_all_users():
     cur = conn.cursor()
 
     # Execute a query
-    cur.execute("SELECT * FROM users")
+    cur.execute("SELECT * FROM users LIMIT 10")
 
     # Fetch the results
     results = cur.fetchall()

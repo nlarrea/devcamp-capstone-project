@@ -111,7 +111,8 @@
 
 
 @media (max-width: calc(500px * 2)) {
-    nav#navbar-component-wrapper {
+    nav#navbar-component-wrapper:has(+ #login-page-wrapper),
+    nav#navbar-component-wrapper:has(+ #register-page-wrapper) {
         display: none;
     }
 

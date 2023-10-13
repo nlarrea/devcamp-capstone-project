@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 from db.models.user import User, UserDB
 from db.models.form import LoginForm
 from db.schemas.user import user_schema, users_schema
-from db.database import get_all_users, create_user, find_user
+from db.users_database import get_all_users, create_user, find_user
 
 
 ALGORITHM = "HS256"
@@ -16,7 +16,10 @@ ACCESS_TOKEN_DURATION = 3   # 3 hours
 SECRET = os.environ.get("SECRET")
 
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/users",
+    tags=["Users"]
+)
 oauth2_login = OAuth2PasswordBearer(tokenUrl="login")
 crypt = CryptContext(schemes=["bcrypt"])
 
@@ -45,7 +48,7 @@ def search_user_db(field: str, key):
 async def auth_user(token: str = Depends(oauth2_login)):
     exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Not valid credentials.",
+        detail="Not valid credentials!",
         headers={"WWW-Authenticate": "Bearer"}
     )
 
@@ -58,7 +61,7 @@ async def auth_user(token: str = Depends(oauth2_login)):
         
     except JWTError:
         raise exception
-    
+
     return search_user("username", username)
 
 
@@ -140,6 +143,6 @@ async def login(form: LoginForm):
 
 
 # Get current user -> GET
-@router.get("/users/me")
+@router.get("/me")
 async def me(user: User = Depends(auth_user)):
     return user

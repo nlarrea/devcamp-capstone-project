@@ -78,13 +78,7 @@ body, .App {
 
 
 div.input-label-wrapper {
-    @include mix.input-icon-label(
-        $bg-color: var.$light-grey,
-        $color: var.$charcoal,
-        $placeholder-color: var.$grey,
-        $highlight-color: var.$blue,
-        $border-color: var.$lapis-lazuli
-    );
+    @include mix.input-icon-label();
 }
 
 

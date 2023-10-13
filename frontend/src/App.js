@@ -70,12 +70,12 @@ function App() {
   const [user, setUser] = useState({});
   const { token } = useToken();
 
-  /* TODO when database is done */
+
   useEffect (() => {
     const login = () => {
       axios.get(
         'http://127.0.0.1:8000/users/me', {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${storedToken}` }
         }
       ).then(response => {
         setIsAuthenticated(true);
@@ -92,7 +92,8 @@ function App() {
       setIsAuthenticated(false);
       setUser({});
     }
-  }, [token, setIsAuthenticated, setUser]);
+  }, []);
+
 
   /**
    * Function that stores some paths and their elements that are available

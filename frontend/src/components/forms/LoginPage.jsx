@@ -40,7 +40,7 @@ const LoginPage = () => {
 
         // Get access token
         await axios.post(
-            'http://127.0.0.1:8000/login',
+            'http://127.0.0.1:8000/users/login',
             loginUser
         ).then(response => {
             // Check if data is correct
