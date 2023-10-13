@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { NavLink } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from 'axios';
@@ -11,8 +11,12 @@ const UserPage = ({ user }) => {
     /* Use the useEffect Hook to call the database and bring minimum the first
     15-20 blogs of this user (infinite scroll to get more blogs) */
     const [blogsList, setBlogsList] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
 
-    useEffect (() => {
+
+    const getUsersBlogs = useCallback(() => {
+        setIsLoading(true);
+
         axios.get(
             `http://127.0.0.1:8000/blogs/${user.id}`
         ).then(response => {
@@ -21,7 +25,30 @@ const UserPage = ({ user }) => {
         }).catch(error => {
             console.error('Error getting user blogs:', error);
         });
-    }, []);
+
+        setIsLoading(false);
+    }, [user.id]);
+
+    useEffect (() => {
+        getUsersBlogs();
+    }, [getUsersBlogs]);
+
+
+    const handleDeleteBlog = (blogId) => {
+        setIsLoading(true);
+
+        axios.delete(
+            `http://127.0.0.1:8000/blogs/remove-blog/${blogId}`
+        ).then(response => {
+            // console.log(response);
+            getUsersBlogs();
+        }).catch(error => {
+            console.error(error);
+        });
+
+        setIsLoading(false);
+    }
+    
 
     return (
         <div id='user-page-wrapper' className='container'>
@@ -59,14 +86,22 @@ const UserPage = ({ user }) => {
 
                     <div className='blog-items-wrapper'>
                         {
-                            blogsList.length > 0 ? (
-                                blogsList.map(blog => (
-                                    <BlogItem key={blog?.id} blog={blog} />
-                                ))
+                            isLoading ? (
+                                <FontAwesomeIcon icon='spinner' fixedWidth spin />
                             ) : (
-                                <p className='no-blogs-message'>
-                                    You haven't written any Blog yet!
-                                </p>
+                                blogsList.length > 0 ? (
+                                    blogsList.map(blog => (
+                                        <BlogItem
+                                            key={blog?.id}
+                                            blog={blog}
+                                            handleDeleteBlog={handleDeleteBlog}
+                                        />
+                                    ))
+                                ) : (
+                                    <p className='no-blogs-message'>
+                                        You haven't written any Blog yet!
+                                    </p>
+                                )
                             )
                         }
                     </div>

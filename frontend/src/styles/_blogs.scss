@@ -61,7 +61,7 @@
             overflow: hidden;
         }
 
-        p {
+        div.blogItem-content {
             display: -webkit-box;
             width: 100%;
             -webkit-line-clamp: 8;
@@ -88,6 +88,20 @@
                     $hover-text-color: var.$gold,
                     $border-color: var.$gold
                 );
+            }
+
+            .icon-btn.remove-blog-btn {
+                @include btn.icon-btn(
+                    $color: var.$charcoal,
+                    $bg-color: transparent,
+                    $hover-bg-color: transparent,
+                    $hover-text-color: var.$warning,
+                    $border-color: transparent
+                );
+
+                svg {
+                    font-size: 1rem;
+                }
             }
         }
     }

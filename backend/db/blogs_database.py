@@ -78,7 +78,7 @@ def find_users_blogs(user_id: int) -> list:
     # Create a cursor object
     cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-    cur.execute(f"SELECT * FROM blogs WHERE blogs_users_id = {user_id}")
+    cur.execute(f"SELECT * FROM blogs WHERE blogs_users_id = {user_id} ORDER BY blogs_id DESC")
     results = cur.fetchall()
 
     cur.close()
@@ -140,5 +140,28 @@ def update_blog(blog: Blog, blog_id: int):
     conn.commit()
 
     # CLose the cursor and connection
+    cur.close()
+    conn.close()
+
+
+def delete_blog(blog_id: int):
+    # Connect to the database
+    conn = psycopg2.connect(
+        host=db_host,
+        port=db_port,
+        database=db_name,
+        user=db_user,
+        password=db_password,
+        sslmode="require"
+    )
+    # Create a cursor object
+    cur = conn.cursor()
+
+    cur.execute(
+        f"DELETE FROM blogs WHERE blogs_id = {blog_id}"
+    )
+    conn.commit()
+
+    # Close the cursor and connection
     cur.close()
     conn.close()

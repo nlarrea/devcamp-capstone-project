@@ -20,28 +20,41 @@ const WriteBlog = () => {
 
 
     const getBlogData = React.useCallback(() => {
-        const path = location.pathname;
-        console.log(path);
+        const currentPath = location.pathname;
+        let route;
+        const routesMatching = matchRoutes(
+            [{ path: '/edit-blog/:blogId' }],
+            currentPath
+        );
 
-        if (matchRoutes(['/edit-blog/:blogId'], path) === null) {
-            console.log('matches route');
+        if (routesMatching === null) {
+            route = undefined;
+        } else {
+            [{ route }] = routesMatching;
+        }
+
+        if (route) {
             axios.get(
                 `http://127.0.0.1:8000/blogs/single-blog/${blogId}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 }
             ).then(response => {
-                console.log(response.data);
+                // console.log(response.data);
 
                 setBlogData(response.data);
             }).catch(error => {
                 console.error(error);
             })
+        } else {
+            setBlogData({});
         }
     }, [blogId, location, token]);
 
     useEffect (() => {
+        setBlogData({});
         getBlogData();
     }, [getBlogData]);
+
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -53,7 +66,7 @@ const WriteBlog = () => {
             image: ''
         };
 
-        if (blogData) {
+        if (Object.entries(blogData).length !== 0) {
             // Put the blog -> update it in the database
             const updateBlog = {
                 id: blogId,
@@ -112,7 +125,7 @@ const WriteBlog = () => {
 
                 <Editor
                     onInit={ (evt, editor) => editorRef.current = editor }
-                    initialValue={blogData.content}
+                    initialValue={blogData.content || ''}
                     init={{
                         menubar: false,
                         resize: false,

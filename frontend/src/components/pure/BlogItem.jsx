@@ -2,7 +2,7 @@ import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-const BlogItem = ({ blog }) => {
+const BlogItem = ({ blog, handleDeleteBlog }) => {
     const location = useLocation();
     const {
         id,
@@ -22,7 +22,7 @@ const BlogItem = ({ blog }) => {
 
             <section className='text-wrapper'>
                 <h3>{title}</h3>
-                <td dangerouslySetInnerHTML={{__html: content}} />
+                <div className='blogItem-content' dangerouslySetInnerHTML={{__html: content}} />
             
                 <nav>
                     {/* <NavLink to={`/blogs/${userId}`} className='icon-btn'>
@@ -31,9 +31,16 @@ const BlogItem = ({ blog }) => {
 
                     {
                         location.pathname === '/users/me' &&
-                        <NavLink to={`/edit-blog/${id}`} className='icon-btn'>
-                            <FontAwesomeIcon icon='pencil' />
-                        </NavLink>
+
+                        <>
+                            <button className='icon-btn remove-blog-btn' onClick={() => handleDeleteBlog(id)}>
+                                <FontAwesomeIcon icon='trash' fixedWidth />
+                            </button>
+
+                            <NavLink to={`/edit-blog/${id}`} className='icon-btn'>
+                                <FontAwesomeIcon icon='pencil' fixedWidth />
+                            </NavLink>
+                        </>
                     }
                 </nav>
             </section>

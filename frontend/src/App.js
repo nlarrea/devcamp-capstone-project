@@ -21,6 +21,7 @@ import {
   // Edition
   faPencil,
   faGear,
+  faTrash,
   // Others
   faMobile,
   faRocket,
@@ -58,6 +59,7 @@ library.add(
   // Edition
   faPencil,
   faGear,
+  faTrash,
   // Others
   faMobile,
   faRocket,

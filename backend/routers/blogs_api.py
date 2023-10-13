@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, status
 
 from db.models.blog import Blog
 from db.schemas.blog import blog_schema, blogs_schema
-from db.blogs_database import create_blog, find_blog, find_users_blogs, update_blog
+from db.blogs_database import create_blog, find_blog, find_users_blogs, update_blog, delete_blog
 
 router = APIRouter(
     prefix="/blogs",
@@ -29,6 +29,9 @@ async def new_blog(blog: Blog):
 async def my_blogs(user_id: int):
     blogs = find_users_blogs(user_id)
 
+    if not blogs:
+        return []
+
     return blogs_schema(blogs)
 
 
@@ -37,6 +40,9 @@ async def my_blogs(user_id: int):
 async def single_blog(blog_id: int):
     blog = find_blog(blog_id)
 
+    if not blog:
+        return
+
     return Blog(**blog_schema(blog))
 
 
@@ -44,3 +50,9 @@ async def single_blog(blog_id: int):
 @router.put("/edit-blog", status_code=status.HTTP_201_CREATED)
 async def edit_blog(blog: Blog):
     update_blog(blog, blog.id)
+
+
+# Delete blog -> DELETE
+@router.delete("/remove-blog/{blog_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def remove_blog(blog_id: int):
+    delete_blog(blog_id)
