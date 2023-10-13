@@ -6,10 +6,9 @@ import { TYPES } from '../../../models/constants';
 import { LogoutButton } from '../../pure/LogLinks';
 import BlogItem from '../../pure/BlogItem';
 
-const UserPage = () => {
+const UserPage = ({ user }) => {
     /* Use the useEffect Hook to call the database and bring minimum the first
     15-20 blogs of this user (infinite scroll to get more blogs) */
-    const user = {};    // remove this
     const blogsList = [];
 
     return (
@@ -33,8 +32,8 @@ const UserPage = () => {
                         </NavLink>
 
                         <NavLink className='icon-text-btn' to='/users/me/edit'>
-                            <FontAwesomeIcon icon='pencil' />
-                            <span>Edit profile</span>
+                            <FontAwesomeIcon icon='gear' />
+                            <span>Configuration</span>
                         </NavLink>
                         
                         <LogoutButton type={TYPES.iconText} addClass='icon-text-btn' />

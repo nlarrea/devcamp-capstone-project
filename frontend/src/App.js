@@ -17,11 +17,13 @@ import {
   faAt,
   faLock,
   faLockOpen,
+  // Edition
+  faPencil,
+  faGear,
   // Others
   faMobile,
   faRocket,
-  faNewspaper,
-  faPencil
+  faNewspaper
 } from '@fortawesome/free-solid-svg-icons';
 
 import { AuthContext, UserContext } from "./context/authContext";
@@ -52,11 +54,13 @@ library.add(
   faAt,
   faLock,
   faLockOpen,
+  // Edition
+  faPencil,
+  faGear,
   // Others
   faMobile,
   faRocket,
-  faNewspaper,
-  faPencil
+  faNewspaper
 )
 
 function App() {
@@ -101,7 +105,7 @@ function App() {
     return [
       {
         path: '/users/me',
-        element: <UserPage />
+        element: <UserPage user={user} />
       },
       {
         path: '/users/me/edit',
@@ -149,7 +153,7 @@ function App() {
       <>
         <AuthContext.Provider value={{isAuthenticated, setIsAuthenticated}}>
           <UserContext.Provider value={{user, setUser}}>
-            <NavBar />
+            <NavBar user={user} />
 
             <Routes>
               <Route

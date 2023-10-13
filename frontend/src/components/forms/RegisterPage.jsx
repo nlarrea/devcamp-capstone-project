@@ -7,6 +7,7 @@ import { AuthContext, UserContext } from '../../context/authContext';
 import registerImg from '../../static/images/forms/register.svg';
 import { checkUsername, checkPasswords, passCharConditions } from '../../models/auxFunctions';
 import PasswordCharTest from '../pure/PasswordCharTest';
+import avatar from '../../static/images/avatars/user_avatar.svg';
 
 const RegisterPage = () => {
     // History and contexts
@@ -76,7 +77,8 @@ const RegisterPage = () => {
         const newUser = {
             username: userRef.current.value,
             email: emailRef.current.value,
-            password: pass1Ref.current.value
+            password: pass1Ref.current.value,
+            image: avatar
         };
 
         axios.post(
@@ -114,7 +116,7 @@ const RegisterPage = () => {
         <div id='register-page-wrapper' className='container'>
             <section>
                 <form onSubmit={handleSubmit}>
-                    <button className='icon-button go-back-button' onClick={() => history('/')}>
+                    <button type='button' className='icon-button go-back-button' onClick={() => history('/')}>
                         <FontAwesomeIcon icon='chevron-left' fixedWidth />
                         Go Back
                     </button>
@@ -240,7 +242,7 @@ const RegisterPage = () => {
                             Have an account? <NavLink to='/login'>Login</NavLink>
                         </p>
 
-                        <button>Register</button>
+                        <button type='submit'>Register</button>
                     </nav>
                 </form>
             </section>

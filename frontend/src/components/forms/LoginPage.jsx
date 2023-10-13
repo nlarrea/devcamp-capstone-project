@@ -30,7 +30,7 @@ const LoginPage = () => {
 
             <section>
                 <form onSubmit={handleLogin}>
-                    <button className='icon-button go-back-button' onClick={() => history('/')}>
+                    <button type='button' className='icon-button go-back-button' onClick={() => history('/')}>
                         <FontAwesomeIcon icon='chevron-left' fixedWidth />
                         Go Back
                     </button>
@@ -74,7 +74,7 @@ const LoginPage = () => {
                             First time here? <NavLink to='/register'>Register</NavLink>
                         </p>
 
-                        <button>Login</button>
+                        <button type='submit'>Login</button>
                     </nav>
                 </form>
             </section>

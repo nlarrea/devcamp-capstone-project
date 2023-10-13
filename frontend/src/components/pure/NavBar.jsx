@@ -1,7 +1,6 @@
 import React, { useContext } from 'react';
 import { NavLink } from 'react-router-dom';
 
-import avatar from '../../static/images/avatars/male_avatar.svg';
 import { AuthContext } from '../../context/authContext';
 import { TYPES } from '../../models/constants';
 import { LoginButton, LogoutButton } from './LogLinks';
@@ -37,8 +36,8 @@ const NavBar = ({ user }) => {
                                     <span className='nav-user-circle-out' />
                                     <span className='nav-user-circle-in' />
                                     <img
-                                        src={user?.picture || avatar}
-                                        alt={user?.nickname || 'user'}
+                                        src={user?.image}
+                                        alt={user?.username || 'user'}
                                         id='logged-user-nav-img'
                                     />
                                 </div>
@@ -46,7 +45,7 @@ const NavBar = ({ user }) => {
 
                             <div className='link-wrapper nav-username-link'>
                                 <NavLink to={'/users/me'}>
-                                    {user?.nickname || 'my username'}
+                                    {user?.username || 'my username'}
                                 </NavLink>
                             </div>
 

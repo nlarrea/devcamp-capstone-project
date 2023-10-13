@@ -7,7 +7,6 @@ import '../../../../node_modules/dropzone/dist/min/dropzone.min.css';
 
 import { UserContext } from '../../../context/authContext';
 import { checkPasswords, checkUsername, passCharConditions } from '../../../models/auxFunctions';
-import avatar from '../../../static/images/avatars/male_avatar.svg';
 import PasswordCharTest from '../../pure/PasswordCharTest';
 
 const UserEditPage = () => {
@@ -24,7 +23,7 @@ const UserEditPage = () => {
     }
 
     // Context & global variable's state
-    const user = useContext(UserContext);
+    const { user } = useContext(UserContext);
     const [editImgMode, setEditImgMode] = useState(false);
 
     const [username, setUsername] = useState(user?.username);
@@ -271,7 +270,7 @@ const UserEditPage = () => {
                                     <div
                                         className='current-user-image'
                                         style={{
-                                            backgroundImage: `url(${user?.image || avatar})`
+                                            backgroundImage: `url(${user?.image})`
                                         }}
                                     />
                                 </div>

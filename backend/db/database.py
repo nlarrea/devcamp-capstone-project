@@ -89,8 +89,8 @@ def create_user(user: UserDB):
 
     # Insert the user into the database
     cur.execute(
-        "INSERT INTO users (users_username, users_email, users_password) VALUES (%s, %s, %s)",
-        (user["username"], user["email"], user["password"])
+        "INSERT INTO users (users_username, users_email, users_image, users_password) VALUES (%s, %s, %s, %s)",
+        (user["username"], user["email"], user["image"], user["password"])
     )
     conn.commit()
 

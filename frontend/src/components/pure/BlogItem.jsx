@@ -1,8 +1,9 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const BlogItem = ({ blog }) => {
+    const location = useLocation();
     const {
         id,
         title,
@@ -28,9 +29,12 @@ const BlogItem = ({ blog }) => {
                         <FontAwesomeIcon icon='user' />
                     </NavLink> */}
 
-                    <NavLink to={`/edit-blog/${id}`} className='icon-btn'>
-                        <FontAwesomeIcon icon='pencil' />
-                    </NavLink>
+                    {
+                        location.pathname === '/users/me' &&
+                        <NavLink to={`/edit-blog/${id}`} className='icon-btn'>
+                            <FontAwesomeIcon icon='pencil' />
+                        </NavLink>
+                    }
                 </nav>
             </section>
         </div>
