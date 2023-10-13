@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState, useEffect } from 'react';
+import React, { useContext, useRef, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from 'axios';
@@ -14,8 +14,8 @@ const RegisterPage = () => {
     // History and contexts
     const history = useNavigate();
     const { setIsAuthenticated } = useContext(AuthContext);
-    const { user, setUser } = useContext(UserContext);
-    const { token, saveToken } = useToken();
+    const { setUser } = useContext(UserContext);
+    const { saveToken } = useToken();
     const [isLoading, setIsLoading] = useState(false);
 
 

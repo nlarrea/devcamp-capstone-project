@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routers import users_auth_db
+from routers import users_auth_api, blogs_api
 
 # SQLite tutorial (Python, FastAPI and React connection)
 # https://www.youtube.com/watch?v=0zb2kohYZIM
@@ -15,11 +15,13 @@ app = FastAPI()
 
 origins = [
     "http://localhost:3000",
+    "http:127.0.0.1:3000",
     "localhost:3000"
 ]
 
 # Routers
-app.include_router(users_auth_db.router)
+app.include_router(users_auth_api.router)
+app.include_router(blogs_api.router)
 
 app.add_middleware(
         CORSMiddleware,

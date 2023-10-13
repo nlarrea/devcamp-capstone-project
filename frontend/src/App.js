@@ -38,7 +38,6 @@ import WriteBlog from "./components/pages/blogs/WriteBlog";
 import UserPage from "./components/pages/users/UserPage";
 import UserEditPage from "./components/pages/users/UserEditPage";
 import NavBar from "./components/pure/NavBar";
-import useToken from "./hooks/useToken";
 
 library.add(
   // Page Icon
@@ -68,7 +67,6 @@ library.add(
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState({});
-  const { token } = useToken();
 
 
   useEffect (() => {
