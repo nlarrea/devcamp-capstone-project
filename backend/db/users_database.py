@@ -23,7 +23,7 @@ def get_all_users():
         sslmode="require"
     )
     # Create a cursor object
-    cur = conn.cursor()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
     # Execute a query
     cur.execute("SELECT * FROM users LIMIT 10")

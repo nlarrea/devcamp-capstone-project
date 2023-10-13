@@ -1,17 +1,47 @@
-import React, { useContext, useRef } from 'react';
+import React, { useContext, useRef, useEffect, useState } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, matchRoutes, useLocation, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 
 import useToken from '../../../hooks/useToken';
 import { UserContext } from '../../../context/authContext';
 
-const WriteBlog = ({ blogData='' }) => {
+const WriteBlog = () => {
+    const location = useLocation();
+    const { blogId } = useParams();
+    const history = useNavigate();
     const { token } = useToken();
     const { user } = useContext(UserContext);
 
     const blogTitleRef = useRef();
     const editorRef = useRef();
+
+    const [blogData, setBlogData] = useState({});
+
+
+    const getBlogData = React.useCallback(() => {
+        const path = location.pathname;
+        console.log(path);
+
+        if (matchRoutes(['/edit-blog/:blogId'], path) === null) {
+            console.log('matches route');
+            axios.get(
+                `http://127.0.0.1:8000/blogs/single-blog/${blogId}`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                }
+            ).then(response => {
+                console.log(response.data);
+
+                setBlogData(response.data);
+            }).catch(error => {
+                console.error(error);
+            })
+        }
+    }, [blogId, location, token]);
+
+    useEffect (() => {
+        getBlogData();
+    }, [getBlogData]);
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -25,7 +55,21 @@ const WriteBlog = ({ blogData='' }) => {
 
         if (blogData) {
             // Put the blog -> update it in the database
-            axios.put()
+            const updateBlog = {
+                id: blogId,
+                ...newBlog
+            };
+
+            axios.put(
+                `http://127.0.0.1:8000/blogs/edit-blog`,
+                updateBlog, {
+                    headers: { Authorization: `Bearer ${token}` }
+                }
+            ).then(response => {
+                // console.log(response.data);
+            }).catch(error => {
+                console.error('Updating error:', error);
+            });
         } else {
             // Post the blog -> add it to database
             axios.post(
@@ -34,10 +78,13 @@ const WriteBlog = ({ blogData='' }) => {
                     headers: { Authorization: `Bearer ${token}` }
                 }
             ).then(response => {
-                console.log(response.data);
+                // Check if data is correct
+                // console.log(response.data);
+
+                history('/users/me');
             }).catch(error => {
-                console.error('handleSubmitNewBlog for new-blog error\n', error);
-            })
+                console.error('Create new blog error:', error);
+            });
         }
     }
 
@@ -53,6 +100,7 @@ const WriteBlog = ({ blogData='' }) => {
                             id='blog-title'
                             className='input-field'
                             placeholder='Blog Title'
+                            defaultValue={blogData.title}
                             required
                             type='text'
                         />
@@ -64,7 +112,7 @@ const WriteBlog = ({ blogData='' }) => {
 
                 <Editor
                     onInit={ (evt, editor) => editorRef.current = editor }
-                    initialValue={blogData}
+                    initialValue={blogData.content}
                     init={{
                         menubar: false,
                         resize: false,

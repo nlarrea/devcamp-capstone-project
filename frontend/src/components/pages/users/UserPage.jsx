@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import axios from 'axios';
 
 import { TYPES } from '../../../models/constants';
 import { LogoutButton } from '../../pure/LogLinks';
@@ -9,7 +10,18 @@ import BlogItem from '../../pure/BlogItem';
 const UserPage = ({ user }) => {
     /* Use the useEffect Hook to call the database and bring minimum the first
     15-20 blogs of this user (infinite scroll to get more blogs) */
-    const blogsList = [];
+    const [blogsList, setBlogsList] = useState([]);
+
+    useEffect (() => {
+        axios.get(
+            `http://127.0.0.1:8000/blogs/${user.id}`
+        ).then(response => {
+            const newBlogs = response.data;
+            setBlogsList(newBlogs);
+        }).catch(error => {
+            console.error('Error getting user blogs:', error);
+        });
+    }, []);
 
     return (
         <div id='user-page-wrapper' className='container'>

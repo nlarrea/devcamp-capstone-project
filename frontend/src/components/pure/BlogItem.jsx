@@ -7,7 +7,7 @@ const BlogItem = ({ blog }) => {
     const {
         id,
         title,
-        text,
+        content,
         // userId,
         image
     } = blog;
@@ -22,7 +22,7 @@ const BlogItem = ({ blog }) => {
 
             <section className='text-wrapper'>
                 <h3>{title}</h3>
-                <p>{text}</p>
+                <td dangerouslySetInnerHTML={{__html: content}} />
             
                 <nav>
                     {/* <NavLink to={`/blogs/${userId}`} className='icon-btn'>
