@@ -6,23 +6,65 @@ from passlib.context import CryptContext
 from datetime import datetime, timedelta
 
 from db.models.user import User, UserDB
+from db.models.form import LoginForm
 from db.schemas.user import user_schema, users_schema
 from db.database import get_all_users, create_user, find_user
 
 
 ALGORITHM = "HS256"
-ACCESS_TOKEN_DURATION = 1   # 1 hour
+ACCESS_TOKEN_DURATION = 3   # 3 hours
 SECRET = os.environ.get("SECRET")
 
 
 router = APIRouter()
-oauth2_register = OAuth2PasswordBearer(tokenUrl="register")
 oauth2_login = OAuth2PasswordBearer(tokenUrl="login")
 crypt = CryptContext(schemes=["bcrypt"])
 
 
+# AUXILIARY FUNCTIONS
+
+
+def search_user(field: str, key):
+    try:
+        user = find_user(field, key)
+        return User(**user_schema(user))
+    
+    except:
+        return {"error": "User is not found!"}
+    
+
+def search_user_db(field: str, key):
+    try:
+        user_db = find_user(field, key)
+        return UserDB(**user_schema(user_db))
+    
+    except:
+        return {"error": "User is not found!"}
+    
+
+async def auth_user(token: str = Depends(oauth2_login)):
+    exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Not valid credentials.",
+        headers={"WWW-Authenticate": "Bearer"}
+    )
+
+    try:
+        # Get username from token
+        username = jwt.decode(token, SECRET, algorithms=[ALGORITHM]).get("sub")
+
+        if username is None:
+            raise exception
+        
+    except JWTError:
+        raise exception
+    
+    return search_user("username", username)
+
+
 # USERS DEFINITION
 
+# Create a new user -> REGISTER
 @router.post("/register", response_model=User, status_code=status.HTTP_201_CREATED)
 async def user(user: UserDB):
     if type(search_user("username", user.username)) == User:
@@ -60,10 +102,38 @@ async def user(user: UserDB):
     return new_user
 
 
-def search_user(field: str, key):
-    try:
-        user = find_user(field, key)
-        return User(**user_schema(user))
+# Set a user -> LOGIN
+@router.post("/login", status_code=status.HTTP_200_OK)
+async def login(form: LoginForm):
+    user_db = search_user_db("email", form.email)
+
+    # Check if email exists
+    if not type(user_db) == UserDB:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="The email is not found!"
+        )
     
-    except:
-        return {"error": "User is not found!"}
+    # Check if password is correct
+    if not crypt.verify(form.password, user_db.password):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="The password is not correct!"
+        )
+
+    # Token parameters
+    access_token = {
+        "sub": user_db.username,
+        "exp": datetime.utcnow() + timedelta(hours=ACCESS_TOKEN_DURATION)
+    }
+
+    return {
+        "access_token": jwt.encode(access_token, SECRET, algorithm=ALGORITHM),
+        "token_type": "bearer"
+    }
+
+
+# Get current user -> GET
+@router.get("/users/me")
+async def me(user: User = Depends(auth_user)):
+    return user

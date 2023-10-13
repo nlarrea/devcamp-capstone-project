@@ -94,7 +94,7 @@ const RegisterPage = () => {
             setUser(userDb);
             history('/');
         }).catch(error => {
-            console.log(error);
+            console.error(error);
 
             const errorType = error.response.data.detail.type;
             const errorMsg = error.response.data.detail.message;
