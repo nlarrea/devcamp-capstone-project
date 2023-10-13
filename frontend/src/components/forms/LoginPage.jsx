@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState } from 'react';
+import React, { useContext, useRef, useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from 'axios';
@@ -13,35 +13,19 @@ const LoginPage = () => {
     const { setIsAuthenticated } = useContext(AuthContext);
     const { setUser } = useContext(UserContext);
 
-    // State
+    // States
     const [isLoading, setIsLoading] = useState(false);
+
+    const [emailError, setEmailError] = useState(false);
+    const [emailErrorMsg, setEmailErrorMsg] = useState('');
+
+    const [passError, setPassError] = useState(false);
+    const [passErrorMsg, setPassErrorMsg] = useState('');
+    const [viewPass, setViewPass] = useState(false);
 
     // Refs
     const emailRef = useRef();
     const passRef = useRef();
-
-
-    const login = () => {
-        // Get user's data after being authorized
-        axios.get(
-            'http://127.0.0.1:8000/users/me', {
-                headers: { Authorization: `Bearer ${token}`}
-            }
-        ).then(response => {
-            // Check if data is correct
-            // console.log(response.data);
-
-            // Login the user with the given credentials
-            setIsAuthenticated(true);
-            const userDb = response.data;
-            setUser(userDb);
-            history('/');
-        }).catch(error => {
-            console.error('login error:', error);
-        });
-
-        setIsLoading(false);
-    };
 
 
     const handleLogin = async (event) => {
@@ -65,12 +49,62 @@ const LoginPage = () => {
             // Save token to localStorage
             saveToken(response.data.access_token);
         }).catch(error => {
-            console.error('auth error:', error);
+            // Print the error in the console
+            // console.error('auth error:', error);
+
+            // Print the error in the form
+            const errorType = error.response.data.detail.type;
+            const errorMsg = error.response.data.detail.message;
+
+            if (errorType === 'email') {
+                setEmailError(true);
+                setEmailErrorMsg(errorMsg);
+            }
+
+            if (errorType === 'password') {
+                setPassError(true);
+                setPassErrorMsg(errorMsg);
+            }
         });
 
         setIsLoading(false);
-        login();
     };
+
+
+    useEffect (() => {
+        const login = () => {
+            // Get user's data after being authorized
+            axios.get(
+                'http://127.0.0.1:8000/users/me', {
+                    headers: { Authorization: `Bearer ${token}`}
+                }
+            ).then(response => {
+                // Check if data is correct
+                // console.log(response.data);
+    
+                // Login the user with the given credentials
+                setIsAuthenticated(true);
+                const userDb = response.data;
+                setUser(userDb);
+                history('/');
+            }).catch(error => {
+                console.error('login error:', error);
+            });
+        };
+
+        if (localStorage.getItem('token')) {
+            login();
+        }
+    }, [token, history, setIsAuthenticated, setUser]);
+
+
+    const resetErrors = () => {
+        setEmailError(false);
+        setEmailErrorMsg('');
+
+        setPassError(false);
+        setPassErrorMsg('');
+    }
 
 
     return (
@@ -95,7 +129,8 @@ const LoginPage = () => {
                         <input
                             ref={emailRef}
                             id='login-email'
-                            className='input-field'
+                            onChange={resetErrors}
+                            className={`input-field ${emailError ? 'input-error' : ''}`}
                             placeholder='your_email@example.com'
                             required
                             spellCheck={false}
@@ -105,21 +140,40 @@ const LoginPage = () => {
                             Email
                         </label>
                         <FontAwesomeIcon icon='at' className='input-icon' fixedWidth />
+                        {emailError && <span className='error-message'>{emailErrorMsg}</span>}
                     </div>
 
                     <div className='input-label-wrapper'>
                         <input
                             ref={passRef}
                             id='login-password'
-                            className='input-field'
+                            onChange={resetErrors}
+                            className={`input-field ${passError ? 'input-error' : ''}`}
                             placeholder='1234_abCD'
                             required
-                            type="password"
+                            type={viewPass ? 'text' : "password"}
                         />
                         <label htmlFor="login-password" className='input-label'>
                             Password
                         </label>
-                        <FontAwesomeIcon icon='lock' className='input-icon' fixedWidth />
+                        {
+                            viewPass ? (
+                                <FontAwesomeIcon
+                                    onClick={() => setViewPass(!viewPass)}
+                                    icon='lock-open'
+                                    className='input-icon icon-btn'
+                                    fixedWidth
+                                />
+                            ) : (
+                                <FontAwesomeIcon
+                                    onClick={() => setViewPass(!viewPass)}    
+                                    icon='lock'
+                                    className='input-icon icon-btn'
+                                    fixedWidth
+                                />
+                            )
+                        }
+                        {passError && <span className='error-message'>{passErrorMsg}</span>}
                     </div>
 
                     <nav>

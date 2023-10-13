@@ -111,14 +111,20 @@ async def login(form: LoginForm):
     if not type(user_db) == UserDB:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="The email is not found!"
+            detail={
+                "type": "email",
+                "message": "This email doesn't exist!"
+            }
         )
     
     # Check if password is correct
     if not crypt.verify(form.password, user_db.password):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="The password is not correct!"
+            detail={
+                "type": "password",
+                "message": "The password is not correct!"
+            }
         )
 
     # Token parameters

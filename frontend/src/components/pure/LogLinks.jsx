@@ -25,6 +25,7 @@ export const LogoutButton = ({ type=TYPES.textIcon, addClass='' }) => {
     const { setIsAuthenticated } = useContext(AuthContext);
 
     const handleLogout = () => {
+        localStorage.removeItem('token');
         setIsAuthenticated(false);
         history('/')
     }
