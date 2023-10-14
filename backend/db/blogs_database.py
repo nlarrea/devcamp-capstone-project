@@ -1,6 +1,7 @@
 import os
 import psycopg2
 import psycopg2.extras
+import urllib
 
 from db.models.blog import Blog
 
@@ -103,10 +104,12 @@ def create_blog(blog: dict):
     # Create a cursor object
     cur = conn.cursor()
 
+    insert_image = psycopg2.Binary(blog["banner_img"])
+
     cur.execute(
         """INSERT INTO blogs (blogs_title, blogs_content, blogs_users_id, blogs_banner_img)
         VALUES (%s, %s, %s, %s)""",
-        (blog["title"], blog["content"], blog["user_id"], blog["banner_img"])
+        (blog["title"], blog["content"], blog["user_id"], insert_image)
     )
     conn.commit()
 

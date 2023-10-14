@@ -156,25 +156,47 @@
         }
     }
 
-    div.se-wrapper,
-    div.se-wrapper-inner {
-        width: 100%;
-        height: 325px !important;
-        color: var.$charcoal;
+    section {
+        width: 80vw;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 32px;
+        flex-wrap: wrap;
 
-        .se-placeholder {
-            font-size: 16px;
+        .sun-editor {
+            width: 700px !important;
+            flex-grow: 1;
         }
 
-        .se-placeholder,
-        .sun-editor-editable {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        div.se-wrapper,
+        div.se-wrapper-inner {
+            height: 325px !important;
+            color: var.$charcoal;
+    
+            .se-placeholder {
+                font-size: 16px;
+            }
+    
+            .se-placeholder,
+            .sun-editor-editable {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            }
+        }
+    
+        div.se-resizing-bar {
+            display: none;
+        }
+
+        div.current-blog-banner-image {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
         }
     }
 
-    div.se-resizing-bar {
-        display: none;
-    }
 
     nav {
         width: 100vw;

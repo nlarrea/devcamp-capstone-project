@@ -1,7 +1,8 @@
 import React, { useContext, useRef, useEffect, useState } from 'react';
 import { NavLink, matchRoutes, useLocation, useNavigate, useParams } from 'react-router-dom';
-import SunEditor, { buttonList } from 'suneditor-react';
+import SunEditor from 'suneditor-react';
 import 'suneditor/dist/css/suneditor.min.css';
+import FileBase64 from 'react-file-base64';
 import axios from 'axios';
 
 import useToken from '../../../hooks/useToken';
@@ -16,10 +17,12 @@ const WriteBlog = () => {
     const { blogId } = useParams();
 
     const blogTitleRef = useRef();
-    // const editorRef = useRef();
     const [editorContent, setEditorContent] = useState('');
+    // const imageRef = useRef();
+    const [image, setImage] = useState(null);
 
     const [blogData, setBlogData] = useState({});
+    const [editMode, setEditMode] = useState(false);
 
 
     const handleEditorChange = (content) => {
@@ -71,7 +74,7 @@ const WriteBlog = () => {
             title: blogTitleRef.current.value,
             content: editorContent,
             user_id: user.id,
-            image: ''
+            banner_img: image
         };
 
         if (Object.entries(blogData).length !== 0) {
@@ -105,7 +108,9 @@ const WriteBlog = () => {
             axios.post(
                 'http://127.0.0.1:8000/blogs/new-blog',
                 newBlog, {
-                    headers: { 'Authorization': `Bearer ${token}` }
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    }
                 }
             ).then(response => {
                 // Check if data is correct
@@ -148,32 +153,73 @@ const WriteBlog = () => {
                     </div>
                 </div>
 
-                <SunEditor
-                    onChange={handleEditorChange}
-                    defaultValue={blogData.content || ''}
-                    setContents={blogData.content}
-                    placeholder='Write your own story!'
-                    setDefaultStyle='font-size: 16px;'
-                    setOptions={{
-                        buttonList: [
-                            [
-                                'bold',
-                                'underline',
-                                'italic',
-                                'strike',
-                            ],
-                            [
-                                'list',
-                                'align',
-                                'table'
-                            ],
-                            [
-                                'fontSize',
-                                'formatBlock',
+                <section>
+                    <SunEditor
+                        onChange={handleEditorChange}
+                        defaultValue={blogData.content || ''}
+                        setContents={blogData.content}
+                        placeholder='Write your own story!'
+                        setDefaultStyle='font-size: 16px;'
+                        setOptions={{
+                            buttonList: [
+                                [
+                                    'bold',
+                                    'underline',
+                                    'italic',
+                                    'strike',
+                                ],
+                                [
+                                    'list',
+                                    'align',
+                                    'table'
+                                ],
+                                [
+                                    'fontSize',
+                                    'formatBlock',
+                                ]
                             ]
-                        ]
-                    }}
-                />
+                        }}
+                    />
+
+                    {
+                        Object.entries(blogData).length !== 0 && !editMode ? (
+                            <>
+                                <div className='current-blog-banner-image'>
+                                    <div
+                                        className='current-banner-image'
+                                        style={{
+                                            backgroundImage: `url(${blogData.banner_img.replace('dataimage/jpegbase64', 'data:image/jpeg;base64,')})`,
+                                            backgroundSize: 'cover',
+                                            backgroundPosition: 'center',
+                                            height: '250px',
+                                            width: '250px'
+                                        }}
+                                    />
+
+                                    <button
+                                        type='button'
+                                        onClick={() => setEditMode(true)}
+                                        className='form-btn edit-btn'
+                                    >Edit</button>
+                                </div>
+                            </>
+                        ) : (
+                            <>
+                                <FileBase64
+                                    type='file'
+                                    multiple={ false }
+                                    onDone={({base64}) => setImage(base64)}
+                                />
+
+                                <button
+                                    type='button'
+                                    onClick={() => setEditMode(false)}
+                                    className='form-btn cancel-btn'
+                                >Cancel</button>
+                            </>
+                        )
+                    }
+                </section>
 
                 <nav>
                     <NavLink to='/users/me' className='cancel-form-submit'>

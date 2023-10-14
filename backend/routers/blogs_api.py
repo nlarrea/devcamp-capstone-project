@@ -2,6 +2,7 @@ import os
 from fastapi import APIRouter, HTTPException, status, Depends, Request
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
+import base64
 
 from db.models.blog import Blog
 from db.models.user import User
@@ -60,6 +61,12 @@ async def new_blog(blog: Blog, request: Request):
     blog_dict = dict(blog)
     del blog_dict["id"]
 
+    # If blog has image -> decode it
+    if blog_dict["banner_img"]:
+        blog_encoded_image = blog_dict["banner_img"]
+        blog_image = base64.b64decode(blog_encoded_image)
+        blog_dict["banner_img"] = blog_image
+
     # Insert the blog into the database
     create_blog(blog_dict)
 
@@ -105,7 +112,7 @@ async def single_blog(blog_id: int):
 @router.put("/edit-blog", status_code=status.HTTP_201_CREATED)
 async def edit_blog(blog: Blog, request: Request):
     validate_token(request)
-    update_blog(blog, blog.id)
+    # update_blog(blog, blog.id)
 
 
 # Delete blog -> DELETE

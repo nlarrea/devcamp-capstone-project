@@ -6,10 +6,12 @@ import axios from 'axios';
 import { TYPES } from '../../../models/constants';
 import { LogoutButton } from '../../pure/LogLinks';
 import BlogItem from '../../pure/BlogItem';
+import useToken from '../../../hooks/useToken';
 
 const UserPage = ({ user }) => {
     /* Use the useEffect Hook to call the database and bring minimum the first
     15-20 blogs of this user (infinite scroll to get more blogs) */
+    const { token } = useToken();
     const [blogsList, setBlogsList] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -38,7 +40,9 @@ const UserPage = ({ user }) => {
         setIsLoading(true);
 
         axios.delete(
-            `http://127.0.0.1:8000/blogs/remove-blog/${blogId}`
+            `http://127.0.0.1:8000/blogs/remove-blog/${blogId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            }
         ).then(response => {
             // console.log(response);
             getUsersBlogs();

@@ -1,27 +1,13 @@
 import React, { useState, useContext, useRef } from 'react';
 import { NavLink } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { DropzoneComponent } from 'react-dropzone-component';
-import '../../../../node_modules/react-dropzone-component/styles/filepicker.css';
-import '../../../../node_modules/dropzone/dist/min/dropzone.min.css';
+import FileBase64 from 'react-file-base64';
 
 import { UserContext } from '../../../context/authContext';
 import { checkPasswords, checkUsername, passCharConditions } from '../../../models/auxFunctions';
 import PasswordCharTest from '../../pure/PasswordCharTest';
 
 const UserEditPage = () => {
-    // Dropzone configuration
-    const componentConfig = {
-        iconFiletypes: ['.jpg', '.png'],
-        showFiletypeIcon: true,
-        postUrl: 'https://httpbin.org/post'
-    }
-
-    const djsConfig = {
-        addRemoveLinks: true,
-        maxFiles: 1
-    }
-
     // Context & global variable's state
     const { user } = useContext(UserContext);
     const [editImgMode, setEditImgMode] = useState(false);
@@ -248,16 +234,17 @@ const UserEditPage = () => {
 
                         editImgMode -> useState
                         editImgMode ? (Dropzone) : (div con img)
+
+                        Ya no Dropzone component, ahora es FileBase64
                     */}
                     {
                         editImgMode ? (
                             <>
-                                <DropzoneComponent
-                                    config={componentConfig}
-                                    djsConfig={djsConfig}
-                                >
-                                    <div className='dz-message'>User Image</div>
-                                </DropzoneComponent>
+                                <FileBase64
+                                    type='file'
+                                    multiple={ false }
+                                    onDone={({base64}) => setImage(base64)}
+                                />
 
                                 <button
                                     onClick={() => setEditImgMode(false)}
