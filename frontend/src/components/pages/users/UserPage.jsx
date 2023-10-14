@@ -86,17 +86,19 @@ const UserPage = ({ user }) => {
 
                     <div className='blog-items-wrapper'>
                         {
-                            isLoading ? (
-                                <FontAwesomeIcon icon='spinner' fixedWidth spin />
+                            blogsList.length > 0 ? (
+                                blogsList.map(blog => (
+                                    <BlogItem
+                                        key={blog?.id}
+                                        blog={blog}
+                                        handleDeleteBlog={handleDeleteBlog}
+                                    />
+                                ))
                             ) : (
-                                blogsList.length > 0 ? (
-                                    blogsList.map(blog => (
-                                        <BlogItem
-                                            key={blog?.id}
-                                            blog={blog}
-                                            handleDeleteBlog={handleDeleteBlog}
-                                        />
-                                    ))
+                                isLoading ? (
+                                    <div>
+                                        <FontAwesomeIcon icon='spinner' fixedWidth spin />
+                                    </div>
                                 ) : (
                                     <p className='no-blogs-message'>
                                         You haven't written any Blog yet!

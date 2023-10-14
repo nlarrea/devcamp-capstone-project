@@ -1,6 +1,7 @@
 import React, { useContext, useRef, useEffect, useState } from 'react';
-import { Editor } from '@tinymce/tinymce-react';
 import { NavLink, matchRoutes, useLocation, useNavigate, useParams } from 'react-router-dom';
+import SunEditor, { buttonList } from 'suneditor-react';
+import 'suneditor/dist/css/suneditor.min.css';
 import axios from 'axios';
 
 import useToken from '../../../hooks/useToken';
@@ -14,9 +15,15 @@ const WriteBlog = () => {
     const { user } = useContext(UserContext);
 
     const blogTitleRef = useRef();
-    const editorRef = useRef();
+    // const editorRef = useRef();
+    const [editorContent, setEditorContent] = useState('');
 
     const [blogData, setBlogData] = useState({});
+
+
+    const handleEditorChange = (content) => {
+        setEditorContent(content);
+    }
 
 
     const getBlogData = React.useCallback(() => {
@@ -58,10 +65,10 @@ const WriteBlog = () => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        
+
         const newBlog = {
             title: blogTitleRef.current.value,
-            content: editorRef.current.getContent(),
+            content: editorContent,
             user_id: user.id,
             image: ''
         };
@@ -123,13 +130,30 @@ const WriteBlog = () => {
                     </div>
                 </div>
 
-                <Editor
-                    onInit={ (evt, editor) => editorRef.current = editor }
-                    initialValue={blogData.content || ''}
-                    init={{
-                        menubar: false,
-                        resize: false,
-                        placeholder: 'Write your own story!'
+                <SunEditor
+                    onChange={handleEditorChange}
+                    defaultValue={blogData.content || ''}
+                    placeholder='Write your own story!'
+                    setDefaultStyle='font-size: 16px;'
+                    setOptions={{
+                        buttonList: [
+                            [
+                                'bold',
+                                'underline',
+                                'italic',
+                                'strike',
+                            ],
+                            [
+                                'list',
+                                'align',
+                                'table',
+                                'image'
+                            ],
+                            [
+                                'fontSize',
+                                'formatBlock',
+                            ]
+                        ]
                     }}
                 />
 
