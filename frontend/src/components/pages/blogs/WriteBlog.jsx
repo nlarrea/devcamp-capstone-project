@@ -5,14 +5,15 @@ import 'suneditor/dist/css/suneditor.min.css';
 import axios from 'axios';
 
 import useToken from '../../../hooks/useToken';
-import { UserContext } from '../../../context/authContext';
+import { AuthContext, UserContext } from '../../../context/authContext';
 
 const WriteBlog = () => {
     const location = useLocation();
-    const { blogId } = useParams();
     const history = useNavigate();
+    const { user, setUser } = useContext(UserContext);
+    const { setIsAuthenticated } = useContext(AuthContext);
     const { token } = useToken();
-    const { user } = useContext(UserContext);
+    const { blogId } = useParams();
 
     const blogTitleRef = useRef();
     // const editorRef = useRef();
@@ -87,8 +88,17 @@ const WriteBlog = () => {
                 }
             ).then(response => {
                 // console.log(response.data);
+                history('/users/me');
             }).catch(error => {
                 console.error('Updating error:', error);
+
+                const errorType = error.response.data.detail.type
+                
+                if (errorType === 'expired') {
+                    setIsAuthenticated(false);
+                    setUser({});
+                    history('/login');
+                }
             });
         } else {
             // Post the blog -> add it to database
@@ -104,6 +114,14 @@ const WriteBlog = () => {
                 history('/users/me');
             }).catch(error => {
                 console.error('Create new blog error:', error);
+
+                const errorType = error.response.data.detail.type
+                
+                if (errorType === 'expired') {
+                    setIsAuthenticated(false);
+                    setUser({});
+                    history('/login');
+                }
             });
         }
     }

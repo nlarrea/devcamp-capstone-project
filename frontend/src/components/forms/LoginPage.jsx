@@ -86,7 +86,8 @@ const LoginPage = () => {
                 setIsAuthenticated(true);
                 const userDb = response.data;
                 setUser(userDb);
-                history('/');
+                // Go back in history
+                history(-1);
             }).catch(error => {
                 console.error('login error:', error);
             });

@@ -22,15 +22,16 @@ router = APIRouter(
 # AUXILIARY FUNCTIONS
 
 def validate_token(request: Request):
-    not_authorized_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="You do not have the necessary permissions"
-    )
-
     # Check if request has the "Authorization" header
     auth_header = request.headers.get("Authorization")
     if not auth_header:
-        raise not_authorized_exception
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail={
+                "type": "Authorization",
+                "message": "You do not have the necessary permissions"
+            }
+        )
     
     # Check if the Token is valid
     try:
@@ -38,7 +39,13 @@ def validate_token(request: Request):
         username: str = jwt.decode(access_token, SECRET, algorithms=[ALGORITHM]).get("sub")
 
     except JWTError:
-        raise not_authorized_exception
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail={
+                "type": "expired",
+                "message": "You do not have the necessary permissions"
+            }
+        )
     
     else:
         return username
