@@ -31,6 +31,12 @@ const WriteBlog = () => {
         setEditorContent(content);
     }
 
+
+    const handleRemoveImg = () => {
+        setEditMode(true);
+        setImage(null);
+    }
+
     useEffect (() => {
         if (location?.state?.from) {
             const blogToEdit = location.state.from;
@@ -178,9 +184,9 @@ const WriteBlog = () => {
 
                                 <button
                                     type='button'
-                                    onClick={() => setEditMode(true)}
+                                    onClick={handleRemoveImg}
                                     className='form-btn edit-btn'
-                                >Edit</button>
+                                >Remove</button>
                             </div>
                         ) : (
                             <div className='current-blog-banner-image'>

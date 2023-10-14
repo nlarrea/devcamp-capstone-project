@@ -4,7 +4,6 @@ from jose import jwt, JWTError
 import base64
 
 from db.models.blog import Blog
-from db.models.user import User
 from db.schemas.blog import blog_schema, blogs_schema
 from db.blogs_database import create_blog, find_blog, find_users_blogs, update_blog, delete_blog
 
@@ -101,6 +100,7 @@ def validate_token(request: Request):
 
 @router.post("/new-blog", status_code=status.HTTP_201_CREATED)
 async def new_blog(blog: Blog, request: Request):
+    # Check if access token is valid
     validate_token(request)
 
     blog_dict = dict(blog)

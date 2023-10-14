@@ -1,7 +1,6 @@
 import os
 import psycopg2
 import psycopg2.extras
-import urllib
 
 from db.models.blog import Blog
 
@@ -152,13 +151,14 @@ def update_blog(blog: dict, blog_id: int):
             WHERE blogs_id = %s;""",
             (blog["title"], blog["content"], blog["user_id"], blog["banner_img"], blog_id)
         )
-        
+
     else:
         cur.execute(
             """UPDATE blogs SET
             blogs_title = %s,
             blogs_content = %s,
-            blogs_users_id = %s
+            blogs_users_id = %s,
+            blogs_banner_img = null
             WHERE blogs_id = %s;""",
             (blog["title"], blog["content"], blog["user_id"], blog_id)
         )
