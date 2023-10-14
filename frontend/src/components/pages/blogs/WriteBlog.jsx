@@ -92,7 +92,6 @@ const WriteBlog = () => {
             });
         } else {
             // Post the blog -> add it to database
-            console.log('token:', token);
             axios.post(
                 'http://127.0.0.1:8000/blogs/new-blog',
                 newBlog, {
