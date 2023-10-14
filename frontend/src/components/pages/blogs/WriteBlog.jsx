@@ -16,7 +16,7 @@ const WriteBlog = () => {
     const { blogId } = useParams();
     const { user, setUser } = useContext(UserContext);
     const { setIsAuthenticated } = useContext(AuthContext);
-    const { setUserBlogs } = useContext(UserBlogsContext);
+    const { userBlogs, setUserBlogs } = useContext(UserBlogsContext);
 
     const blogTitleRef = useRef();
     const [editorContent, setEditorContent] = useState('');
@@ -63,6 +63,11 @@ const WriteBlog = () => {
                 }
             ).then(response => {
                 // console.log(response.data);
+
+                setUserBlogs(() => {
+                    const restOfBlogs = userBlogs.filter(blog => blog.id !== parseInt(blogId));
+                    return [response.data, ...restOfBlogs];
+                });
                 history('/users/me');
             }).catch(error => {
                 console.error('Updating error:', error);

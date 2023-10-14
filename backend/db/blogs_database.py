@@ -142,15 +142,27 @@ def update_blog(blog: dict, blog_id: int):
     # Create a cursor object
     cur = conn.cursor()
 
-    cur.execute(
-        """UPDATE blogs SET
-        blogs_title = %s,
-        blogs_content = %s,
-        blogs_users_id = %s,
-        blogs_banner_img = %s
-        WHERE blogs_id = %s;""",
-        (blog["title"], blog["content"], blog["user_id"], blog["banner_img"], blog_id)
-    )
+    if blog["banner_img"]:
+        cur.execute(
+            """UPDATE blogs SET
+            blogs_title = %s,
+            blogs_content = %s,
+            blogs_users_id = %s,
+            blogs_banner_img = %s
+            WHERE blogs_id = %s;""",
+            (blog["title"], blog["content"], blog["user_id"], blog["banner_img"], blog_id)
+        )
+        
+    else:
+        cur.execute(
+            """UPDATE blogs SET
+            blogs_title = %s,
+            blogs_content = %s,
+            blogs_users_id = %s
+            WHERE blogs_id = %s;""",
+            (blog["title"], blog["content"], blog["user_id"], blog_id)
+        )
+
     conn.commit()
 
     # CLose the cursor and connection

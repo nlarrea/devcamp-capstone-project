@@ -1,6 +1,5 @@
 import os
-from fastapi import APIRouter, HTTPException, status, Depends, Request
-from fastapi.security import OAuth2PasswordBearer
+from fastapi import APIRouter, HTTPException, status, Request
 from jose import jwt, JWTError
 import base64
 
@@ -10,7 +9,6 @@ from db.schemas.blog import blog_schema, blogs_schema
 from db.blogs_database import create_blog, find_blog, find_users_blogs, update_blog, delete_blog
 
 ALGORITHM = "HS256"
-ACCESS_TOKEN_DURATION = 3   # 3 hours
 SECRET = os.environ.get("SECRET")
 
 
@@ -23,19 +21,17 @@ router = APIRouter(
 # AUXILIARY FUNCTIONS
 
 def search_blog_by_user(blog_to_find: Blog) -> Blog:
-    """ Searches a blog based on a field parameter. If field is the user's ID,
-     it gets all its blogs and needs a blog parameter to search for it.
+    """ Searches a single blog based on a user ID from the blog to search in
+     the database.
     
      Parameters:
-        - field (`str`): field to find the blog.
-        - key (`any`): the value of the given field.
         - blog_to_find (`Blog`): the blog to find and get its ID.
+
+     Returns:
+        - (`Blog`): The blog with all the parameters saved in the database.
     """
 
-    try:
-        blog = find_users_blogs(blog_to_find.user_id)[0]
-    except:
-        print("No funciona")
+    blog = find_users_blogs(blog_to_find.user_id)[0]
 
     if blog is None:
         raise HTTPException(
@@ -46,7 +42,32 @@ def search_blog_by_user(blog_to_find: Blog) -> Blog:
     return Blog(**blog_schema(blog))
 
 
+def search_blog_by_id(blog_id: int) -> Blog:
+    """ Searches a single blog by its ID.
+     
+     Parameters:
+        - blog_id (`int`): The ID of the blog to be found.
+    
+     Returns:
+        - (`Blog`): The blog with all the parameters saved in the database.
+    """
+
+    blog = find_blog(blog_id)
+
+    return Blog(**blog_schema(blog))
+
+
 def validate_token(request: Request):
+    """ Checks if the request has a header called "Authorization" with the
+     access token. If so, checks if the token did not expire.
+    
+     Parameters:
+        - request (`fastapi.Request`): The request made from frontend side.
+    
+     Returns:
+        - username (`str`): The username read from the access token.
+    """
+
     # Check if request has the "Authorization" header
     auth_header = request.headers.get("Authorization")
     if not auth_header:
@@ -94,6 +115,7 @@ async def new_blog(blog: Blog, request: Request):
     # Insert the blog into the database
     create_blog(blog_dict)
 
+    # Return the inserted blog
     return search_blog_by_user(blog)
 
 
@@ -135,7 +157,7 @@ async def single_blog(blog_id: int):
 
 
 # Update one blog's data / content -> PUT
-@router.put("/edit-blog", status_code=status.HTTP_201_CREATED)
+@router.put("/edit-blog", response_model=Blog, status_code=status.HTTP_201_CREATED)
 async def edit_blog(blog: Blog, request: Request):
     validate_token(request)
 
@@ -148,6 +170,8 @@ async def edit_blog(blog: Blog, request: Request):
         blog_dict["banner_img"] = blog_image
 
     update_blog(blog_dict, blog.id)
+
+    return search_blog_by_id(blog.id)
 
 
 # Delete blog -> DELETE
