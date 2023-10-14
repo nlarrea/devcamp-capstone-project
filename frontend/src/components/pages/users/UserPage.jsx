@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useContext } from 'react';
 import { NavLink } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from 'axios';
@@ -7,33 +7,14 @@ import { TYPES } from '../../../models/constants';
 import { LogoutButton } from '../../pure/LogLinks';
 import BlogItem from '../../pure/BlogItem';
 import useToken from '../../../hooks/useToken';
+import { UserBlogsContext } from '../../../context/blogsContext';
 
 const UserPage = ({ user }) => {
     /* Use the useEffect Hook to call the database and bring minimum the first
     15-20 blogs of this user (infinite scroll to get more blogs) */
     const { token } = useToken();
-    const [blogsList, setBlogsList] = useState([]);
+    const { userBlogs, setUserBlogs } = useContext(UserBlogsContext);
     const [isLoading, setIsLoading] = useState(false);
-
-
-    const getUsersBlogs = useCallback(() => {
-        setIsLoading(true);
-
-        axios.get(
-            `http://127.0.0.1:8000/blogs/${user.id}`
-        ).then(response => {
-            const newBlogs = response.data;
-            setBlogsList(newBlogs);
-        }).catch(error => {
-            console.error('Error getting user blogs:', error);
-        });
-
-        setIsLoading(false);
-    }, [user.id]);
-
-    useEffect (() => {
-        getUsersBlogs();
-    }, [getUsersBlogs]);
 
 
     const handleDeleteBlog = (blogId) => {
@@ -45,7 +26,8 @@ const UserPage = ({ user }) => {
             }
         ).then(response => {
             // console.log(response);
-            getUsersBlogs();
+            const currentBlogs = userBlogs.filter(blog => blog.id !== response.data);
+            setUserBlogs([...currentBlogs]);
         }).catch(error => {
             console.error(error);
         });
@@ -90,10 +72,10 @@ const UserPage = ({ user }) => {
 
                     <div className='blog-items-wrapper'>
                         {
-                            blogsList.length > 0 ? (
-                                blogsList.map(blog => (
+                            userBlogs.length > 0 ? (
+                                userBlogs.map(blog => (
                                     <BlogItem
-                                        key={blog?.id}
+                                        key={blog.id}
                                         blog={blog}
                                         handleDeleteBlog={handleDeleteBlog}
                                     />

@@ -8,9 +8,11 @@ const BlogItem = ({ blog, handleDeleteBlog }) => {
         id,
         title,
         content,
-        // userId,
-        image
+        // user_id, // not being used
+        banner_img
     } = blog;
+    
+    const getBannerImg = () => banner_img ? banner_img.replace('dataimage/jpegbase64', 'data:image/jpeg;base64,') : '';
 
     return (
         <div className='blog-item-wrapper'>
@@ -18,7 +20,9 @@ const BlogItem = ({ blog, handleDeleteBlog }) => {
                 Read Blog
             </NavLink>
             
-            <section className='image-wrapper' style={{backgroundImage: `url(${image})`}} />
+            <section className='image-wrapper' style={{
+                backgroundImage: `url(${getBannerImg()})`
+            }} />
 
             <section className='text-wrapper'>
                 <h3>{title}</h3>
@@ -37,7 +41,11 @@ const BlogItem = ({ blog, handleDeleteBlog }) => {
                                 <FontAwesomeIcon icon='trash' fixedWidth />
                             </button>
 
-                            <NavLink to={`/edit-blog/${id}`} className='icon-btn'>
+                            <NavLink 
+                                to={{ pathname: `/edit-blog/${id}` }}
+                                state= {{ from: blog }}
+                                className='icon-btn'
+                            >
                                 <FontAwesomeIcon icon='pencil' fixedWidth />
                             </NavLink>
                         </>

@@ -22,6 +22,30 @@ router = APIRouter(
 
 # AUXILIARY FUNCTIONS
 
+def search_blog_by_user(blog_to_find: Blog) -> Blog:
+    """ Searches a blog based on a field parameter. If field is the user's ID,
+     it gets all its blogs and needs a blog parameter to search for it.
+    
+     Parameters:
+        - field (`str`): field to find the blog.
+        - key (`any`): the value of the given field.
+        - blog_to_find (`Blog`): the blog to find and get its ID.
+    """
+
+    try:
+        blog = find_users_blogs(blog_to_find.user_id)[0]
+    except:
+        print("No funciona")
+
+    if blog is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="The Blog you're searching for is not in Database."
+        )
+
+    return Blog(**blog_schema(blog))
+
+
 def validate_token(request: Request):
     # Check if request has the "Authorization" header
     auth_header = request.headers.get("Authorization")
@@ -70,6 +94,8 @@ async def new_blog(blog: Blog, request: Request):
     # Insert the blog into the database
     create_blog(blog_dict)
 
+    return search_blog_by_user(blog)
+
 
 # Get one user's blogs -> GET
 @router.get("/{user_id}", response_model=list[Blog] | list, status_code=status.HTTP_200_OK)
@@ -112,11 +138,22 @@ async def single_blog(blog_id: int):
 @router.put("/edit-blog", status_code=status.HTTP_201_CREATED)
 async def edit_blog(blog: Blog, request: Request):
     validate_token(request)
-    # update_blog(blog, blog.id)
+
+    blog_dict = dict(blog)
+
+    # If blog has image -> decode it
+    if blog_dict["banner_img"]:
+        blog_encoded_image = blog_dict["banner_img"]
+        blog_image = base64.b64decode(blog_encoded_image)
+        blog_dict["banner_img"] = blog_image
+
+    update_blog(blog_dict, blog.id)
 
 
 # Delete blog -> DELETE
-@router.delete("/remove-blog/{blog_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/remove-blog/{blog_id}", response_model=int, status_code=status.HTTP_200_OK)
 async def remove_blog(blog_id: int, request: Request):
     validate_token(request)
     delete_blog(blog_id)
+
+    return blog_id

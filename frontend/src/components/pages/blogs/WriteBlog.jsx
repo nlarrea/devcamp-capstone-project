@@ -1,5 +1,5 @@
 import React, { useContext, useRef, useEffect, useState } from 'react';
-import { NavLink, matchRoutes, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate, useParams } from 'react-router-dom';
 import SunEditor from 'suneditor-react';
 import 'suneditor/dist/css/suneditor.min.css';
 import FileBase64 from 'react-file-base64';
@@ -7,64 +7,36 @@ import axios from 'axios';
 
 import useToken from '../../../hooks/useToken';
 import { AuthContext, UserContext } from '../../../context/authContext';
+import { UserBlogsContext } from '../../../context/blogsContext';
 
 const WriteBlog = () => {
     const location = useLocation();
     const history = useNavigate();
-    const { user, setUser } = useContext(UserContext);
-    const { setIsAuthenticated } = useContext(AuthContext);
     const { token } = useToken();
     const { blogId } = useParams();
+    const { user, setUser } = useContext(UserContext);
+    const { setIsAuthenticated } = useContext(AuthContext);
+    const { setUserBlogs } = useContext(UserBlogsContext);
 
     const blogTitleRef = useRef();
     const [editorContent, setEditorContent] = useState('');
     // const imageRef = useRef();
     const [image, setImage] = useState(null);
+    const [editMode, setEditMode] = useState(false);
 
     const [blogData, setBlogData] = useState({});
-    const [editMode, setEditMode] = useState(false);
 
 
     const handleEditorChange = (content) => {
         setEditorContent(content);
     }
 
-
-    const getBlogData = React.useCallback(() => {
-        const currentPath = location.pathname;
-        let route;
-        const routesMatching = matchRoutes(
-            [{ path: '/edit-blog/:blogId' }],
-            currentPath
-        );
-
-        if (routesMatching === null) {
-            route = undefined;
-        } else {
-            [{ route }] = routesMatching;
-        }
-
-        if (route) {
-            axios.get(
-                `http://127.0.0.1:8000/blogs/single-blog/${blogId}`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                }
-            ).then(response => {
-                // console.log(response.data);
-
-                setBlogData(response.data);
-            }).catch(error => {
-                console.error(error);
-            })
-        } else {
-            setBlogData({});
-        }
-    }, [blogId, location, token]);
-
     useEffect (() => {
-        setBlogData({});
-        getBlogData();
-    }, [getBlogData]);
+        if (location?.state?.from) {
+            const blogToEdit = location.state.from;
+            setBlogData(blogToEdit);
+        }
+    }, [location]);
 
 
     const handleSubmit = (event) => {
@@ -74,7 +46,7 @@ const WriteBlog = () => {
             title: blogTitleRef.current.value,
             content: editorContent,
             user_id: user.id,
-            banner_img: image
+            banner_img: image || ''
         };
 
         if (Object.entries(blogData).length !== 0) {
@@ -114,8 +86,11 @@ const WriteBlog = () => {
                 }
             ).then(response => {
                 // Check if data is correct
-                // console.log(response.data);
+                // console.log('posted blog:', response.data);
 
+                setUserBlogs(prevState => ([
+                    response.data, ...prevState
+                ]));
                 history('/users/me');
             }).catch(error => {
                 console.error('Create new blog error:', error);
@@ -183,28 +158,27 @@ const WriteBlog = () => {
 
                     {
                         Object.entries(blogData).length !== 0 && !editMode ? (
-                            <>
-                                <div className='current-blog-banner-image'>
-                                    <div
-                                        className='current-banner-image'
-                                        style={{
-                                            backgroundImage: `url(${blogData.banner_img.replace('dataimage/jpegbase64', 'data:image/jpeg;base64,')})`,
-                                            backgroundSize: 'cover',
-                                            backgroundPosition: 'center',
-                                            height: '250px',
-                                            width: '250px'
-                                        }}
-                                    />
+                            <div className='current-blog-banner-image'>
+                                <div
+                                    className='current-banner-image'
+                                    style={{
+                                        backgroundImage: `url(${blogData?.banner_img?.replace('dataimage/jpegbase64', 'data:image/jpeg;base64,') || ''})`,
+                                        backgroundSize: 'cover',
+                                        backgroundColor: 'lightgrey',
+                                        backgroundPosition: 'center',
+                                        height: '250px',
+                                        width: '250px'
+                                    }}
+                                />
 
-                                    <button
-                                        type='button'
-                                        onClick={() => setEditMode(true)}
-                                        className='form-btn edit-btn'
-                                    >Edit</button>
-                                </div>
-                            </>
+                                <button
+                                    type='button'
+                                    onClick={() => setEditMode(true)}
+                                    className='form-btn edit-btn'
+                                >Edit</button>
+                            </div>
                         ) : (
-                            <>
+                            <div className='current-blog-banner-image'>
                                 <FileBase64
                                     type='file'
                                     multiple={ false }
@@ -216,7 +190,7 @@ const WriteBlog = () => {
                                     onClick={() => setEditMode(false)}
                                     className='form-btn cancel-btn'
                                 >Cancel</button>
-                            </>
+                            </div>
                         )
                     }
                 </section>

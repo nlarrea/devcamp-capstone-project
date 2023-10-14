@@ -39,6 +39,7 @@ import WriteBlog from "./components/pages/blogs/WriteBlog";
 import UserPage from "./components/pages/users/UserPage";
 import UserEditPage from "./components/pages/users/UserEditPage";
 import NavBar from "./components/pure/NavBar";
+import { UserBlogsContext } from "./context/blogsContext";
 
 library.add(
   // Page Icon
@@ -69,11 +70,12 @@ library.add(
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState({});
+  const [userBlogs, setUserBlogs] = useState([]);
 
 
   useEffect (() => {
-    const login = () => {
-      axios.get(
+    const login = async () => {
+      await axios.get(
         'http://127.0.0.1:8000/users/me', {
           headers: { Authorization: `Bearer ${storedToken}` }
         }
@@ -82,17 +84,33 @@ function App() {
         setUser(response.data);
       }).catch(error => {
         console.error(error);
-      })
-    }
+      });
+    };
+
+    const getUserBlogs = async () => {
+      await axios.get(
+        `http://127.0.0.1:8000/blogs/${user.id}`, {
+          headers: { Authorization: `Bearer ${storedToken}`}
+        }
+      ).then(response => {
+        setUserBlogs([...response.data]);
+      }).catch(error => {
+        console.error('Error getting user blogs:', error);
+      });
+    };
 
     const storedToken = localStorage.getItem('token');
     if (storedToken) {
       login();
+
+      if (user.id) {
+        getUserBlogs();
+      }
     } else {
       setIsAuthenticated(false);
       setUser({});
     }
-  }, []);
+  }, [user.id]);
 
 
   /**
@@ -172,17 +190,18 @@ function App() {
     <div className="App">
       <>
         <AuthContext.Provider value={{isAuthenticated, setIsAuthenticated}}>
-          <UserContext.Provider value={{user, setUser}}>
-            <NavBar user={user} />
+        <UserContext.Provider value={{user, setUser}}>
+        <UserBlogsContext.Provider value={{userBlogs, setUserBlogs}}>
+          <NavBar user={user} />
 
-            <Routes>
-              <Route
-                exact
-                path='/'
-                element={
-                  <WelcomePage />
-                }
-              />
+          <Routes>
+            <Route
+              exact
+              path='/'
+              element={
+                <WelcomePage />
+              }
+            />
 
               {
                 isAuthenticated ? (
@@ -204,12 +223,13 @@ function App() {
                 )
               }
 
-              <Route
-                path='*'
-                element={<NotFoundPage />}
-              />
-            </Routes>
-          </UserContext.Provider>
+            <Route
+              path='*'
+              element={<NotFoundPage />}
+            />
+          </Routes>
+        </UserBlogsContext.Provider>
+        </UserContext.Provider>
         </AuthContext.Provider>
       </>
     </div>

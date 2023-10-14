@@ -82,6 +82,9 @@ def find_users_blogs(user_id: int) -> list:
     cur.execute(f"SELECT * FROM blogs WHERE blogs_users_id = {user_id} ORDER BY blogs_id DESC")
     results = cur.fetchall()
 
+    # Create a list of objects
+    results = [dict(obj) for obj in results]
+
     cur.close()
     conn.close()
 
@@ -104,13 +107,21 @@ def create_blog(blog: dict):
     # Create a cursor object
     cur = conn.cursor()
 
-    insert_image = psycopg2.Binary(blog["banner_img"])
+    if blog["banner_img"]:
+        insert_image = psycopg2.Binary(blog["banner_img"])
 
-    cur.execute(
-        """INSERT INTO blogs (blogs_title, blogs_content, blogs_users_id, blogs_banner_img)
-        VALUES (%s, %s, %s, %s)""",
-        (blog["title"], blog["content"], blog["user_id"], insert_image)
-    )
+        cur.execute(
+            """INSERT INTO blogs (blogs_title, blogs_content, blogs_users_id, blogs_banner_img)
+            VALUES (%s, %s, %s, %s)""",
+            (blog["title"], blog["content"], blog["user_id"], insert_image)
+        )
+    else:
+        cur.execute(
+            """INSERT INTO blogs (blogs_title, blogs_content, blogs_users_id)
+            VALUES (%s, %s, %s)""",
+            (blog["title"], blog["content"], blog["user_id"])
+        )
+
     conn.commit()
 
     # Close the cursor and connection
@@ -118,7 +129,7 @@ def create_blog(blog: dict):
     conn.close()
 
 
-def update_blog(blog: Blog, blog_id: int):
+def update_blog(blog: dict, blog_id: int):
     # Connect to the database
     conn = psycopg2.connect(
         host=db_host,
@@ -138,7 +149,7 @@ def update_blog(blog: Blog, blog_id: int):
         blogs_users_id = %s,
         blogs_banner_img = %s
         WHERE blogs_id = %s;""",
-        (blog.title, blog.content, blog.user_id, blog.banner_img, blog_id)
+        (blog["title"], blog["content"], blog["user_id"], blog["banner_img"], blog_id)
     )
     conn.commit()
 
