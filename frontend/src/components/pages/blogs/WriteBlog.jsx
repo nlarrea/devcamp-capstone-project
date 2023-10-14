@@ -92,10 +92,11 @@ const WriteBlog = () => {
             });
         } else {
             // Post the blog -> add it to database
+            console.log('token:', token);
             axios.post(
                 'http://127.0.0.1:8000/blogs/new-blog',
                 newBlog, {
-                    headers: { Authorization: `Bearer ${token}` }
+                    headers: { 'Authorization': `Bearer ${token}` }
                 }
             ).then(response => {
                 // Check if data is correct
@@ -133,6 +134,7 @@ const WriteBlog = () => {
                 <SunEditor
                     onChange={handleEditorChange}
                     defaultValue={blogData.content || ''}
+                    setContents={blogData.content}
                     placeholder='Write your own story!'
                     setDefaultStyle='font-size: 16px;'
                     setOptions={{
@@ -146,8 +148,7 @@ const WriteBlog = () => {
                             [
                                 'list',
                                 'align',
-                                'table',
-                                'image'
+                                'table'
                             ],
                             [
                                 'fontSize',
