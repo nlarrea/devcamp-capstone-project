@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from 'axios';
 
@@ -8,11 +8,15 @@ import { LogoutButton } from '../../pure/LogLinks';
 import BlogItem from '../../pure/BlogItem';
 import useToken from '../../../hooks/useToken';
 import { UserBlogsContext } from '../../../context/blogsContext';
+import { AuthContext, UserContext } from '../../../context/authContext';
 
-const UserPage = ({ user }) => {
+const UserPage = () => {
     /* Use the useEffect Hook to call the database and bring minimum the first
     15-20 blogs of this user (infinite scroll to get more blogs) */
+    const history = useNavigate();
     const { token } = useToken();
+    const { user, setUser } = useContext(UserContext);
+    const { setIsAuthenticated } = useContext(AuthContext);
     const { userBlogs, setUserBlogs } = useContext(UserBlogsContext);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -29,7 +33,15 @@ const UserPage = ({ user }) => {
             const currentBlogs = userBlogs.filter(blog => blog.id !== response.data);
             setUserBlogs([...currentBlogs]);
         }).catch(error => {
-            console.error(error);
+            if (error.response.status === 401) {
+                localStorage.removeItem('token');
+                setUser({});
+                setIsAuthenticated(false);
+                setUserBlogs([]);
+                history('/login');
+            } else {
+                console.error(error);
+            }
         });
 
         setIsLoading(false);

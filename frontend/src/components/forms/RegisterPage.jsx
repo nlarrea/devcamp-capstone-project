@@ -51,14 +51,14 @@ const RegisterPage = () => {
 
     const handlePassChange = () => {
         // Check both's lengths and if they're equals
-        checkPasswords(
-            pass1Ref.current.value,
-            pass2Ref.current.value,
-            setPass1Error,
-            setPass1ErrorMsg,
-            setPass2Error,
-            setPass2ErrorMsg
-        );
+        checkPasswords({
+            pass1: pass1Ref.current.value,
+            pass2: pass2Ref.current.value,
+            isError1: setPass1Error,
+            errorMsg1: setPass1ErrorMsg,
+            isError2: setPass2Error,
+            errorMsg2: setPass2ErrorMsg
+        });
 
         // Check if password has at least one of the char types
         const newConditions = passCharConditions(

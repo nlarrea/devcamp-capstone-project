@@ -85,7 +85,14 @@ function App() {
         setIsAuthenticated(true);
         setUser(response.data);
       }).catch(error => {
-        console.error(error);
+        if (error.response.status === 401) {
+          localStorage.removeItem('token');
+          setIsAuthenticated(false);
+          setUser({});
+          setUserBlogs([]);
+        } else {
+          console.error(error);
+        }
       });
     };
 
@@ -145,7 +152,7 @@ function App() {
     return [
       {
         path: '/users/me',
-        element: <UserPage user={user} />
+        element: <UserPage />
       },
       {
         path: '/users/me/edit',

@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState, useEffect } from 'react';
+import React, { useContext, useRef, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from 'axios';
@@ -9,7 +9,7 @@ import loginImg from '../../static/images/forms/login.svg';
 
 const LoginPage = () => {
     const history = useNavigate();
-    const { token, saveToken } = useToken();
+    const { saveToken } = useToken();
     const { setIsAuthenticated } = useContext(AuthContext);
     const { setUser } = useContext(UserContext);
 
@@ -28,26 +28,18 @@ const LoginPage = () => {
     const passRef = useRef();
 
 
-    const handleLogin = async (event) => {
-        event.preventDefault();
-
-        setIsLoading(true);
-
-        const loginUser = {
-            email: emailRef.current.value,
-            password: passRef.current.value
-        };
-
+    const loginUser = async (loginUserData) => {
         // Get access token
-        await axios.post(
+        return await axios.post(
             'http://127.0.0.1:8000/users/login',
-            loginUser
+            loginUserData
         ).then(response => {
             // Check if data is correct
             // console.log(response.data);
 
             // Save token to localStorage
             saveToken(response.data.access_token);
+            return response.data.access_token;
         }).catch(error => {
             // Print the error in the console
             // console.error('auth error:', error);
@@ -66,36 +58,49 @@ const LoginPage = () => {
                 setPassErrorMsg(errorMsg);
             }
         });
+    };
+
+    const getUser = (token) => {
+        // Get user's data after being authorized
+        axios.get(
+            'http://127.0.0.1:8000/users/me', {
+                headers: { Authorization: `Bearer ${token}`}
+            }
+        ).then(response => {
+            // Check if data is correct
+            // console.log(response.data);
+
+            // Login the user with the given credentials
+            setIsAuthenticated(true);
+            const userDb = response.data;
+            setUser(userDb);
+            history('/');
+        }).catch(error => {
+            console.error('login error:', error);
+        });
+    }
+
+
+    const handleLogin = async (event) => {
+        event.preventDefault();
+
+        setIsLoading(true);
+
+        const loginUserData = {
+            email: emailRef.current.value,
+            password: passRef.current.value
+        };
+
+        // Get access token
+        const createdToken = await loginUser(loginUserData);
+
+        // Get user's data if token is valid
+        if (createdToken) {
+            getUser(createdToken);
+        }
 
         setIsLoading(false);
     };
-
-
-    useEffect (() => {
-        const login = () => {
-            // Get user's data after being authorized
-            axios.get(
-                'http://127.0.0.1:8000/users/me', {
-                    headers: { Authorization: `Bearer ${token}`}
-                }
-            ).then(response => {
-                // Check if data is correct
-                // console.log(response.data);
-    
-                // Login the user with the given credentials
-                setIsAuthenticated(true);
-                const userDb = response.data;
-                setUser(userDb);
-                history('/');
-            }).catch(error => {
-                console.error('login error:', error);
-            });
-        };
-
-        if (localStorage.getItem('token')) {
-            login();
-        }
-    }, [token, history, setIsAuthenticated, setUser]);
 
 
     const resetErrors = () => {

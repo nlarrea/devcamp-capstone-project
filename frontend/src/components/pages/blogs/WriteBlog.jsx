@@ -93,8 +93,10 @@ const WriteBlog = () => {
                 const errorType = error.response.data.detail.type
                 
                 if (errorType === 'expired') {
+                    localStorage.removeItem('token');
                     setIsAuthenticated(false);
                     setUser({});
+                    setUserBlogs({})
                     history('/login');
                 }
             });

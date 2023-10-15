@@ -32,7 +32,7 @@ export const LogoutButton = ({ type=TYPES.textIcon, addClass='' }) => {
         setIsAuthenticated(false);
         setUser({});
         setUserBlogs([]);
-        history('/')
+        history('/');
     }
 
     return (
