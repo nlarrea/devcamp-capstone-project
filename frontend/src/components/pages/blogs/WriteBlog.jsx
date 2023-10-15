@@ -2,12 +2,12 @@ import React, { useContext, useRef, useEffect, useState } from 'react';
 import { NavLink, useLocation, useNavigate, useParams } from 'react-router-dom';
 import SunEditor from 'suneditor-react';
 import 'suneditor/dist/css/suneditor.min.css';
-import FileBase64 from 'react-file-base64';
 import axios from 'axios';
 
 import useToken from '../../../hooks/useToken';
 import { AuthContext, UserContext } from '../../../context/authContext';
 import { UserBlogsContext } from '../../../context/blogsContext';
+import FileBase64 from '../../pure/FileBase64';
 
 const WriteBlog = () => {
     const location = useLocation();
@@ -20,7 +20,8 @@ const WriteBlog = () => {
 
     const blogTitleRef = useRef();
     const [editorContent, setEditorContent] = useState('');
-    // const imageRef = useRef();
+
+    const [originalImg, setOriginalImg] = useState(null);
     const [image, setImage] = useState(null);
     const [editMode, setEditMode] = useState(false);
 
@@ -37,10 +38,21 @@ const WriteBlog = () => {
         setImage(null);
     }
 
+
+    const handleCancelImg = () => {
+        setEditMode(false);
+        setImage(originalImg);
+    }
+
+
     useEffect (() => {
         if (location?.state?.from) {
             const blogToEdit = location.state.from;
             setBlogData(blogToEdit);
+            setOriginalImg(location.state.from.banner_img);
+        } else {
+            setBlogData({})
+            setOriginalImg('');
         }
     }, [location]);
 
@@ -142,8 +154,7 @@ const WriteBlog = () => {
                 <section>
                     <SunEditor
                         onChange={handleEditorChange}
-                        defaultValue={blogData.content || ''}
-                        setContents={blogData.content}
+                        setContents={blogData.content || ''}
                         placeholder='Write your own story!'
                         setDefaultStyle='font-size: 16px;'
                         setOptions={{
@@ -168,39 +179,53 @@ const WriteBlog = () => {
                     />
 
                     {
-                        Object.entries(blogData).length !== 0 && !editMode ? (
-                            <div className='current-blog-banner-image'>
-                                <div
-                                    className='current-banner-image'
-                                    style={{
-                                        backgroundImage: `url(${blogData?.banner_img?.replace('dataimage/jpegbase64', 'data:image/jpeg;base64,') || ''})`,
-                                        backgroundSize: 'cover',
-                                        backgroundColor: 'lightgrey',
-                                        backgroundPosition: 'center',
-                                        height: '250px',
-                                        width: '250px'
-                                    }}
-                                />
+                        Object.entries(blogData).length !== 0 ? (
+                            /* EDIT BLOG MODE */
+                            !editMode ? (
+                                /* SHOW ORIGINAL IMAGE */
+                                <div className='current-blog-banner-image'>
+                                    <div
+                                        className='current-banner-image'
+                                        style={{
+                                            backgroundImage: `url(${blogData?.banner_img?.replace('dataimage/jpegbase64', 'data:image/jpeg;base64,') || ''})`,
+                                            backgroundSize: 'cover',
+                                            backgroundColor: 'lightgrey',
+                                            backgroundPosition: 'center',
+                                            height: '250px',
+                                            width: '250px'
+                                        }}
+                                    />
 
-                                <button
-                                    type='button'
-                                    onClick={handleRemoveImg}
-                                    className='form-btn edit-btn'
-                                >Remove</button>
-                            </div>
+                                    <button
+                                        type='button'
+                                        onClick={handleRemoveImg}
+                                        className='form-btn edit-btn'
+                                    >Remove</button>
+                                </div>
+                            ) : (
+                                /* ADD ANOTHER IMAGE */
+                                <div className='current-blog-banner-image'>
+                                    <FileBase64
+                                        inputId='banner-image'
+                                        multiple={false}
+                                        onDone={({base64}) => setImage(base64)}
+                                    />
+
+                                    <button
+                                        type='button'
+                                        onClick={handleCancelImg}
+                                        className='form-btn cancel-btn'
+                                    >Cancel</button>
+                                </div>
+                            )
                         ) : (
+                            /* WRITING A NEW BLOG MODE */
                             <div className='current-blog-banner-image'>
                                 <FileBase64
-                                    type='file'
-                                    multiple={ false }
+                                    inputId='banner-image'
+                                    multiple={false}
                                     onDone={({base64}) => setImage(base64)}
                                 />
-
-                                <button
-                                    type='button'
-                                    onClick={() => setEditMode(false)}
-                                    className='form-btn cancel-btn'
-                                >Cancel</button>
                             </div>
                         )
                     }

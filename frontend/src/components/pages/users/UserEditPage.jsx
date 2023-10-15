@@ -1,11 +1,12 @@
 import React, { useState, useContext, useRef } from 'react';
 import { NavLink } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import FileBase64 from 'react-file-base64';
+// import FileBase64 from '../../../../node_modules/react-file-base64/src/js/components/react-file-base64';
 
 import { UserContext } from '../../../context/authContext';
 import { checkPasswords, checkUsername, passCharConditions } from '../../../models/auxFunctions';
 import PasswordCharTest from '../../pure/PasswordCharTest';
+import FileBase64 from '../../pure/FileBase64';
 
 const UserEditPage = () => {
     // Context & global variable's state
@@ -223,7 +224,7 @@ const UserEditPage = () => {
                     />
                 </section>
 
-                {/* DROPZONE -> user image */}
+                {/* user image */}
                 <section className='user-img-section'>
                     {/* 
                         Poner un div con la img actual del user y un button que
@@ -238,13 +239,21 @@ const UserEditPage = () => {
                         Ya no Dropzone component, ahora es FileBase64
                     */}
                     {
-                        editImgMode ? (
+                        editImgMode || !image ? (
                             <>
-                                <FileBase64
-                                    type='file'
-                                    multiple={ false }
-                                    onDone={({base64}) => setImage(base64)}
-                                />
+                                <label htmlFor='banner-image' className='custom-file-upload'>
+                                    <div className='file-icon'>
+                                        <FontAwesomeIcon icon='upload' fixedWidth />
+                                    </div>
+                                    <div className='file-text'>
+                                        <span>Click to upload an Image</span>
+                                    </div>
+                                    <FileBase64
+                                        type='file'
+                                        multiple={ false }
+                                        onDone={({base64}) => setImage(base64)}
+                                    />
+                                </label>
 
                                 <button
                                     onClick={() => setEditImgMode(false)}
