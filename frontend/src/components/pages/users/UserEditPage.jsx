@@ -1,29 +1,38 @@
 import React, { useState, useContext, useRef } from 'react';
 import { NavLink } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-// import FileBase64 from '../../../../node_modules/react-file-base64/src/js/components/react-file-base64';
+import axios from 'axios';
 
+import avatar from '../../../static/images/avatars/user_avatar.svg';
 import { UserContext } from '../../../context/authContext';
-import { checkPasswords, checkUsername, passCharConditions } from '../../../models/auxFunctions';
+import useToken from '../../../hooks/useToken';
+import {
+    checkOldAndNewPasswords,
+    checkPasswords,
+    checkUsername,
+    passCharConditions
+} from '../../../models/auxFunctions';
 import PasswordCharTest from '../../pure/PasswordCharTest';
 import FileBase64 from '../../pure/FileBase64';
 
 const UserEditPage = () => {
     // Context & global variable's state
-    const { user } = useContext(UserContext);
+    const { user, setUser } = useContext(UserContext);
+    const { token, saveToken } = useToken();
+    const [isLoading, setIsLoading] = useState(false);
     const [editImgMode, setEditImgMode] = useState(false);
 
-    const [username, setUsername] = useState(user?.username);
-    const [email, setEmail] = useState(user?.email);
-    const [password, setPassword] = useState(user?.password);
-    const [image, setImage] = useState(user?.image);
+    const originalImg = user?.image || avatar;
+    const [image, setImage] = useState(user?.image || avatar);
 
+    const [viewOldPass, setViewOldPass] = useState(false);
     const [viewPass1, setViewPass1] = useState(false);
     const [viewPass2, setViewPass2] = useState(false);
 
     // Refs to inputs
     const usernameRef = useRef();
     const emailRef = useRef();
+    const oldPassRef = useRef();
     const pass1Ref = useRef();
     const pass2Ref = useRef();
 
@@ -31,6 +40,8 @@ const UserEditPage = () => {
     const [userError, setUserError] = useState(false);
     const [userErrorMsg, setUserErrorMsg] = useState('');
 
+    const [oldPassError, setOldPassError] = useState(false);
+    const [oldPassErrorMsg, setOldPassErrorMsg] = useState('');
     const [pass1Error, setPass1Error] = useState(false);
     const [pass1ErrorMsg, setPass1ErrorMsg] = useState('');
     const [pass2Error, setPass2Error] = useState(false);
@@ -38,67 +49,145 @@ const UserEditPage = () => {
     const [charConditions, setCharConditions] = useState();
 
 
-    // Create a form because we are passing images too
-    const buildForm = () => {
-        let formData = new FormData();
-
-        formData.append('user[username]', username);
-        formData.append('user[email]', email);
-        formData.append('user[password]', password);
-
-        if (image) {
-            formData.append('user[image]', image);
-        }
-        
-        return formData;
+    const handleRemoveImg = () => {
+        setEditImgMode(true);
+        setImage(null);
     }
 
 
+    const handleCancelImg = () => {
+        setEditImgMode(false);
+        setImage(originalImg);
+    }
+
+
+    const updateUser = async ( newUserData ) => {
+        return await axios.put(
+            'http://127.0.0.1:8000/users/check-user-exists',
+            newUserData, {
+                headers: { Authorization: `Bearer ${token}` }
+            }
+        ).then(response => {
+            saveToken(response.data.access_token);
+            return response.data.access_token;
+        }).catch(error => {
+            console.error('Error updating user data:', error);
+        });
+    };
+
+    /* const updateToken = async (newUserData) => {
+        const newLoginCredentials = {
+            email: newUserData.email,
+            password: newUserData.new_password
+        };
+
+        return await axios.post(
+            'http://127.0.0.1:8000/users/login',
+            newLoginCredentials
+        ).then(response => {
+            saveToken(response.data.access_token);
+            return response.data.access_token
+        }).catch(error => {
+            console.error('Error login user with new credentials:', error);
+        });
+    }; */
+
+    const getUserNewData = async (token) => {
+        await axios.get(
+            'http://127.0.0.1:8000/users/me', {
+                headers: { Authorization: `Bearer ${token}` }
+            }
+        ).then(response => {
+            setUser(response.data);
+        }).catch(error => {
+            console.error('Error getting user\'s new data:', error);
+        });
+    };
+
+
     // When changes are made, send those to DB
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
+        setIsLoading(true);
         event.preventDefault();
 
-        // Check if data is correct
+        if (userError || pass1Error || pass2Error || oldPassError) {
+            return;
+        }
+
+        const newUserData = {
+            username: usernameRef.current.value || user.username,
+            email: emailRef.current.value || user.email,
+            old_password: oldPassRef.current.value,
+            new_password: pass1Ref.current.value || '',
+            image: image !== avatar ? image : ''
+        }
+
+        // Check if new data doesn't already exist
+        const validCredentials = await updateUser(newUserData);
         
-
-        /* Check if new username doesn't exist in DB
-            * Check if current username !== new username
-            * Check if new username doesn't exist in DB
-        */
-        if (usernameRef.current.value !== username) {
-            setUsername(usernameRef.current.value);
+        if (validCredentials) {
+            localStorage.removeItem('token');
+            // const createdToken = await updateToken(newUserData);
+            await getUserNewData(validCredentials);
         }
 
-        /* Check if new email doesn't exist in DB
-            * Check if current email !== new email
-            * Check if new email doesn't exist in DB
-        */
-        if (emailRef.current.value !== email) {
-            setEmail(emailRef.current.value);
-        }
-
-        buildForm();
-
+        setIsLoading(false);
     }
 
 
     const handlePassChange = () => {
-        checkPasswords(
-            pass1Ref.current.value,
-            pass2Ref.current.value,
-            setPass1Error,
-            setPass1ErrorMsg,
-            setPass2Error,
-            setPass2ErrorMsg
-        );
+        const pass1 = pass1Ref?.current?.value;
+        const pass2 = pass2Ref?.current?.value;
 
-        // Check if password has at least one of the char types
-        const newConditions = passCharConditions(
-            pass1Ref.current.value,
-            setPass1Error,
-            setPass1ErrorMsg
-        );
-        setCharConditions(newConditions);
+        if (pass1 || pass2) {
+            checkPasswords({
+                pass1: pass1Ref.current.value,
+                pass2: pass2Ref.current.value,
+                isError1: setPass1Error,
+                errorMsg1: setPass1ErrorMsg,
+                isError2: setPass2Error,
+                errorMsg2: setPass2ErrorMsg
+            });
+    
+            // Check if password has at least one of the char types
+            const newConditions = passCharConditions({
+                password: pass1Ref.current.value,
+                isError: setPass1Error,
+                errorMessage: setPass1ErrorMsg
+            });
+            setCharConditions(newConditions);
+        } else {
+            setPass1Error(false);
+            setPass1ErrorMsg('');
+            setPass2Error(false);
+            setPass2ErrorMsg('');
+        }
+    }
+
+
+    const handleOldPassChange = () => {
+        const oldPass = oldPassRef?.current?.value;
+        const newPass = pass1Ref?.current?.value;
+
+        if (newPass) {
+            checkOldAndNewPasswords({
+                oldPass: oldPass,
+                newPass: newPass,
+                isOldError: setOldPassError,
+                oldErrorMsg: setOldPassErrorMsg,
+                isNewError: setPass1Error,
+                newErrorMsg: setPass1ErrorMsg
+            });
+    
+            passCharConditions({
+                password: oldPass,
+                isError: setOldPassError,
+                errorMessage: setOldPassErrorMsg
+            });
+        } else {
+            setPass1Error(false);
+            setPass1ErrorMsg('');
+        }
     }
 
 
@@ -119,6 +208,7 @@ const UserEditPage = () => {
                             id='username-input'
                             placeholder='YourUsername'
                             defaultValue={user.username}
+                            spellCheck={false}
                             required
                         />
                         <label
@@ -137,6 +227,7 @@ const UserEditPage = () => {
                             id='email-input'
                             placeholder='your_email@example.com'
                             defaultValue={user.email}
+                            spellCheck={false}
                             required
                         />
                         <label
@@ -146,6 +237,42 @@ const UserEditPage = () => {
                         <FontAwesomeIcon icon='at' className='input-icon' />
                     </div>
 
+                    <div className='input-label-wrapper'>
+                        <input
+                            ref={oldPassRef}
+                            onChange={handleOldPassChange}
+                            type={viewOldPass ? 'text' : "password"}
+                            className={`input-field ${oldPassError ? 'input-error' : ''}`}
+                            id='original-password'
+                            placeholder='1234ABcd_'
+                            spellCheck={false}
+                            required
+                            autoFocus={true}
+                        />
+                        <label
+                            htmlFor="original-password"
+                            className='input-label'
+                        >Old Password</label>
+                        {
+                            viewOldPass ? (
+                                <FontAwesomeIcon
+                                    onClick={() => setViewOldPass(!viewOldPass)}
+                                    icon='lock-open'
+                                    className='input-icon icon-btn'
+                                    fixedWidth
+                                />
+                            ) : (
+                                <FontAwesomeIcon
+                                    onClick={() => setViewOldPass(!viewOldPass)}
+                                    icon='lock'
+                                    className='input-icon icon-btn'
+                                    fixedWidth
+                                />
+                            )
+                        }
+                        <span className='error-message'>{oldPassErrorMsg || 'Required'}</span>
+                    </div>
+
                     <div className='input-label-wrapper' id='password-wrapper'>
                         <input
                             ref={pass1Ref}
@@ -153,14 +280,14 @@ const UserEditPage = () => {
                             type={viewPass1 ? 'text' : "password"}
                             className={`input-field ${pass1Error ? 'input-error' : ''}`}
                             id='password-1'
-                            placeholder='abCD1234'
-                            defaultValue={user.password || ''}
+                            placeholder='_abCD1234'
+                            spellCheck={false}
                             required
                         />
                         <label
                             htmlFor="password-1"
                             className='input-label'
-                        >Password</label>
+                        >New Password</label>
                         {
                             viewPass1 ? (
                                 <FontAwesomeIcon
@@ -188,14 +315,14 @@ const UserEditPage = () => {
                             type={viewPass2 ? 'text' : "password"}
                             className={`input-field ${pass2Error ? 'input-error' : ''}`}
                             id='password-2'
-                            placeholder='abCD1234'
-                            defaultValue={user.password || ''}
+                            placeholder='_abCD1234'
+                            spellCheck={false}
                             required
                         />
                         <label
                             htmlFor="password-2"
                             className='input-label'
-                        >Confirm Password</label>
+                        >Confirm New Password</label>
                         {
                             viewPass2 ? (
                                 <FontAwesomeIcon
@@ -226,37 +353,17 @@ const UserEditPage = () => {
 
                 {/* user image */}
                 <section className='user-img-section'>
-                    {/* 
-                        Poner un div con la img actual del user y un button que
-                        permita modificar la img. Si se pulsa el botón, en vez
-                        de mostrarse la img, se verá el Dropzone para poder
-                        subir una nueva.
-                        Añadir también un "Cancel" para volver a la imagen.
-
-                        editImgMode -> useState
-                        editImgMode ? (Dropzone) : (div con img)
-
-                        Ya no Dropzone component, ahora es FileBase64
-                    */}
                     {
-                        editImgMode || !image ? (
+                        editImgMode ? (
                             <>
-                                <label htmlFor='banner-image' className='custom-file-upload'>
-                                    <div className='file-icon'>
-                                        <FontAwesomeIcon icon='upload' fixedWidth />
-                                    </div>
-                                    <div className='file-text'>
-                                        <span>Click to upload an Image</span>
-                                    </div>
-                                    <FileBase64
-                                        type='file'
-                                        multiple={ false }
-                                        onDone={({base64}) => setImage(base64)}
-                                    />
-                                </label>
+                                <FileBase64
+                                    type='file'
+                                    multiple={ false }
+                                    onDone={({base64}) => setImage(base64)}
+                                />
 
                                 <button
-                                    onClick={() => setEditImgMode(false)}
+                                    onClick={handleCancelImg}
                                     className='form-btn cancel-btn'
                                 >Cancel</button>
                             </>
@@ -266,12 +373,12 @@ const UserEditPage = () => {
                                     <div
                                         className='current-user-image'
                                         style={{
-                                            backgroundImage: `url(${user?.image})`
+                                            backgroundImage: `url(${image})`
                                         }}
                                     />
                                 </div>
                                 <button
-                                    onClick={() => setEditImgMode(true)}
+                                    onClick={handleRemoveImg}
                                     className='form-btn edit-btn'
                                 >Edit</button>
                             </>
@@ -287,7 +394,13 @@ const UserEditPage = () => {
                     onClick={handleSubmit}
                     className='form-btn'
                 >
-                    Confirm Changes
+                    {
+                        isLoading ? (
+                            <FontAwesomeIcon icon='spinner' fixedWidth spin />
+                        ) : (
+                            'Confirm Changes'
+                        )
+                    }
                 </button>
             </nav>
         </div>

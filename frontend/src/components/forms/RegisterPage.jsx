@@ -7,7 +7,6 @@ import { AuthContext, UserContext } from '../../context/authContext';
 import registerImg from '../../static/images/forms/register.svg';
 import { checkUsername, checkPasswords, passCharConditions } from '../../models/auxFunctions';
 import PasswordCharTest from '../pure/PasswordCharTest';
-import avatar from '../../static/images/avatars/user_avatar.svg';
 import useToken from '../../hooks/useToken';
 
 const RegisterPage = () => {
@@ -61,11 +60,11 @@ const RegisterPage = () => {
         });
 
         // Check if password has at least one of the char types
-        const newConditions = passCharConditions(
-            pass1Ref.current.value,
-            setPass1Error,
-            setPass1ErrorMsg
-        );
+        const newConditions = passCharConditions({
+            password: pass1Ref.current.value,
+            isError: setPass1Error,
+            errorMessage: setPass1ErrorMsg
+        });
         setCharConditions(newConditions);
     }
 
@@ -113,7 +112,7 @@ const RegisterPage = () => {
             username: userRef.current.value,
             email: emailRef.current.value,
             password: pass1Ref.current.value,
-            image: avatar
+            image: ''
         };
 
         const data = await createUser(newUser).then(data => {

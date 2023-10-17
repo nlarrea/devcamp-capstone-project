@@ -9,6 +9,7 @@ const FileBase64 = ({ inputId='image-input', multiple=false, onDone }) => {
         // Get the files
         setFiles(event.target.files);
         let files = event.target.files;
+        files.type = 'image/jpg';
 
         // Process each file
         let allFiles = [];
@@ -23,7 +24,7 @@ const FileBase64 = ({ inputId='image-input', multiple=false, onDone }) => {
             reader.readAsDataURL(file);
 
             // On loader load something...
-            reader.onload = () => {
+            reader.onloadend = () => {
                 // Make a info object
                 let fileInfo = {
                     name: file.name,

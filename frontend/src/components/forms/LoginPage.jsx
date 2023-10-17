@@ -139,6 +139,7 @@ const LoginPage = () => {
                             placeholder='your_email@example.com'
                             required
                             spellCheck={false}
+                            autoFocus={true}
                             type="email"
                         />
                         <label htmlFor="login-email" className='input-label'>

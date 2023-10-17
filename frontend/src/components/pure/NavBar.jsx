@@ -3,6 +3,7 @@ import { NavLink } from 'react-router-dom';
 
 import { AuthContext } from '../../context/authContext';
 import { TYPES } from '../../models/constants';
+import avatar from '../../static/images/avatars/user_avatar.svg';
 import { LoginButton, LogoutButton } from './LogLinks';
 
 const NavBar = ({ user }) => {
@@ -36,7 +37,7 @@ const NavBar = ({ user }) => {
                                     <span className='nav-user-circle-out' />
                                     <span className='nav-user-circle-in' />
                                     <img
-                                        src={user?.image}
+                                        src={user?.image || avatar}
                                         alt={user?.username || 'user'}
                                         id='logged-user-nav-img'
                                     />

@@ -2,6 +2,7 @@ import os
 from fastapi import APIRouter, HTTPException, status, Request
 from jose import jwt, JWTError
 import base64
+import re
 
 from db.models.blog import Blog
 from db.schemas.blog import blog_schema, blogs_schema
@@ -96,6 +97,35 @@ def validate_token(request: Request):
         return username
     
 
+def process_base64_images(base64_image):
+    def decode_base64(data, alt_chars=b"+/"):
+        """ Decode base64, padding being optional.
+
+        Parameters:
+            - data: base64 data as an ASCII byte string.
+        
+        Returns:
+            - The decoded byte sting.
+        """
+
+        # Normalize
+        data = re.sub(rb"[^a-zA-Z0-9%s]+" % alt_chars, b"", data)
+
+        missing_padding = len(data) % 4
+        if missing_padding:
+            data += b"=" * (4 - missing_padding)
+
+        return base64.b64decode(data, alt_chars)
+    
+
+    if b"png" in base64_image:
+            base64_image = re.sub(b"png", b"jpeg", base64_image)
+            
+    blog_encoded_image = base64_image
+    blog_image = decode_base64(blog_encoded_image)
+    return blog_image
+    
+
 # BLOGS DEFINITIONS
 
 @router.post("/new-blog", status_code=status.HTTP_201_CREATED)
@@ -108,9 +138,7 @@ async def new_blog(blog: Blog, request: Request):
 
     # If blog has image -> decode it
     if blog_dict["banner_img"]:
-        blog_encoded_image = blog_dict["banner_img"]
-        blog_image = base64.b64decode(blog_encoded_image)
-        blog_dict["banner_img"] = blog_image
+        blog_dict["banner_img"] = process_base64_images(blog_dict["banner_img"])
 
     # Insert the blog into the database
     create_blog(blog_dict)
@@ -165,9 +193,7 @@ async def edit_blog(blog: Blog, request: Request):
 
     # If blog has image -> decode it
     if blog_dict["banner_img"]:
-        blog_encoded_image = blog_dict["banner_img"]
-        blog_image = base64.b64decode(blog_encoded_image)
-        blog_dict["banner_img"] = blog_image
+        blog_dict["banner_img"] = process_base64_images(blog_dict["banner_img"])
 
     update_blog(blog_dict, blog.id)
 

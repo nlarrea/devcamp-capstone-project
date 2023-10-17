@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import {
@@ -70,6 +70,7 @@ library.add(
 )
 
 function App() {
+  const history = useNavigate();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState({});
   const [userBlogs, setUserBlogs] = useState([]);
@@ -90,13 +91,14 @@ function App() {
           setIsAuthenticated(false);
           setUser({});
           setUserBlogs([]);
+          history('/login');
         } else {
           console.error(error);
         }
       });
     };
 
-    const getUserBlogs = async () => {
+    /* const getUserBlogs = async () => {
       await axios.get(
         `http://127.0.0.1:8000/blogs/${user.id}`, {
           headers: { Authorization: `Bearer ${storedToken}`}
@@ -106,20 +108,22 @@ function App() {
       }).catch(error => {
         console.error('Error getting user blogs:', error);
       });
-    };
+    }; */
 
     const storedToken = localStorage.getItem('token');
     if (storedToken) {
       login();
 
-      if (user.id) {
+      /* if (user.id) {
         getUserBlogs();
-      }
+      } */
     } else {
       setIsAuthenticated(false);
       setUser({});
+      history('/login');
     }
-  }, [user.id]);
+    // eslint-disable-next-line
+  }, []);
 
 
   /**

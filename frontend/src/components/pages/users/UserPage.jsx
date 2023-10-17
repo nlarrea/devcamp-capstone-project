@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from 'axios';
@@ -16,9 +16,31 @@ const UserPage = () => {
     const history = useNavigate();
     const { token } = useToken();
     const { user, setUser } = useContext(UserContext);
-    const { setIsAuthenticated } = useContext(AuthContext);
+    const { isAuthenticated, setIsAuthenticated } = useContext(AuthContext);
     const { userBlogs, setUserBlogs } = useContext(UserBlogsContext);
     const [isLoading, setIsLoading] = useState(false);
+
+
+    useEffect (() => {
+        const getUserBlogs = async () => {
+            await axios.get(
+                `http://127.0.0.1:8000/blogs/${user.id}`, {
+                    headers: { Authorization: `Bearer ${token}`}
+                }
+            ).then(response => {
+                setUserBlogs([...response.data]);
+            }).catch(error => {
+                console.error('Error getting user blogs:', error);
+            });
+        };
+
+        if (isAuthenticated) {
+            getUserBlogs();
+        } else {
+            history('/login');
+        }
+    // eslint-disable-next-line
+    }, []);
 
 
     const handleDeleteBlog = (blogId) => {

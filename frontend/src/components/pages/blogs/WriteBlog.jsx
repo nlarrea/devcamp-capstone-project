@@ -8,12 +8,16 @@ import useToken from '../../../hooks/useToken';
 import { AuthContext, UserContext } from '../../../context/authContext';
 import { UserBlogsContext } from '../../../context/blogsContext';
 import FileBase64 from '../../pure/FileBase64';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const WriteBlog = () => {
     const location = useLocation();
     const history = useNavigate();
+    const [isLoading, setIsLoading] = useState(false);
+
     const { token } = useToken();
     const { blogId } = useParams();
+    
     const { user, setUser } = useContext(UserContext);
     const { setIsAuthenticated } = useContext(AuthContext);
     const { userBlogs, setUserBlogs } = useContext(UserBlogsContext);
@@ -21,8 +25,8 @@ const WriteBlog = () => {
     const blogTitleRef = useRef();
     const [editorContent, setEditorContent] = useState('');
 
-    const [originalImg, setOriginalImg] = useState(null);
-    const [image, setImage] = useState(null);
+    const originalImg = location?.state?.from?.banner_img || '';
+    const [image, setImage] = useState(originalImg ? originalImg : null);
     const [editMode, setEditMode] = useState(false);
 
     const [blogData, setBlogData] = useState({});
@@ -49,15 +53,14 @@ const WriteBlog = () => {
         if (location?.state?.from) {
             const blogToEdit = location.state.from;
             setBlogData(blogToEdit);
-            setOriginalImg(location.state.from.banner_img);
         } else {
             setBlogData({})
-            setOriginalImg('');
         }
     }, [location]);
 
 
     const handleSubmit = (event) => {
+        setIsLoading(true);
         event.preventDefault();
 
         const newBlog = {
@@ -90,7 +93,7 @@ const WriteBlog = () => {
             }).catch(error => {
                 console.error('Updating error:', error);
 
-                const errorType = error.response.data.detail.type
+                const errorType = error.response?.data?.detail?.type
                 
                 if (errorType === 'expired') {
                     localStorage.removeItem('token');
@@ -99,6 +102,8 @@ const WriteBlog = () => {
                     setUserBlogs({})
                     history('/login');
                 }
+            }).finally(() => {
+                setIsLoading(false);
             });
         } else {
             // Post the blog -> add it to database
@@ -120,13 +125,15 @@ const WriteBlog = () => {
             }).catch(error => {
                 console.error('Create new blog error:', error);
 
-                const errorType = error.response.data.detail.type
+                const errorType = error.response?.data?.detail?.type
                 
                 if (errorType === 'expired') {
                     setIsAuthenticated(false);
                     setUser({});
                     history('/login');
                 }
+            }).finally(() => {
+                setIsLoading(false);
             });
         }
     }
@@ -146,6 +153,7 @@ const WriteBlog = () => {
                             defaultValue={blogData.title}
                             required
                             type='text'
+                            autoFocus={true}
                         />
                         <label htmlFor='blog-title' className='input-label'>
                             Blog Title
@@ -241,7 +249,15 @@ const WriteBlog = () => {
                     <button
                         type='submit'
                         className='form-btn'
-                    >Submit Blog</button>
+                    >
+                        {
+                            isLoading ? (
+                                <FontAwesomeIcon icon='spinner' fixedWidth spin />
+                            ) : (
+                                'Submit Blog'
+                            )
+                        }
+                    </button>
                 </nav>
             </form>
         </div>

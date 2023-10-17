@@ -228,6 +228,10 @@
     display: none;
 }
 
+#original-password {
+    border-color: var.$charcoal;
+}
+
 @keyframes zoom {
     0% {
         transform: scale(2);
