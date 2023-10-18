@@ -3,11 +3,11 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from 'axios';
 
-import { AuthContext, UserContext } from '../../context/authContext';
-import registerImg from '../../static/images/forms/register.svg';
-import { checkUsername, checkPasswords, passCharConditions } from '../../models/auxFunctions';
-import PasswordCharTest from '../pure/PasswordCharTest';
-import useToken from '../../hooks/useToken';
+import { AuthContext, UserContext } from '../../../context/authContext';
+import registerImg from '../../../static/images/forms/register.svg';
+import { checkUsername, checkPasswords, passCharConditions } from '../../../models/auxFunctions';
+import PasswordCharTest from '../../pure/PasswordCharTest';
+import useToken from '../../../hooks/useToken';
 
 const RegisterPage = () => {
     // History and contexts
