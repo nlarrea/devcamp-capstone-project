@@ -22,8 +22,8 @@ const UserEditPage = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [editImgMode, setEditImgMode] = useState(false);
 
-    const originalImg = user?.image || avatar;
-    const [image, setImage] = useState(user?.image || avatar);
+    const originalImg = user?.image || null;
+    const [image, setImage] = useState(originalImg ? originalImg : null);
 
     const [viewOldPass, setViewOldPass] = useState(false);
     const [viewPass1, setViewPass1] = useState(false);
@@ -119,8 +119,10 @@ const UserEditPage = () => {
             email: emailRef.current.value || user.email,
             old_password: oldPassRef.current.value,
             new_password: pass1Ref.current.value || '',
-            image: image !== avatar ? image : ''
+            image: image || ''
         }
+
+        console.log('newUserData:', newUserData);
 
         // Check if new data doesn't already exist
         const validCredentials = await updateUser(newUserData);
@@ -373,7 +375,9 @@ const UserEditPage = () => {
                                     <div
                                         className='current-user-image'
                                         style={{
-                                            backgroundImage: `url(${image})`
+                                            backgroundImage: `url(${image?.replace('dataimage/jpegbase64', 'data:image/jpeg;base64,') || originalImg || avatar})`,
+                                            backgroundSize: 'cover',
+                                            backgroundPosition: 'center'
                                         }}
                                     />
                                 </div>
@@ -391,6 +395,7 @@ const UserEditPage = () => {
                 <NavLink to='/users/me'>Cancel</NavLink>
 
                 <button
+                    type='submit'
                     onClick={handleSubmit}
                     className='form-btn'
                 >

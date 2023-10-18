@@ -36,11 +36,25 @@ const NavBar = ({ user }) => {
                                 <div className='nav-user-img-wrapper'>
                                     <span className='nav-user-circle-out' />
                                     <span className='nav-user-circle-in' />
-                                    <img
-                                        src={user?.image || avatar}
-                                        alt={user?.username || 'user'}
-                                        id='logged-user-nav-img'
-                                    />
+                                    {
+                                        user?.image ? (
+                                            <div
+                                                id='logged-user-nav-img'
+                                                style={{
+                                                    backgroundImage: `url(${user?.image.replace('dataimage/jpegbase64', 'data:image/jpeg;base64,')})`,
+                                                    backgroundSize: 'cover',
+                                                    backgroundPosition: 'center',
+                                                    borderRadius: '50%'
+                                                }}
+                                            />
+                                        ) : (
+                                            <img
+                                                id='logged-user-nav-img'
+                                                src={avatar}
+                                                alt="user avatar"
+                                            />
+                                        )
+                                    }
                                 </div>
                             </NavLink>
 

@@ -9,7 +9,7 @@ const FileBase64 = ({ inputId='image-input', multiple=false, onDone }) => {
         // Get the files
         setFiles(event.target.files);
         let files = event.target.files;
-        files.type = 'image/jpg';
+        files.type = 'image/jpeg';
 
         // Process each file
         let allFiles = [];

@@ -1,6 +1,8 @@
+import base64
+
 def user_schema(user) -> dict:
-    if user["users_image"] is None:
-        user["users_image"] = ""
+    if user["users_image"]:
+        user["users_image"] = base64.b64encode(user["users_image"])
         
     return {
         "id": user["users_id"],

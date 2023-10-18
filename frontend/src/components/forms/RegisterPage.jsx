@@ -112,7 +112,6 @@ const RegisterPage = () => {
             username: userRef.current.value,
             email: emailRef.current.value,
             password: pass1Ref.current.value,
-            image: ''
         };
 
         const data = await createUser(newUser).then(data => {
