@@ -92,6 +92,8 @@
             justify-content: flex-end;
             gap: 16px;
 
+            position: relative;
+
             a {
                 color: var.$charcoal;
 
@@ -104,6 +106,17 @@
             button {
                 @include btn.form-btn($bg-color: var.$blue);
                 width: fit-content;
+            }
+
+            .api-error-message {
+                color: var.$warning;
+                font-size: 0.8rem;
+                font-weight: bold;
+                text-wrap: nowrap;
+    
+                position: absolute;
+                top: -15px;
+                left: 0;
             }
         }
     }

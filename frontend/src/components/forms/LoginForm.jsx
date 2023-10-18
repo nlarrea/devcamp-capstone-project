@@ -4,19 +4,28 @@ import * as Yup from 'yup';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
+
+const nChars = {
+    password: {
+        min: 8,
+        max: 30
+    }
+};
+
 const loginSchema = Yup.object().shape({
     email: Yup.string()
         .email('Invalid email format.')
         .required('Email is required.'),
     password: Yup.string()
         .required('Password is required.')
-        .min(8, 'Password is too short!')
-        .max(30, 'Password is too long!')
+        .min(nChars.password.min, `Min ${nChars.password.min} characters!`)
+        .max(nChars.password.max, `Max ${nChars.password.max} characters!`)
         .matches(
             /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_-])[A-Za-z\d@$!%*?&_-]{8,30}$/,
-            'At least 8 characters with 1 uppercase, 1 lowercase and 1 special.'
+            'At least 1 uppercase, 1 lowercase and 1 special character.'
         )
 });
+
 
 const LoginForm = ({ handleSubmit, setMessage, message }) => {
     const history = useNavigate();
