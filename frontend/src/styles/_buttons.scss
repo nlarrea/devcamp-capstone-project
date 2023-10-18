@@ -168,3 +168,21 @@
         cursor: pointer;
     }
 }
+
+
+@mixin link-type-btn(
+    $color: var.$charcoal,
+    $hover-color: var.$blue
+) {
+    background: none;
+    border: none;
+
+    cursor: pointer;
+    text-decoration: underline;
+    font-size: 0.9rem;
+    color: $color;
+    
+    &:hover, &:focus {
+        color: $hover-color;
+    }
+}

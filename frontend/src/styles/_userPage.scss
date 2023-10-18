@@ -121,6 +121,12 @@
             justify-content: center;
             gap: 32px;
 
+            #remove-user-btn {
+                @include btn.link-type-btn(
+                    $hover-color: var.$warning
+                );
+            }
+
             &.user-img-section {
                 div.filepicker,
                 div.current-user-image-wrapper {

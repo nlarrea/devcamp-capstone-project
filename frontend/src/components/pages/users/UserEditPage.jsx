@@ -1,10 +1,10 @@
 import React, { useState, useContext, useRef } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from 'axios';
 
 import avatar from '../../../static/images/avatars/user_avatar.svg';
-import { UserContext } from '../../../context/authContext';
+import { AuthContext, UserContext } from '../../../context/authContext';
 import useToken from '../../../hooks/useToken';
 import {
     checkOldAndNewPasswords,
@@ -17,6 +17,8 @@ import FileBase64 from '../../pure/FileBase64';
 
 const UserEditPage = () => {
     // Context & global variable's state
+    const history = useNavigate();
+    const { setIsAuthenticated } = useContext(AuthContext);
     const { user, setUser } = useContext(UserContext);
     const { token, saveToken } = useToken();
     const [isLoading, setIsLoading] = useState(false);
@@ -122,8 +124,6 @@ const UserEditPage = () => {
             image: image || ''
         }
 
-        console.log('newUserData:', newUserData);
-
         // Check if new data doesn't already exist
         const validCredentials = await updateUser(newUserData);
         
@@ -134,6 +134,25 @@ const UserEditPage = () => {
         }
 
         setIsLoading(false);
+    }
+
+
+    const handleRemoveAccount = (event) => {
+        event.preventDefault();
+
+        axios.delete(
+            'http://127.0.0.1:8000/users/remove-account', {
+                headers: { Authorization: `Bearer ${token}` }
+            }
+        ).then(response => {
+            // console.log('User has been successfully deleted');
+            setUser({})
+            setIsAuthenticated(false);
+            localStorage.removeItem('token');
+            history('/');
+        }).catch(error => {
+            console.error('An error occurred deleting the current user:', error)
+        })
     }
 
 
@@ -194,7 +213,7 @@ const UserEditPage = () => {
 
 
     return (
-        <div id='edit-user-data-page-wrapper' className='container'>
+        <form id='edit-user-data-page-wrapper' className='container'>
             <main>
                 <section>
                     <div className='input-label-wrapper'>
@@ -351,6 +370,12 @@ const UserEditPage = () => {
                         hasNumber={charConditions?.hasNumber || false}
                         hasSpecial={charConditions?.hasSpecial || false}
                     />
+
+                    <button
+                        type='button'
+                        onClick={handleRemoveAccount}
+                        id='remove-user-btn'
+                    >Remove account</button>
                 </section>
 
                 {/* user image */}
@@ -408,7 +433,7 @@ const UserEditPage = () => {
                     }
                 </button>
             </nav>
-        </div>
+        </form>
     );
 };
 

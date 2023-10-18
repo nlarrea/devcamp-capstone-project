@@ -10,7 +10,7 @@ import re
 from db.models.user import User, UserDB
 from db.models.form import LoginForm, EditForm
 from db.schemas.user import user_schema
-from db.users_database import create_user, find_user, find_user_conditional, update_user
+from db.users_database import create_user, find_user_conditional, update_user, delete_user
 
 
 ALGORITHM = "HS256"
@@ -114,7 +114,7 @@ def decode_base64(data, alt_chars=b"+/"):
         data += b"=" * (4 - missing_padding)
 
     return base64.b64decode(data, alt_chars)
-    
+
 
 # USERS DEFINITION
 
@@ -245,3 +245,8 @@ async def update_user_data(new_user: EditForm, logged_user: User = Depends(auth_
         "access_token": jwt.encode(access_token, SECRET, algorithm=ALGORITHM),
         "token_type": "bearer"
     }
+
+
+@router.delete("/remove-account", status_code=status.HTTP_200_OK)
+async def remove_current_user(user: User = Depends(auth_user)):
+    delete_user(user.id)

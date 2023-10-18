@@ -11,7 +11,7 @@ const BlogPage = () => {
             const obtainedData = response.data;
             setBlogData(obtainedData);
         }).catch(error => {
-            console.log('BlogPage fetch data error', error);
+            console.error('BlogPage fetch data error', error);
         })
     }
 
