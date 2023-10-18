@@ -1,115 +1,75 @@
-import React, { useContext, useRef, useState } from 'react';
+import React, { useContext, useState } from 'react';
+import { Formik, Form, Field, ErrorMessage } from 'formik';
+import * as Yup from 'yup';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import axios from 'axios';
 
-import useToken from '../../hooks/useToken';
+import AuthService from '../../common/auth';
 import { AuthContext, UserContext } from '../../context/authContext';
 import loginImg from '../../static/images/forms/login.svg';
 
+const loginSchema = Yup.object().shape({
+    email: Yup.string()
+        .email('Invalid email format.')
+        .required('Email is required.'),
+    password: Yup.string()
+        .required('Password is required.')
+        .min(8, 'Password is too short!')
+        .max(30, 'Password is too long!')
+        .matches(
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_-])[A-Za-z\d@$!%*?&_-]{8,30}$/,
+            'At least 8 characters with 1 uppercase, 1 lowercase and 1 special.'
+        )
+})
+
 const LoginPage = () => {
+    const initialCredentials = {
+        email: '',
+        password: ''
+    };
+
     const history = useNavigate();
-    const { saveToken } = useToken();
     const { setIsAuthenticated } = useContext(AuthContext);
     const { setUser } = useContext(UserContext);
 
     // States
-    const [isLoading, setIsLoading] = useState(false);
-
-    const [emailError, setEmailError] = useState(false);
-    const [emailErrorMsg, setEmailErrorMsg] = useState('');
-
-    const [passError, setPassError] = useState(false);
-    const [passErrorMsg, setPassErrorMsg] = useState('');
+    const [message, setMessage] = useState('');
     const [viewPass, setViewPass] = useState(false);
 
-    // Refs
-    const emailRef = useRef();
-    const passRef = useRef();
 
+    const handleSubmit = async (values) => {
+        setMessage('');
+        
+        await AuthService.login({
+            email: values.email,
+            password: values.password
+        }).then(async (data) => {
+            const obtainedToken = data.access_token;
 
-    const loginUser = async (loginUserData) => {
-        // Get access token
-        return await axios.post(
-            'http://127.0.0.1:8000/users/login',
-            loginUserData
-        ).then(response => {
-            // Check if data is correct
-            // console.log(response.data);
-
-            // Save token to localStorage
-            saveToken(response.data.access_token);
-            return response.data.access_token;
-        }).catch(error => {
-            // Print the error in the console
-            // console.error('auth error:', error);
-
-            // Print the error in the form
-            const errorType = error.response.data.detail.type;
-            const errorMsg = error.response.data.detail.message;
-
-            if (errorType === 'email') {
-                setEmailError(true);
-                setEmailErrorMsg(errorMsg);
+            if (obtainedToken) {
+                localStorage.setItem('token', obtainedToken);
+                
+                await AuthService.getCurrentUser().then(response => {
+                    const obtainedUser = response.data;
+                    setIsAuthenticated(true);
+                    setUser(obtainedUser);
+                });
             }
 
-            if (errorType === 'password') {
-                setPassError(true);
-                setPassErrorMsg(errorMsg);
-            }
-        });
-    };
-
-    const getUser = (token) => {
-        // Get user's data after being authorized
-        axios.get(
-            'http://127.0.0.1:8000/users/me', {
-                headers: { Authorization: `Bearer ${token}`}
-            }
-        ).then(response => {
-            // Check if data is correct
-            // console.log(response.data);
-
-            // Login the user with the given credentials
-            setIsAuthenticated(true);
-            const userDb = response.data;
-            setUser(userDb);
             history('/');
         }).catch(error => {
-            console.error('login error:', error);
+            const resMessage = (
+                error.response &&
+                error.response.data &&
+                error.response.data.detail &&
+                error.response.data.detail.message
+                ) ||
+                error.message ||
+                error.toString();
+
+            setMessage(resMessage);
         });
-    }
-
-
-    const handleLogin = async (event) => {
-        event.preventDefault();
-
-        setIsLoading(true);
-
-        const loginUserData = {
-            email: emailRef.current.value,
-            password: passRef.current.value
-        };
-
-        // Get access token
-        const createdToken = await loginUser(loginUserData);
-
-        // Get user's data if token is valid
-        if (createdToken) {
-            getUser(createdToken);
-        }
-
-        setIsLoading(false);
     };
-
-
-    const resetErrors = () => {
-        setEmailError(false);
-        setEmailErrorMsg('');
-
-        setPassError(false);
-        setPassErrorMsg('');
-    }
 
 
     return (
@@ -119,87 +79,128 @@ const LoginPage = () => {
             </section>
 
             <section>
-                <form onSubmit={handleLogin}>
-                    <button type='button' className='icon-button go-back-button' onClick={() => history('/')}>
-                        <FontAwesomeIcon icon='chevron-left' fixedWidth />
-                        Go Back
-                    </button>
+                <Formik
+                    // Initial values that the form will take
+                    initialValues={initialCredentials}
+                    // Yup validation schema
+                    validationSchema={loginSchema}
+                    validateOnChange={true}
+                    // On submit event
+                    onSubmit={handleSubmit}
+                >
+                    {/* Props from Formik */}
+                    {({
+                        values,
+                        touched,
+                        errors,
+                        isSubmitting,
+                        setFieldTouched,
+                        handleChange
+                    }) => (
+                        <Form>
+                            <button type='button' className='icon-button go-back-button' onClick={() => history('/')}>
+                                <FontAwesomeIcon icon='chevron-left' fixedWidth />
+                                Go Back
+                            </button>
 
-                    <header>
-                        <h2>Login</h2>
-                        <p>Nice to see you again!</p>
-                    </header>
+                            <header>
+                                <h2>Login</h2>
+                                <p>Nice to see you again!</p>
+                            </header>
 
-                    <div className='input-label-wrapper'>
-                        <input
-                            ref={emailRef}
-                            id='login-email'
-                            onChange={resetErrors}
-                            className={`input-field ${emailError ? 'input-error' : ''}`}
-                            placeholder='your_email@example.com'
-                            required
-                            spellCheck={false}
-                            autoFocus={true}
-                            type="email"
-                        />
-                        <label htmlFor="login-email" className='input-label'>
-                            Email
-                        </label>
-                        <FontAwesomeIcon icon='at' className='input-icon' fixedWidth />
-                        {emailError && <span className='error-message'>{emailErrorMsg}</span>}
-                    </div>
-
-                    <div className='input-label-wrapper'>
-                        <input
-                            ref={passRef}
-                            id='login-password'
-                            onChange={resetErrors}
-                            className={`input-field ${passError ? 'input-error' : ''}`}
-                            placeholder='1234_abCD'
-                            required
-                            type={viewPass ? 'text' : "password"}
-                        />
-                        <label htmlFor="login-password" className='input-label'>
-                            Password
-                        </label>
-                        {
-                            viewPass ? (
-                                <FontAwesomeIcon
-                                    onClick={() => setViewPass(!viewPass)}
-                                    icon='lock-open'
-                                    className='input-icon icon-btn'
-                                    fixedWidth
+                            <div className='input-label-wrapper'>
+                                <Field
+                                    id='login-email'
+                                    className={`input-field ${errors.email ? 'input-error' : ''}`}
+                                    name='email'
+                                    placeholder='your_email@example.com'
+                                    type='email'
+                                    value={values.email}
+                                    onChange={e => {
+                                        handleChange(e);
+                                        setFieldTouched('email', true, false);
+                                        setMessage('');
+                                    }}
                                 />
-                            ) : (
-                                <FontAwesomeIcon
-                                    onClick={() => setViewPass(!viewPass)}    
-                                    icon='lock'
-                                    className='input-icon icon-btn'
-                                    fixedWidth
+                                <label htmlFor='login-email' className='input-label'>Email</label>
+                                <FontAwesomeIcon icon='at' className='input-icon' fixedWidth />
+                                {
+                                    errors.email && touched.email && (
+                                        <ErrorMessage
+                                            name='email'
+                                            component='span'
+                                            className='error-message'
+                                        />
+                                    )
+                                }
+                            </div>
+                            
+                            <div className='input-label-wrapper'>
+                                <Field
+                                    id='login-password'
+                                    className={`input-field ${errors.password ? 'input-error' : ''}`}
+                                    name='password'
+                                    placeholder='1234ABcd_'
+                                    type={viewPass ? 'text' : 'password'}
+                                    value={values.password}
+                                    onChange={e => {
+                                        handleChange(e);
+                                        setFieldTouched('password', true, false);
+                                        setMessage('');
+                                    }}
                                 />
-                            )
-                        }
-                        {passError && <span className='error-message'>{passErrorMsg}</span>}
-                    </div>
+                                <label htmlFor='login-password' className='input-label'>Password</label>
+                                {
+                                    viewPass ? (
+                                        <FontAwesomeIcon
+                                            icon='lock-open'
+                                            className='input-icon icon-btn'
+                                            fixedWidth
+                                            onClick={() => setViewPass(false)}
+                                        />
+                                    ) : (
+                                        <FontAwesomeIcon
+                                            icon='lock'
+                                            className='input-icon icon-btn'
+                                            fixedWidth
+                                            onClick={() => setViewPass(true)}
+                                        />
+                                    )
+                                }
+                                {
+                                    errors.password && touched.password && (
+                                        <ErrorMessage
+                                            name='password'
+                                            component='span'
+                                            className='error-message'
+                                        />
+                                    )
+                                }
+                            </div>
 
-                    <nav>
-                        <p>
-                            First time here? <NavLink to='/register'>Register</NavLink>
-                        </p>
+                            <nav>
+                                <p>
+                                    First time here? <NavLink to='/register'>Register</NavLink>
+                                </p>
 
-                        <button type='submit'>
-                            {
-                                isLoading ? (
-                                    <FontAwesomeIcon icon='spinner' fixedWidth spin />
-                                ) : (
-                                    <>
-                                        Login
-                                    </>
-                                )
-                            }
-                        </button>
-                    </nav>
-                </form>
+                                <button type='submit' disabled={isSubmitting}>
+                                    {
+                                        isSubmitting ? (
+                                            <FontAwesomeIcon icon='spinner' fixedWidth spin />
+                                        ) : (
+                                            'Login'
+                                        )
+                                    }
+                                </button>
+
+                                {
+                                    message &&
+                                    <p className='api-error-message'>{message}</p>
+                                }
+                            </nav>
+                        </Form>
+                    )}
+                </Formik>
             </section>
         </div>
     );
