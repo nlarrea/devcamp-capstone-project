@@ -44,6 +44,29 @@ body, .App {
 }
 
 
+.page-loader {
+    width: 100vw;
+    height: 100vh;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    font-size: 1.2rem;
+    font-weight: bold;
+
+    svg {
+        color: var.$blue;
+    }
+
+    span {
+        color: var.$charcoal;
+        font-family: 'Montserrat', sans-serif;
+    }
+}
+
+
 .link-wrapper {
     padding: 0 16px;
     

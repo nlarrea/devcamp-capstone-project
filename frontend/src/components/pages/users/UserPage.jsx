@@ -10,6 +10,7 @@ import useToken from '../../../hooks/useToken';
 import { UserBlogsContext } from '../../../context/blogsContext';
 import { AuthContext, UserContext } from '../../../context/authContext';
 
+
 const UserPage = () => {
     /* Use the useEffect Hook to call the database and bring minimum the first
     15-20 blogs of this user (infinite scroll to get more blogs) */

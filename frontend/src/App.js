@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Routes, Route, useNavigate } from "react-router-dom";
-import axios from "axios";
+import { Routes, Route } from "react-router-dom";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import {
   // Page Icon
@@ -17,7 +16,7 @@ import {
   faUser,
   faAt,
   faLock,
-  faLockOpen,
+  faUnlock,
   // Edition
   faPencil,
   faGear,
@@ -26,14 +25,15 @@ import {
   // Others
   faMobile,
   faRocket,
-  faNewspaper
+  faNewspaper,
 } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { AuthContext, UserContext } from "./context/authContext";
 import WelcomePage from "./components/pages/WelcomePage";
 import NotFoundPage from "./components/pages/NotFoundPage";
-import LoginPage from "./components/forms/LoginPage";
-import RegisterPage from "./components/forms/RegisterPage";
+import LoginPage from "./components/pages/auth/LoginPage";
+import RegisterPage from "./components/pages/auth/RegisterPage";
 import BlogsList from './components/pages/blogs/BlogsList';
 import BlogPage from './components/pages/blogs/BlogPage';
 import WriteBlog from "./components/pages/blogs/WriteBlog";
@@ -41,6 +41,7 @@ import UserPage from "./components/pages/users/UserPage";
 import UserEditPage from "./components/pages/users/UserEditPage";
 import NavBar from "./components/pure/NavBar";
 import { UserBlogsContext } from "./context/blogsContext";
+import AuthService from "./common/auth";
 
 library.add(
   // Page Icon
@@ -57,7 +58,7 @@ library.add(
   faUser,
   faAt,
   faLock,
-  faLockOpen,
+  faUnlock,
   // Edition
   faPencil,
   faGear,
@@ -70,60 +71,49 @@ library.add(
 )
 
 function App() {
-  const history = useNavigate();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState({});
   const [userBlogs, setUserBlogs] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
 
   useEffect (() => {
-    const login = async () => {
-      await axios.get(
-        'http://127.0.0.1:8000/users/me', {
-          headers: { Authorization: `Bearer ${storedToken}` }
-        }
-      ).then(response => {
-        setIsAuthenticated(true);
-        setUser(response.data);
-      }).catch(error => {
-        if (error.response.status === 401) {
-          localStorage.removeItem('token');
+    const loginUser = async () => {
+      setIsLoading(true);
+
+      await AuthService.getCurrentUser().then(response => {
+        const obtainedUser = response.data;
+  
+        if (obtainedUser) {
+          setIsAuthenticated(true);
+          setUser(obtainedUser);
+        } else {
           setIsAuthenticated(false);
           setUser({});
-          setUserBlogs([]);
-          history('/login');
-        } else {
-          console.error(error);
         }
+      }).catch(error => {
+        console.error(error);
       });
+
+      setIsLoading(false);
     };
 
-    /* const getUserBlogs = async () => {
-      await axios.get(
-        `http://127.0.0.1:8000/blogs/${user.id}`, {
-          headers: { Authorization: `Bearer ${storedToken}`}
-        }
-      ).then(response => {
-        setUserBlogs([...response.data]);
-      }).catch(error => {
-        console.error('Error getting user blogs:', error);
-      });
-    }; */
-
     const storedToken = localStorage.getItem('token');
-    if (storedToken) {
-      login();
 
-      /* if (user.id) {
-        getUserBlogs();
-      } */
-    } else {
-      setIsAuthenticated(false);
-      setUser({});
-      history('/login');
+    if (storedToken) {
+      loginUser();
     }
-    // eslint-disable-next-line
   }, []);
+
+
+  if (isLoading) {
+    return (
+      <div className="page-loader">
+        <FontAwesomeIcon icon='spinner' fixedWidth spin />
+        <span>Loading...</span>
+      </div>
+    )
+  };
 
 
   /**
@@ -195,6 +185,7 @@ function App() {
   }
 
 
+  // Definition of the paths based on when they're available
   const pathsWhenLogged = [...alwaysAuthorized(), ...authorizedWhenLogged()];
   const pathsWhenNotLogged = [...alwaysAuthorized(), ...authorizedWhenNotLogged()];
 

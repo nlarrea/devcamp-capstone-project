@@ -75,7 +75,7 @@ const NavBar = ({ user }) => {
                     )
                 }
             </div>
-            </nav>
+        </nav>
     );
 };
 
