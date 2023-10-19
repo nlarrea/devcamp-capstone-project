@@ -45,3 +45,15 @@ export const DISPLAY_TYPE = (textToDisplay, iconName='') => {
         icon: <FontAwesomeIcon icon={iconName} fixedWidth />
     }
 }
+
+
+export const nChars = {
+    username: {
+        min: 6,
+        max: 20
+    },
+    password: {
+        min: 8,
+        max: 30
+    }
+};

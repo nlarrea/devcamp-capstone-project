@@ -1,5 +1,5 @@
 import os
-from fastapi import APIRouter, Depends, HTTPException, status, Request
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 from passlib.context import CryptContext
@@ -199,7 +199,7 @@ async def me(user: User = Depends(auth_user)):
     return user
 
 
-@router.put("/check-user-exists", status_code=status.HTTP_201_CREATED)
+@router.put("/update-me", status_code=status.HTTP_201_CREATED)
 async def update_user_data(new_user: EditForm, logged_user: User = Depends(auth_user)):
     if not check_allowed_data(new_user, logged_user):
         return False

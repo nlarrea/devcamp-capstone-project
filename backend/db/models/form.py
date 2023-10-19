@@ -11,4 +11,4 @@ class EditForm(BaseModel):
     email: Optional[str] = ""
     old_password: str
     new_password: Optional[str] = ""
-    image: Optional[bytes] = ""
+    image: Optional[bytes] = b""

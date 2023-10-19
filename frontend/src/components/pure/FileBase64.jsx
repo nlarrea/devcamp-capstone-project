@@ -63,6 +63,7 @@ const FileBase64 = ({ inputId='image-input', multiple=false, onDone }) => {
                 id={inputId}
                 onChange={handleChange}
                 multiple={multiple}
+                accept='image/jpeg, image/jpg, image/png'
             />
 
             {

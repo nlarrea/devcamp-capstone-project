@@ -4,13 +4,8 @@ import * as Yup from 'yup';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
+import { nChars } from '../../models/constants';
 
-const nChars = {
-    password: {
-        min: 8,
-        max: 30
-    }
-};
 
 const loginSchema = Yup.object().shape({
     email: Yup.string()
@@ -115,7 +110,7 @@ const LoginForm = ({ handleSubmit, setMessage, message }) => {
                         {
                             viewPass ? (
                                 <FontAwesomeIcon
-                                    icon='lock-open'
+                                    icon='unlock'
                                     className='input-icon icon-btn'
                                     fixedWidth
                                     onClick={() => setViewPass(false)}

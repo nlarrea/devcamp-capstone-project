@@ -4,17 +4,8 @@ import * as Yup from 'yup';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
+import { nChars } from '../../models/constants';
 
-const nChars = {
-    username: {
-        min: 6,
-        max: 20
-    },
-    password: {
-        min: 8,
-        max: 30
-    }
-};
 
 const registerSchema = Yup.object().shape({
     username: Yup.string()
@@ -121,6 +112,7 @@ const RegisterForm = ({ handleSubmit, setMessage, message }) => {
                             onChange={e => {
                                 handleChange(e);
                                 setFieldTouched('email', true, false);
+                                setMessage('');
                             }}
                             placeholder='your_email@example.com'
                             spellCheck={false}
@@ -160,7 +152,7 @@ const RegisterForm = ({ handleSubmit, setMessage, message }) => {
                             viewPass1 ? (
                                 <FontAwesomeIcon
                                     onClick={() => setViewPass1(!viewPass1)}
-                                    icon='lock-open'
+                                    icon='unlock'
                                     className='input-icon icon-btn'
                                     fixedWidth
                                 />
@@ -203,7 +195,7 @@ const RegisterForm = ({ handleSubmit, setMessage, message }) => {
                             viewPass2 ? (
                                 <FontAwesomeIcon
                                     onClick={() => setViewPass2(!viewPass2)}
-                                    icon='lock-open'
+                                    icon='unlock'
                                     className='input-icon icon-btn'
                                     fixedWidth
                                 />

@@ -1,54 +1,70 @@
-import React, { useState, useContext, useRef } from 'react';
+import React, { useState, useContext } from 'react';
+import { Formik, Form, Field, ErrorMessage } from 'formik';
+import * as yup from 'yup';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import axios from 'axios';
 
-import avatar from '../../../static/images/avatars/user_avatar.svg';
+import AuthService from '../../../common/auth';
 import { AuthContext, UserContext } from '../../../context/authContext';
-import useToken from '../../../hooks/useToken';
-import {
-    checkOldAndNewPasswords,
-    checkPasswords,
-    checkUsername,
-    passCharConditions
-} from '../../../models/auxFunctions';
-import PasswordCharTest from '../../pure/PasswordCharTest';
+import avatar from '../../../static/images/avatars/user_avatar.svg';
 import FileBase64 from '../../pure/FileBase64';
+import { nChars } from '../../../models/constants';
+
+
+const userEditSchema = yup.object().shape({
+    username: yup.string()
+        .min(nChars.username.min, `Min ${nChars.username.min} characters!`)
+        .max(nChars.username.max, `Max ${nChars.username.max} characters!`),
+    email: yup.string()
+        .email('Invalid email format'),
+    oldPassword: yup.string()
+        .min(nChars.password.min, `Min ${nChars.password.min} characters!`)
+        .max(nChars.password.max, `Max ${nChars.password.max} characters!`)
+        .matches(
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_-])[A-Za-z\d@$!%*?&_-]{8,30}$/,
+            'At least 1 upper, 1 lower and 1 special char.'
+        )
+        .required("The old password is required!"),
+    newPassword: yup.string()
+        .min(nChars.password.min, `Min ${nChars.password.min} characters!`)
+        .max(nChars.password.max, `Max ${nChars.password.max} characters!`)
+        .matches(
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_-])[A-Za-z\d@$!%*?&_-]{8,30}$/,
+            'At least 1 uppercase, 1 lowercase and 1 special character.'
+        ),
+    confirmPassword: yup.string()
+        .oneOf([yup.ref('newPassword'), null], 'Both passwords must be equals!')
+});
+
 
 const UserEditPage = () => {
-    // Context & global variable's state
+    // Contexts & global variable's state
     const history = useNavigate();
     const { setIsAuthenticated } = useContext(AuthContext);
     const { user, setUser } = useContext(UserContext);
-    const { token, saveToken } = useToken();
-    const [isLoading, setIsLoading] = useState(false);
-    const [editImgMode, setEditImgMode] = useState(false);
-
+    
+    // Image states and values
     const originalImg = user?.image || null;
     const [image, setImage] = useState(originalImg ? originalImg : null);
+    const [editImgMode, setEditImgMode] = useState(false);
 
+    // Passwords
+    const [oldPasswordValue, setOldPasswordValue] = useState('');
     const [viewOldPass, setViewOldPass] = useState(false);
     const [viewPass1, setViewPass1] = useState(false);
     const [viewPass2, setViewPass2] = useState(false);
 
-    // Refs to inputs
-    const usernameRef = useRef();
-    const emailRef = useRef();
-    const oldPassRef = useRef();
-    const pass1Ref = useRef();
-    const pass2Ref = useRef();
+    // Any error message from API
+    const [message, setMessage] = useState('');
 
-    // State to errors
-    const [userError, setUserError] = useState(false);
-    const [userErrorMsg, setUserErrorMsg] = useState('');
 
-    const [oldPassError, setOldPassError] = useState(false);
-    const [oldPassErrorMsg, setOldPassErrorMsg] = useState('');
-    const [pass1Error, setPass1Error] = useState(false);
-    const [pass1ErrorMsg, setPass1ErrorMsg] = useState('');
-    const [pass2Error, setPass2Error] = useState(false);
-    const [pass2ErrorMsg, setPass2ErrorMsg] = useState('');
-    const [charConditions, setCharConditions] = useState();
+    const initialCredentials = {
+        username: '',
+        email: '',
+        oldPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+    };
 
 
     const handleRemoveImg = () => {
@@ -63,377 +79,356 @@ const UserEditPage = () => {
     }
 
 
-    const updateUser = async ( newUserData ) => {
-        return await axios.put(
-            'http://127.0.0.1:8000/users/check-user-exists',
-            newUserData, {
-                headers: { Authorization: `Bearer ${token}` }
-            }
-        ).then(response => {
-            saveToken(response.data.access_token);
-            return response.data.access_token;
-        }).catch(error => {
-            console.error('Error updating user data:', error);
-        });
-    };
+    const showApiErrors = (error) => {
+        const resMessage = (
+            error.response &&
+            error.response.data &&
+            error.response.data.detail &&
+            error.response.data.detail.message
+            ) ||
+            error.message ||
+            error.toString();
 
-    /* const updateToken = async (newUserData) => {
-        const newLoginCredentials = {
-            email: newUserData.email,
-            password: newUserData.new_password
-        };
-
-        return await axios.post(
-            'http://127.0.0.1:8000/users/login',
-            newLoginCredentials
-        ).then(response => {
-            saveToken(response.data.access_token);
-            return response.data.access_token
-        }).catch(error => {
-            console.error('Error login user with new credentials:', error);
-        });
-    }; */
-
-    const getUserNewData = async (token) => {
-        await axios.get(
-            'http://127.0.0.1:8000/users/me', {
-                headers: { Authorization: `Bearer ${token}` }
-            }
-        ).then(response => {
-            setUser(response.data);
-        }).catch(error => {
-            console.error('Error getting user\'s new data:', error);
-        });
-    };
+        setMessage(resMessage);
+    }
 
 
-    // When changes are made, send those to DB
-    const handleSubmit = async (event) => {
-        setIsLoading(true);
-        event.preventDefault();
+    const handleSubmit = async (values) => {
+        setMessage('');
 
-        if (userError || pass1Error || pass2Error || oldPassError) {
-            return;
-        }
-
-        const newUserData = {
-            username: usernameRef.current.value || user.username,
-            email: emailRef.current.value || user.email,
-            old_password: oldPassRef.current.value,
-            new_password: pass1Ref.current.value || '',
+        await AuthService.updateUser({
+            username: values.username,
+            email: values.email,
+            old_password: values.oldPassword,
+            new_password: values.newPassword,
             image: image || ''
-        }
+        }).then(async (response) => {
+            const obtainedToken = response.data.access_token;
 
-        // Check if new data doesn't already exist
-        const validCredentials = await updateUser(newUserData);
-        
-        if (validCredentials) {
-            localStorage.removeItem('token');
-            // const createdToken = await updateToken(newUserData);
-            await getUserNewData(validCredentials);
-        }
+            if (obtainedToken) {
+                localStorage.setItem('token', obtainedToken);
 
-        setIsLoading(false);
+                await AuthService.getCurrentUser().then(response => {
+                    const obtainedUser = response.data;
+                    setUser(obtainedUser);
+                });
+            }
+        }).catch(error => {
+            showApiErrors(error);
+        })
     }
 
 
     const handleRemoveAccount = (event) => {
         event.preventDefault();
 
-        axios.delete(
-            'http://127.0.0.1:8000/users/remove-account', {
-                headers: { Authorization: `Bearer ${token}` }
-            }
-        ).then(response => {
-            // console.log('User has been successfully deleted');
-            setUser({})
+        AuthService.removeAccount(
+            oldPasswordValue
+        ).then(() => {
+            setUser({});
             setIsAuthenticated(false);
             localStorage.removeItem('token');
             history('/');
         }).catch(error => {
-            console.error('An error occurred deleting the current user:', error)
+            showApiErrors(error);
         })
     }
 
 
-    const handlePassChange = () => {
-        const pass1 = pass1Ref?.current?.value;
-        const pass2 = pass2Ref?.current?.value;
-
-        if (pass1 || pass2) {
-            checkPasswords({
-                pass1: pass1Ref.current.value,
-                pass2: pass2Ref.current.value,
-                isError1: setPass1Error,
-                errorMsg1: setPass1ErrorMsg,
-                isError2: setPass2Error,
-                errorMsg2: setPass2ErrorMsg
-            });
-    
-            // Check if password has at least one of the char types
-            const newConditions = passCharConditions({
-                password: pass1Ref.current.value,
-                isError: setPass1Error,
-                errorMessage: setPass1ErrorMsg
-            });
-            setCharConditions(newConditions);
-        } else {
-            setPass1Error(false);
-            setPass1ErrorMsg('');
-            setPass2Error(false);
-            setPass2ErrorMsg('');
-        }
-    }
-
-
-    const handleOldPassChange = () => {
-        const oldPass = oldPassRef?.current?.value;
-        const newPass = pass1Ref?.current?.value;
-
-        if (newPass) {
-            checkOldAndNewPasswords({
-                oldPass: oldPass,
-                newPass: newPass,
-                isOldError: setOldPassError,
-                oldErrorMsg: setOldPassErrorMsg,
-                isNewError: setPass1Error,
-                newErrorMsg: setPass1ErrorMsg
-            });
-    
-            passCharConditions({
-                password: oldPass,
-                isError: setOldPassError,
-                errorMessage: setOldPassErrorMsg
-            });
-        } else {
-            setPass1Error(false);
-            setPass1ErrorMsg('');
-        }
-    }
-
-
     return (
-        <form id='edit-user-data-page-wrapper' className='container'>
-            <main>
-                <section>
-                    <div className='input-label-wrapper'>
-                        <input
-                            ref={usernameRef}
-                            onChange={() => checkUsername(
-                                usernameRef.current.value,
-                                setUserError,
-                                setUserErrorMsg
-                            )}
-                            type='text'
-                            className={`input-field ${userError ? 'input-error' : ''}`}
-                            id='username-input'
-                            placeholder='YourUsername'
-                            defaultValue={user.username}
-                            spellCheck={false}
-                            required
-                        />
-                        <label
-                            htmlFor="username-input"
-                            className='input-label'
-                        >Username</label>
-                        <FontAwesomeIcon icon='user' className='input-icon' />
-                        {userErrorMsg && <span className='error-message'>{userErrorMsg}</span>}
-                    </div>
-
-                    <div className='input-label-wrapper'>
-                        <input
-                            ref={emailRef}
-                            type='email'
-                            className='input-field'
-                            id='email-input'
-                            placeholder='your_email@example.com'
-                            defaultValue={user.email}
-                            spellCheck={false}
-                            required
-                        />
-                        <label
-                            htmlFor="email-input"
-                            className='input-label'
-                        >Email</label>
-                        <FontAwesomeIcon icon='at' className='input-icon' />
-                    </div>
-
-                    <div className='input-label-wrapper'>
-                        <input
-                            ref={oldPassRef}
-                            onChange={handleOldPassChange}
-                            type={viewOldPass ? 'text' : "password"}
-                            className={`input-field ${oldPassError ? 'input-error' : ''}`}
-                            id='original-password'
-                            placeholder='1234ABcd_'
-                            spellCheck={false}
-                            required
-                            autoFocus={true}
-                        />
-                        <label
-                            htmlFor="original-password"
-                            className='input-label'
-                        >Old Password</label>
-                        {
-                            viewOldPass ? (
-                                <FontAwesomeIcon
-                                    onClick={() => setViewOldPass(!viewOldPass)}
-                                    icon='lock-open'
-                                    className='input-icon icon-btn'
-                                    fixedWidth
-                                />
-                            ) : (
-                                <FontAwesomeIcon
-                                    onClick={() => setViewOldPass(!viewOldPass)}
-                                    icon='lock'
-                                    className='input-icon icon-btn'
-                                    fixedWidth
-                                />
-                            )
-                        }
-                        <span className='error-message'>{oldPassErrorMsg || 'Required'}</span>
-                    </div>
-
-                    <div className='input-label-wrapper' id='password-wrapper'>
-                        <input
-                            ref={pass1Ref}
-                            onChange={handlePassChange}
-                            type={viewPass1 ? 'text' : "password"}
-                            className={`input-field ${pass1Error ? 'input-error' : ''}`}
-                            id='password-1'
-                            placeholder='_abCD1234'
-                            spellCheck={false}
-                            required
-                        />
-                        <label
-                            htmlFor="password-1"
-                            className='input-label'
-                        >New Password</label>
-                        {
-                            viewPass1 ? (
-                                <FontAwesomeIcon
-                                    onClick={() => setViewPass1(!viewPass1)}
-                                    icon='lock-open'
-                                    className='input-icon icon-btn'
-                                    fixedWidth
-                                />
-                            ) : (
-                                <FontAwesomeIcon
-                                    onClick={() => setViewPass1(!viewPass1)}
-                                    icon='lock'
-                                    className='input-icon icon-btn'
-                                    fixedWidth
-                                />
-                            )
-                        }
-                        {pass1ErrorMsg && <span className='error-message'>{pass1ErrorMsg}</span>}
-                    </div>
-
-                    <div className='input-label-wrapper'>
-                        <input
-                            ref={pass2Ref}
-                            onChange={handlePassChange}
-                            type={viewPass2 ? 'text' : "password"}
-                            className={`input-field ${pass2Error ? 'input-error' : ''}`}
-                            id='password-2'
-                            placeholder='_abCD1234'
-                            spellCheck={false}
-                            required
-                        />
-                        <label
-                            htmlFor="password-2"
-                            className='input-label'
-                        >Confirm New Password</label>
-                        {
-                            viewPass2 ? (
-                                <FontAwesomeIcon
-                                    onClick={() => setViewPass2(!viewPass2)}
-                                    icon='lock-open'
-                                    className='input-icon icon-btn'
-                                    fixedWidth
-                                />
-                            ) : (
-                                <FontAwesomeIcon
-                                    onClick={() => setViewPass2(!viewPass2)}
-                                    icon='lock'
-                                    className='input-icon icon-btn'
-                                    fixedWidth
-                                />
-                            )
-                        }
-                        {pass2ErrorMsg && <span className='error-message'>{pass2ErrorMsg}</span>}
-                    </div>
-
-                    <PasswordCharTest
-                        hasUpper={charConditions?.hasUpper || false}
-                        hasLower={charConditions?.hasLower || false}
-                        hasNumber={charConditions?.hasNumber || false}
-                        hasSpecial={charConditions?.hasSpecial || false}
-                    />
-
-                    <button
-                        type='button'
-                        onClick={handleRemoveAccount}
-                        id='remove-user-btn'
-                    >Remove account</button>
-                </section>
-
-                {/* user image */}
-                <section className='user-img-section'>
-                    {
-                        editImgMode ? (
-                            <>
-                                <FileBase64
-                                    type='file'
-                                    multiple={ false }
-                                    onDone={({base64}) => setImage(base64)}
-                                />
-
-                                <button
-                                    onClick={handleCancelImg}
-                                    className='form-btn cancel-btn'
-                                >Cancel</button>
-                            </>
-                        ) : (
-                            <>
-                                <div className="current-user-image-wrapper">
-                                    <div
-                                        className='current-user-image'
-                                        style={{
-                                            backgroundImage: `url(${image?.replace('dataimage/jpegbase64', 'data:image/jpeg;base64,') || originalImg || avatar})`,
-                                            backgroundSize: 'cover',
-                                            backgroundPosition: 'center'
-                                        }}
-                                    />
-                                </div>
-                                <button
-                                    onClick={handleRemoveImg}
-                                    className='form-btn edit-btn'
-                                >Edit</button>
-                            </>
-                        )
-                    }
-                </section>
-            </main>
-
-            <nav>
-                <NavLink to='/users/me'>Cancel</NavLink>
-
-                <button
-                    type='submit'
-                    onClick={handleSubmit}
-                    className='form-btn'
+        <Formik
+            // Initial values that the form will take
+            initialValues={initialCredentials}
+            // Yup validation schema
+            validationSchema={userEditSchema}
+            // On submit event
+            onSubmit={handleSubmit}
+        >
+            {/* Props from Formik */}
+            {({
+                values,
+                touched,
+                errors,
+                isSubmitting,
+                setFieldTouched,
+                handleChange
+            }) => (
+                <Form
+                    id='edit-user-data-page-wrapper'
+                    className='container'
                 >
-                    {
-                        isLoading ? (
-                            <FontAwesomeIcon icon='spinner' fixedWidth spin />
-                        ) : (
-                            'Confirm Changes'
-                        )
-                    }
-                </button>
-            </nav>
-        </form>
+                    <main> {/* this should be the form */}
+                        <section>
+                            <div className='input-label-wrapper'>
+                                <Field
+                                    id='username-input'
+                                    name='username'
+                                    className={`input-field ${errors.username ? 'input-error' : ''}`}
+                                    type='text'
+                                    placeholder='YourUsername'
+                                    onChange={e => {
+                                        handleChange(e);
+                                        setFieldTouched('username', true, false);
+                                        setMessage('');
+                                    }}
+                                    value={values.username}
+                                    spellCheck={false}
+                                />
+                                <label
+                                    htmlFor="username-input"
+                                    className='input-label'
+                                >Username</label>
+                                <FontAwesomeIcon icon='user' className='input-icon' />
+                                {
+                                    errors.username && touched.username && (
+                                        <ErrorMessage
+                                            name='username'
+                                            component='span'
+                                            className='error-message'
+                                        />
+                                    )
+                                }
+                            </div>
+
+                            <div className='input-label-wrapper'>
+                                <Field
+                                    id='email-input'
+                                    name='email'
+                                    className={`input-field ${errors.email ? 'input-error' : ''}`}
+                                    type='email'
+                                    placeholder='your_email@example.com'
+                                    value={values.email}
+                                    onChange={e => {
+                                        handleChange(e);
+                                        setFieldTouched('email', true, false);
+                                        setMessage('');
+                                    }}
+                                    spellCheck={false}
+                                />
+                                <label
+                                    htmlFor="email-input"
+                                    className='input-label'
+                                >Email</label>
+                                <FontAwesomeIcon icon='at' className='input-icon' />
+                                {
+                                    errors.email && touched.email && (
+                                        <ErrorMessage
+                                            name='email'
+                                            component='span'
+                                            className='error-message'
+                                        />
+                                    )
+                                }
+                            </div>
+
+                            <div className='input-label-wrapper'>
+                                <Field
+                                    id='original-password'
+                                    name='oldPassword'
+                                    className={`input-field ${errors.oldPassword ? 'input-error' : ''}`}
+                                    type={viewOldPass ? 'text' : "password"}
+                                    placeholder='1234ABcd_'
+                                    onChange={e => {
+                                        setOldPasswordValue(e.target.value);
+                                        handleChange(e);
+                                        setFieldTouched('oldPassword', true, false);
+                                    }}
+                                    spellCheck={false}
+                                    autoFocus={true}
+                                />
+                                <label
+                                    htmlFor="original-password"
+                                    className='input-label'
+                                >Old Password</label>
+                                {
+                                    viewOldPass ? (
+                                        <FontAwesomeIcon
+                                            onClick={() => setViewOldPass(!viewOldPass)}
+                                            icon='unlock'
+                                            className='input-icon icon-btn'
+                                            fixedWidth
+                                        />
+                                    ) : (
+                                        <FontAwesomeIcon
+                                            onClick={() => setViewOldPass(!viewOldPass)}
+                                            icon='lock'
+                                            className='input-icon icon-btn'
+                                            fixedWidth
+                                        />
+                                    )
+                                }
+                                {
+                                    errors.oldPassword && touched.oldPassword && (
+                                        <ErrorMessage
+                                            name='oldPassword'
+                                            component='span'
+                                            className='error-message'
+                                        />
+                                    )
+                                }
+                            </div>
+
+                            <div className='input-label-wrapper' id='password-wrapper'>
+                                <Field
+                                    id='password-1'
+                                    name='newPassword'
+                                    className={`input-field ${errors.newPassword ? 'input-error' : ''}`}
+                                    type={viewPass1 ? 'text' : "password"}
+                                    onChange={e => {
+                                        handleChange(e);
+                                        setFieldTouched('newPassword', true, false);
+                                    }}
+                                    placeholder='_abCD1234'
+                                />
+                                <label
+                                    htmlFor="password-1"
+                                    className='input-label'
+                                >New Password</label>
+                                {
+                                    viewPass1 ? (
+                                        <FontAwesomeIcon
+                                            onClick={() => setViewPass1(!viewPass1)}
+                                            icon='unlock'
+                                            className='input-icon icon-btn'
+                                            fixedWidth
+                                        />
+                                    ) : (
+                                        <FontAwesomeIcon
+                                            onClick={() => setViewPass1(!viewPass1)}
+                                            icon='lock'
+                                            className='input-icon icon-btn'
+                                            fixedWidth
+                                        />
+                                    )
+                                }
+                                {
+                                    errors.newPassword && touched.newPassword && (
+                                        <ErrorMessage
+                                            name='newPassword'
+                                            component='span'
+                                            className='error-message'
+                                        />
+                                    )
+                                }
+                            </div>
+
+                            <div className='input-label-wrapper'>
+                                <Field
+                                    id='password-2'
+                                    name='confirmPassword'
+                                    className={`input-field ${errors.confirmPassword ? 'input-error' : ''}`}
+                                    type={viewPass2 ? 'text' : "password"}
+                                    onChange={e => {
+                                        handleChange(e);
+                                        setFieldTouched('confirmPassword', true, false);
+                                    }}
+                                    placeholder='_abCD1234'
+                                />
+                                <label
+                                    htmlFor="password-2"
+                                    className='input-label'
+                                >Confirm New Password</label>
+                                {
+                                    viewPass2 ? (
+                                        <FontAwesomeIcon
+                                            onClick={() => setViewPass2(!viewPass2)}
+                                            icon='unlock'
+                                            className='input-icon icon-btn'
+                                            fixedWidth
+                                        />
+                                    ) : (
+                                        <FontAwesomeIcon
+                                            onClick={() => setViewPass2(!viewPass2)}
+                                            icon='lock'
+                                            className='input-icon icon-btn'
+                                            fixedWidth
+                                        />
+                                    )
+                                }
+                                {
+                                    errors.confirmPassword && touched.confirmPassword && (
+                                        <ErrorMessage
+                                            name='confirmPassword'
+                                            component='span'
+                                            className='error-message'
+                                        />
+                                    )
+                                }
+                            </div>
+
+                            <button
+                                type='button'
+                                onClick={handleRemoveAccount}
+                                id='remove-user-btn'
+                            >Remove account</button>
+                        </section>
+
+                        {/* user image */}
+                        <section className='user-img-section'>
+                            {
+                                editImgMode ? (
+                                    <>
+                                        <FileBase64
+                                            type='file'
+                                            multiple={ false }
+                                            onDone={({base64}) => setImage(base64)}
+                                        />
+
+                                        <button
+                                            type='button'
+                                            onClick={handleCancelImg}
+                                            className='form-btn cancel-btn'
+                                        >Cancel</button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <div className="current-user-image-wrapper">
+                                            <div
+                                                className='current-user-image'
+                                                style={{
+                                                    backgroundImage: `url(${image?.replace('dataimage/jpegbase64', 'data:image/jpeg;base64,') || originalImg || avatar})`,
+                                                    backgroundSize: 'cover',
+                                                    backgroundPosition: 'center'
+                                                }}
+                                            />
+                                        </div>
+                                        <button
+                                            type='button'
+                                            onClick={handleRemoveImg}
+                                            className='form-btn edit-btn'
+                                        >Edit</button>
+                                    </>
+                                )
+                            }
+                        </section>
+                    </main>
+
+                    <nav>
+                        <NavLink to='/users/me'>Cancel</NavLink>
+
+                        <button
+                            type='submit'
+                            className='form-btn'
+                            disabled={isSubmitting}
+                        >
+                            {
+                                isSubmitting ? (
+                                    <FontAwesomeIcon icon='spinner' fixedWidth spin />
+                                ) : (
+                                    'Confirm Changes'
+                                )
+                            }
+                        </button>
+
+                        {
+                            message && (
+                                <p className='api-error-message'>{message}</p>
+                            )
+                        }
+                    </nav>
+                </Form>
+            )}
+        </Formik>
     );
 };
 
