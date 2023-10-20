@@ -4,7 +4,7 @@ import * as yup from 'yup';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import AuthService from '../../../common/auth';
+import AuthService from '../../../services/auth';
 import { AuthContext, UserContext } from '../../../context/authContext';
 import avatar from '../../../static/images/avatars/user_avatar.svg';
 import FileBase64 from '../../pure/FileBase64';

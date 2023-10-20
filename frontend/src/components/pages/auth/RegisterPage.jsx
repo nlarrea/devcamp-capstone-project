@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { AuthContext, UserContext } from '../../../context/authContext';
 import registerImg from '../../../static/images/forms/register.svg';
-import AuthService from '../../../common/auth';
+import AuthService from '../../../services/auth';
 import RegisterForm from '../../forms/RegisterForm';
 
 

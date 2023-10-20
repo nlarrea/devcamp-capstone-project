@@ -229,3 +229,38 @@
         display: none;
     }
 }
+
+
+/* BLOG HEADER */
+
+.skewed-header-wrapper {
+    height: 400px;
+    position: relative;
+    overflow: hidden;
+
+    .skewed-header {
+        width: 100%;
+        height: 100%;
+
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        left: 0;
+
+        background-repeat: no-repeat;
+        background-size: cover;
+
+        transform: skewY(-6deg);
+        transform-origin: top left;
+
+        h1 {
+            padding: 12px;
+            color: var.$off-white;
+            background-color: var.$oxford-blue;
+            border-bottom-left-radius: 3px;
+            border-bottom-right-radius: 3px;
+            font-family: 'Gluten', cursive;
+        }
+    }
+}

@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import AuthService from '../../../common/auth';
+import AuthService from '../../../services/auth';
 import { AuthContext, UserContext } from '../../../context/authContext';
 import LoginForm from '../../forms/LoginForm';
 import loginImg from '../../../static/images/forms/login.svg';

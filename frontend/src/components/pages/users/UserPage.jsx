@@ -1,58 +1,46 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import axios from 'axios';
 
-import { TYPES } from '../../../models/constants';
-import { LogoutButton } from '../../pure/LogLinks';
-import BlogItem from '../../pure/BlogItem';
-import useToken from '../../../hooks/useToken';
-import { UserBlogsContext } from '../../../context/blogsContext';
+import DataService from '../../../services/data';
 import { AuthContext, UserContext } from '../../../context/authContext';
+import { UserBlogsContext } from '../../../context/blogsContext';
+import { TYPES } from '../../../models/constants';
+import BlogItem from '../../pure/BlogItem';
+import { LogoutButton } from '../../pure/LogLinks';
+import { getApiErrorMsg } from '../../../models/auxFunctions';
 
 
 const UserPage = () => {
     /* Use the useEffect Hook to call the database and bring minimum the first
     15-20 blogs of this user (infinite scroll to get more blogs) */
     const history = useNavigate();
-    const { token } = useToken();
     const { user, setUser } = useContext(UserContext);
-    const { isAuthenticated, setIsAuthenticated } = useContext(AuthContext);
+    const { setIsAuthenticated } = useContext(AuthContext);
     const { userBlogs, setUserBlogs } = useContext(UserBlogsContext);
+    const [message, setMessage] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
 
     useEffect (() => {
-        const getUserBlogs = async () => {
-            await axios.get(
-                `http://127.0.0.1:8000/blogs/${user.id}`, {
-                    headers: { Authorization: `Bearer ${token}`}
-                }
-            ).then(response => {
-                setUserBlogs([...response.data]);
-            }).catch(error => {
-                console.error('Error getting user blogs:', error);
-            });
-        };
+        setIsLoading(true);
+        setMessage('');
 
-        if (isAuthenticated) {
-            getUserBlogs();
-        } else {
-            history('/login');
-        }
-    // eslint-disable-next-line
+        DataService.getUserBlogs(user.id).then(response => {
+            setUserBlogs([...response.data]);
+        }).catch(error => {
+            setMessage(getApiErrorMsg(error));
+        });
+
+        setIsLoading(false);
+        // eslint-disable-next-line
     }, []);
 
 
-    const handleDeleteBlog = (blogId) => {
+    const handleDeleteBlog = async (blogId) => {
         setIsLoading(true);
 
-        axios.delete(
-            `http://127.0.0.1:8000/blogs/remove-blog/${blogId}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            }
-        ).then(response => {
-            // console.log(response);
+        await DataService.deleteBlog(blogId).then(response => {
             const currentBlogs = userBlogs.filter(blog => blog.id !== response.data);
             setUserBlogs([...currentBlogs]);
         }).catch(error => {
@@ -63,7 +51,7 @@ const UserPage = () => {
                 setUserBlogs([]);
                 history('/login');
             } else {
-                console.error(error);
+                setMessage(getApiErrorMsg(error));
             }
         });
 
@@ -116,14 +104,18 @@ const UserPage = () => {
                                     />
                                 ))
                             ) : (
-                                isLoading ? (
-                                    <div>
-                                        <FontAwesomeIcon icon='spinner' fixedWidth spin />
-                                    </div>
+                                message ? (
+                                    <p className='no-blogs-message'>{message}</p>
                                 ) : (
-                                    <p className='no-blogs-message'>
-                                        You haven't written any Blog yet!
-                                    </p>
+                                    isLoading ? (
+                                        <div>
+                                            <FontAwesomeIcon icon='spinner' fixedWidth spin />
+                                        </div>
+                                    ) : (
+                                        <p className='no-blogs-message'>
+                                            You haven't written any Blog yet!
+                                        </p>
+                                    )
                                 )
                             )
                         }
