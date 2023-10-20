@@ -34,6 +34,7 @@ body, .App {
 
 
 .container {
+    width: 100vw;
     max-width: 2000px;
     min-height: calc(100vh - var.$nav-height);
     margin: 0 auto;
@@ -67,6 +68,28 @@ body, .App {
 }
 
 
+.icon-text-btn {
+    @include btn.icon-text-btn();
+}
+
+.text-btn {
+    @include btn.text-btn();
+}
+
+.form-btn {
+    @include btn.form-btn();
+}
+
+.go-back-button {
+    @include btn.icon-text-btn();
+}
+
+
+div.input-label-wrapper {
+    @include mix.input-icon-label();
+}
+
+
 .link-wrapper {
     padding: 0 16px;
     
@@ -86,22 +109,24 @@ body, .App {
     }
 }
 
+.blog-link-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 
-.icon-text-btn {
-    @include btn.icon-text-btn();
-}
+    a {
+        cursor: pointer;
+        border: none;
+        background-color: transparent;
 
-.text-btn {
-    @include btn.text-btn();
-}
-
-.form-btn {
-    @include btn.form-btn();
-}
-
-
-div.input-label-wrapper {
-    @include mix.input-icon-label();
+        color: var.$gold;
+        text-decoration: none;
+        
+        font-size: 1rem;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-weight: bold;
+    }
 }
 
 

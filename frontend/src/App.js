@@ -29,7 +29,10 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
+import AuthService from "./services/auth";
 import { AuthContext, UserContext } from "./context/authContext";
+import { UserBlogsContext } from "./context/blogsContext";
+import NavBar from "./components/pure/NavBar";
 import WelcomePage from "./components/pages/WelcomePage";
 import NotFoundPage from "./components/pages/NotFoundPage";
 import LoginPage from "./components/pages/auth/LoginPage";
@@ -39,9 +42,6 @@ import BlogPage from './components/pages/blogs/BlogPage';
 import WriteBlog from "./components/pages/blogs/WriteBlog";
 import UserPage from "./components/pages/users/UserPage";
 import UserEditPage from "./components/pages/users/UserEditPage";
-import NavBar from "./components/pure/NavBar";
-import { UserBlogsContext } from "./context/blogsContext";
-import AuthService from "./common/auth";
 
 library.add(
   // Page Icon

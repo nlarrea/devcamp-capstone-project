@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 
 import { AuthContext } from '../../context/authContext';
 import { TYPES } from '../../models/constants';
@@ -7,7 +7,14 @@ import avatar from '../../static/images/avatars/user_avatar.svg';
 import { LoginButton, LogoutButton } from './LogLinks';
 
 const NavBar = ({ user }) => {
+    const location = useLocation();
     const { isAuthenticated } = useContext(AuthContext);
+
+    // Don't show NavBar when user in BlogPage
+    const regex = /[\/blogs\/]+(\d+)$/g;    // eslint-disable-line
+    if (location.pathname.match(regex)) {
+        return (<></>);
+    }
 
     return (
         <nav id='navbar-component-wrapper'>
