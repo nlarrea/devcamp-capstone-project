@@ -7,7 +7,7 @@ const getUserBlogs = async (userId) => {
     const storedToken = localStorage.getItem('token');
 
     const userBlogs = await axios.get(
-        API_URL + userId, {
+        API_URL + `user/${userId}`, {
             headers: { Authorization: `Bearer ${storedToken}` }
         }
     );
@@ -23,6 +23,16 @@ const getSingleBlog = async (blogId) => {
 
     return obtainedBlog;
 };
+
+
+const getAllBlogs = async ({ skip, limit }) => {
+    const obtainedBlogs = await axios.get(
+        API_URL + 'all-blogs',
+        { skip, limit }
+    );
+
+    return obtainedBlogs;
+}
 
 
 const updateBlog = async (updatedBlog) => {
@@ -53,6 +63,7 @@ const deleteBlog = async (blogId) => {
 const DataService = {
     getUserBlogs,
     getSingleBlog,
+    getAllBlogs,
     updateBlog,
     deleteBlog
 };

@@ -12,7 +12,7 @@ db_user = os.environ.get("DB_USER")
 db_password = os.environ.get("DB_PASSWORD")
 
 
-def get_blogs():
+def get_blogs(skip: int, limit: int):
     # Connect to the database
     conn = psycopg2.connect(
         host=db_host,
@@ -26,7 +26,11 @@ def get_blogs():
     cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
     # Execute a query
-    cur.execute("SELECT * FROM blogs LIMIT 10")
+    cur.execute(
+        f"""SELECT * FROM blogs
+        ORDER BY blogs_id DESC
+        LIMIT {limit} OFFSET {skip}"""
+    )
 
     # Fetch the results
     results = cur.fetchall()
@@ -35,7 +39,12 @@ def get_blogs():
     cur.close()
     conn.close()
 
-    return results
+    if results:
+        # Create a list of objects
+        results = [dict(obj) for obj in results]
+        return results
+    
+    return None
 
 
 def find_blog(blog_id: int) -> dict:
@@ -81,13 +90,14 @@ def find_users_blogs(user_id: int) -> list:
     cur.execute(f"SELECT * FROM blogs WHERE blogs_users_id = {user_id} ORDER BY blogs_id DESC")
     results = cur.fetchall()
 
-    # Create a list of objects
-    results = [dict(obj) for obj in results]
 
     cur.close()
     conn.close()
 
     if results:
+        # Create a list of objects
+        results = [dict(obj) for obj in results]
+
         return results
     
     return None

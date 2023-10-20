@@ -6,7 +6,7 @@ import re
 
 from db.models.blog import Blog
 from db.schemas.blog import blog_schema, blogs_schema
-from db.blogs_database import create_blog, find_blog, find_users_blogs, update_blog, delete_blog
+from db.blogs_database import get_blogs, create_blog, find_blog, find_users_blogs, update_blog, delete_blog
 
 ALGORITHM = "HS256"
 SECRET = os.environ.get("SECRET")
@@ -148,7 +148,7 @@ async def new_blog(blog: Blog, request: Request):
 
 
 # Get one user's blogs -> GET
-@router.get("/{user_id}", response_model=list[Blog] | list, status_code=status.HTTP_200_OK)
+@router.get("/user/{user_id}", response_model=list[Blog] | list, status_code=status.HTTP_200_OK)
 async def my_blogs(user_id: int):
     if not type(user_id) == int:
         raise HTTPException(
@@ -182,6 +182,16 @@ async def single_blog(blog_id: int):
         )
 
     return Blog(**blog_schema(blog))
+
+
+@router.get("/all-blogs", response_model= list[Blog] | list, status_code=status.HTTP_200_OK)
+async def get_all_blogs(skip: int = 0, limit: int = 10):
+    blog_list = get_blogs(skip, limit)
+
+    if not blog_list:
+        return []
+    
+    return blogs_schema(blog_list)
 
 
 # Update one blog's data / content -> PUT
