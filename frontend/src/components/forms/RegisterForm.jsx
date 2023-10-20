@@ -88,6 +88,7 @@ const RegisterForm = ({ handleSubmit, setMessage, message }) => {
                             value={values.username}
                             spellCheck={false}
                             type="text"
+                            autoFocus={true}
                         />
                         <label htmlFor='register-username' className='input-label'>
                             Username

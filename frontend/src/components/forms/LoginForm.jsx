@@ -78,6 +78,7 @@ const LoginForm = ({ handleSubmit, setMessage, message }) => {
                                 setFieldTouched('email', true, false);
                                 setMessage('');
                             }}
+                            autoFocus={true}
                         />
                         <label htmlFor='login-email' className='input-label'>Email</label>
                         <FontAwesomeIcon icon='at' className='input-icon' fixedWidth />
