@@ -185,8 +185,12 @@ async def single_blog(blog_id: int):
 
 
 @router.get("/all-blogs", response_model= list[Blog] | list, status_code=status.HTTP_200_OK)
-async def get_all_blogs(skip: int = 0, limit: int = 10):
-    blog_list = get_blogs(skip, limit)
+async def get_all_blogs(page: int = 1):
+    print("page:", page)
+    limit = page * 10
+    offset = limit - 10
+    print("limit:", limit)
+    blog_list = get_blogs(offset, limit)
 
     if not blog_list:
         return []

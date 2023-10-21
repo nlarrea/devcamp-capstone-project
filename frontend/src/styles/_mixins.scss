@@ -140,3 +140,23 @@
         grid-template-columns: 1fr;
     }
 }
+
+
+@mixin loaders() {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    font-size: 1.2rem;
+    font-weight: bold;
+
+    svg {
+        color: var.$blue;
+    }
+
+    span {
+        color: var.$charcoal;
+        font-family: 'Montserrat', sans-serif;
+    }
+}

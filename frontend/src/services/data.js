@@ -25,10 +25,10 @@ const getSingleBlog = async (blogId) => {
 };
 
 
-const getAllBlogs = async ({ skip, limit }) => {
+const getAllBlogs = async (page) => {
     const obtainedBlogs = await axios.get(
-        API_URL + 'all-blogs',
-        { skip, limit }
+        API_URL + `all-blogs?page=${page}`
+        // page
     );
 
     return obtainedBlogs;

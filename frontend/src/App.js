@@ -27,7 +27,6 @@ import {
   faRocket,
   faNewspaper,
 } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import AuthService from "./services/auth";
 import { AuthContext, UserContext } from "./context/authContext";
@@ -42,6 +41,7 @@ import BlogPage from './components/pages/blogs/BlogPage';
 import WriteBlog from "./components/pages/blogs/WriteBlog";
 import UserPage from "./components/pages/users/UserPage";
 import UserEditPage from "./components/pages/users/UserEditPage";
+import PageLoader from "./components/pure/PageLoader";
 
 library.add(
   // Page Icon
@@ -107,12 +107,7 @@ function App() {
 
 
   if (isLoading) {
-    return (
-      <div className="page-loader">
-        <FontAwesomeIcon icon='spinner' fixedWidth spin />
-        <span>Loading...</span>
-      </div>
-    )
+    return <PageLoader />
   };
 
 
