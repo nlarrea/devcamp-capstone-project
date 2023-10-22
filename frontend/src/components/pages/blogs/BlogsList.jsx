@@ -10,7 +10,7 @@ const BlogsList = () => {
     const [message, setMessage] = useState('');
     const [page, setPage] = useState(1);
     const [scrollEnd, setScrollEnd] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
 
     const getBlogsData = async () => {
@@ -33,7 +33,7 @@ const BlogsList = () => {
     const handleScroll = () => {
         if (
             window.innerHeight + document.documentElement.scrollTop !==
-            document.documentElement.offsetHeight || isLoading
+            document.documentElement.offsetHeight
         ) {
           return;
         }
@@ -95,6 +95,7 @@ const BlogsList = () => {
                             />
                         ))
                     ) : (
+                        !isLoading &&
                         <p className='no-blogs-message'>
                             No Blog has been written yet!
                         </p>
