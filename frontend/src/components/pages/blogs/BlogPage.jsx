@@ -48,7 +48,7 @@ const BlogPage = () => {
                     )
                 }
                 
-                <td dangerouslySetInnerHTML={{__html: blogData?.content}} />
+                <div dangerouslySetInnerHTML={{__html: blogData?.content}} />
             </main>
         </div>
     );

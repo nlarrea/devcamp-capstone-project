@@ -3,6 +3,20 @@ import axios from "axios";
 const API_URL = 'http://127.0.0.1:8000/blogs/';
 
 
+const createBlog = async (newBlog) => {
+    const storedToken = localStorage.getItem('token');
+
+    const createdBlog = await axios.post(
+        API_URL + 'new-blog',
+        newBlog, {
+            headers: { Authorization: `Bearer ${storedToken}` }
+        }
+    );
+
+    return createdBlog;
+};
+
+
 const getUserBlogs = async (userId) => {
     const storedToken = localStorage.getItem('token');
 
@@ -37,9 +51,9 @@ const getAllBlogs = async (page) => {
 const updateBlog = async (updatedBlog) => {
     const storedToken = localStorage.getItem('token');
 
-    await axios.put(
+    return await axios.put(
         API_URL + 'edit-blog',
-        updateBlog, {
+        updatedBlog, {
             headers: { Authorization: `Bearer ${storedToken}` }
         }
     );
@@ -60,6 +74,7 @@ const deleteBlog = async (blogId) => {
 
 
 const DataService = {
+    createBlog,
     getUserBlogs,
     getSingleBlog,
     getAllBlogs,

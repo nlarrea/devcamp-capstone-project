@@ -2,9 +2,8 @@ import React, { useContext, useRef, useEffect, useState } from 'react';
 import { NavLink, useLocation, useNavigate, useParams } from 'react-router-dom';
 import SunEditor from 'suneditor-react';
 import 'suneditor/dist/css/suneditor.min.css';
-import axios from 'axios';
 
-import useToken from '../../../hooks/useToken';
+import DataService from '../../../services/data';
 import { AuthContext, UserContext } from '../../../context/authContext';
 import { UserBlogsContext } from '../../../context/blogsContext';
 import FileBase64 from '../../pure/FileBase64';
@@ -15,7 +14,6 @@ const WriteBlog = () => {
     const history = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
 
-    const { token } = useToken();
     const { blogId } = useParams();
     
     const { user, setUser } = useContext(UserContext);
@@ -77,17 +75,10 @@ const WriteBlog = () => {
                 ...newBlog
             };
 
-            axios.put(
-                `http://127.0.0.1:8000/blogs/edit-blog`,
-                updateBlog, {
-                    headers: { Authorization: `Bearer ${token}` }
-                }
-            ).then(response => {
-                // console.log(response.data);
-
+            DataService.updateBlog(updateBlog).then(response => {
                 setUserBlogs(() => {
                     const restOfBlogs = userBlogs.filter(blog => blog.id !== parseInt(blogId));
-                    return [response.data, ...restOfBlogs];
+                    return [response?.data, ...restOfBlogs];
                 });
                 history('/users/me');
             }).catch(error => {
@@ -107,17 +98,7 @@ const WriteBlog = () => {
             });
         } else {
             // Post the blog -> add it to database
-            axios.post(
-                'http://127.0.0.1:8000/blogs/new-blog',
-                newBlog, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                    }
-                }
-            ).then(response => {
-                // Check if data is correct
-                // console.log('posted blog:', response.data);
-
+            DataService.createBlog(newBlog).then(response => {
                 setUserBlogs(prevState => ([
                     response.data, ...prevState
                 ]));
