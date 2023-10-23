@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import {
   // Page Icon
@@ -42,6 +42,7 @@ import WriteBlog from "./components/pages/blogs/WriteBlog";
 import UserPage from "./components/pages/users/UserPage";
 import UserEditPage from "./components/pages/users/UserEditPage";
 import PageLoader from "./components/pure/PageLoader";
+import AuthVerify from "./models/authVerify";
 
 library.add(
   // Page Icon
@@ -71,6 +72,7 @@ library.add(
 )
 
 function App() {
+  const history = useNavigate();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState({});
   const [userBlogs, setUserBlogs] = useState([]);
@@ -227,6 +229,14 @@ function App() {
               element={<NotFoundPage />}
             />
           </Routes>
+
+          <AuthVerify logOut={() => {
+            localStorage.removeItem('token');
+            setIsAuthenticated(false);
+            setUser({});
+            setUserBlogs([]);
+            history('/login');
+          }} />
         </UserBlogsContext.Provider>
         </UserContext.Provider>
         </AuthContext.Provider>
