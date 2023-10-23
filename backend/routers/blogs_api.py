@@ -6,7 +6,7 @@ import re
 
 from db.models.blog import Blog
 from db.schemas.blog import blog_schema, blogs_schema
-from db.blogs_database import get_blogs, create_blog, find_blog, find_users_blogs, update_blog, delete_blog
+from db.blogs_database import get_blogs, create_blog, find_blog, find_users_blogs, update_blog, delete_blog, get_total_of_blogs
 
 ALGORITHM = "HS256"
 SECRET = os.environ.get("SECRET")
@@ -184,18 +184,31 @@ async def single_blog(blog_id: int):
     return Blog(**blog_schema(blog))
 
 
-@router.get("/all-blogs", response_model= list[Blog] | list, status_code=status.HTTP_200_OK)
+@router.get("/all-blogs", response_model=dict, status_code=status.HTTP_200_OK)
 async def get_all_blogs(page: int = 1):
-    print("page:", page)
-    limit = page * 10
-    offset = limit - 10
-    print("limit:", limit)
-    blog_list = get_blogs(offset, limit)
+    offset = (page * 10) - 10
+    blog_list = get_blogs(offset, limit=10)
 
     if not blog_list:
-        return []
+        return {
+            "blogs": [],
+            "total": 0
+        }
     
-    return blogs_schema(blog_list)
+    return {
+        "blogs": blogs_schema(blog_list),
+        "total": get_total_of_blogs()
+    }
+
+
+# @router.get("/blogs-quantity", response_model=int, status_code=status.HTTP_200_OK)
+# async def get_blogs_quantity():
+#     qty = get_total_of_blogs()
+
+#     if qty:
+#         return qty
+    
+#     return 0
 
 
 # Update one blog's data / content -> PUT

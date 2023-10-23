@@ -12,7 +12,29 @@ db_user = os.environ.get("DB_USER")
 db_password = os.environ.get("DB_PASSWORD")
 
 
-def get_blogs(skip: int, limit: int):
+def get_total_of_blogs() -> int | None:
+    # Connect to the database
+    conn = psycopg2.connect(
+        host=db_host,
+        port=db_port,
+        database=db_name,
+        user=db_user,
+        password=db_password,
+        sslmode="require"
+    )
+    # Create a cursor object
+    cur = conn.cursor()
+
+    cur.execute("SELECT COUNT(*) FROM blogs;")
+    result = cur.fetchone()
+
+    if result:
+        return result[0]
+    
+    return None
+
+
+def get_blogs(offset: int, limit: int):
     # Connect to the database
     conn = psycopg2.connect(
         host=db_host,
@@ -29,7 +51,7 @@ def get_blogs(skip: int, limit: int):
     cur.execute(
         f"""SELECT * FROM blogs
         ORDER BY blogs_id DESC
-        LIMIT {limit} OFFSET {skip}"""
+        LIMIT {limit} OFFSET {offset}"""
     )
 
     # Fetch the results

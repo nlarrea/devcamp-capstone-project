@@ -7,15 +7,21 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const BlogsList = () => {
     const [blogList, setBlogList] = useState([]);
+    const [totalOfBlogs, setTotalOfBlogs] = useState(0);
     const [message, setMessage] = useState('');
     const [page, setPage] = useState(1);
     const [scrollEnd, setScrollEnd] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
 
 
+    /**
+     * Uses DataService to call the API and fetch the blogs and the total of
+     * blogs from it.
+     */
     const getBlogsData = async () => {
         await DataService.getAllBlogs(page).then(response => {
-            setBlogList(prev => prev.concat(response.data));
+            setTotalOfBlogs(response.data.total)
+            setBlogList(prev => prev.concat(response.data.blogs));
             setIsLoading(false);
         }, (error) => {
             setMessage(getApiErrorMsg(error));
@@ -33,15 +39,17 @@ const BlogsList = () => {
     const handleScroll = () => {
         if (
             window.innerHeight + document.documentElement.scrollTop !==
-            document.documentElement.offsetHeight
+            document.documentElement.offsetHeight || isLoading
         ) {
           return;
         }
 
-        setIsLoading(true);
-        setPage(prev => prev + 1);
-        setScrollEnd(true);
-      };
+        if ((totalOfBlogs - (10 * page)) / 10 > 0) {
+            setIsLoading(true);
+            setScrollEnd(true);
+            setPage(prev => prev + 1);
+        }
+    };
     
     
     /**
@@ -52,7 +60,7 @@ const BlogsList = () => {
         return () => window.removeEventListener('scroll', handleScroll, { capture: true });
 
     // eslint-disable-next-line
-    }, []);
+    }, [totalOfBlogs, page, isLoading]);
 
 
     /**

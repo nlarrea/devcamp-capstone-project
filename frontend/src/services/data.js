@@ -28,7 +28,6 @@ const getSingleBlog = async (blogId) => {
 const getAllBlogs = async (page) => {
     const obtainedBlogs = await axios.get(
         API_URL + `all-blogs?page=${page}`
-        // page
     );
 
     return obtainedBlogs;
