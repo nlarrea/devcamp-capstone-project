@@ -31,7 +31,7 @@ import {
 import AuthService from "./services/auth";
 import { AuthContext, UserContext } from "./context/authContext";
 import { UserBlogsContext } from "./context/blogsContext";
-import NavBar from "./components/pure/NavBar";
+import NavBar from "./components/pure/nav/NavBar";
 import WelcomePage from "./components/pages/WelcomePage";
 import NotFoundPage from "./components/pages/NotFoundPage";
 import LoginPage from "./components/pages/auth/LoginPage";

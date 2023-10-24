@@ -1,6 +1,8 @@
 @use './variables' as var;
 @use './buttons' as btn;
 
+/* NAVBAR */
+
 nav#navbar-component-wrapper {
     width: 100vw;
     max-width: 2000px;
@@ -16,6 +18,10 @@ nav#navbar-component-wrapper {
 
     background-color: var.$light-grey;
     box-shadow: 0 0 8px rgba(var.$charcoal, 0.6);
+
+    .left-nav-side.switch {
+        display: none;
+    }
 
     // user data
     .nav-user-data-wrapper {
@@ -89,19 +95,63 @@ nav#navbar-component-wrapper {
 
 @media (max-width: 775px) {
     nav#navbar-component-wrapper {
-        padding: 0 8px;
+        .left-nav-side.switch {
+            display: block;
+        }
+
+        .left-nav-side:not(.switch),
+        .nav-user-data-wrapper {
+            display: none;
+        }
+
+        .left-nav-side:not(.switch).open-modal {
+            width: 100vw;
+            height: fit-content;
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+
+            position: absolute;
+            top: var.$nav-height;
+            left: 0;
+            z-index: 9;
+
+            background-color: var.$grey;
+            font-weight: bold;
+
+            box-shadow: 0 0 8px rgba(var.$charcoal, 0.3);
         
-        .right-nav-side {
-            .login-btn,
-            .logout-btn {
-                display: none;
+            div {
+                width: 100%;
+                display: flex;
+
+                border: none;
+                transition: all 0.3s;
+                
+                a {
+                    width: 100%;
+                    height: 100%;
+                    padding: 8px 0;
+                    border: none;
+                    transition: all 0.5s;
+                }
+
+                &:hover {
+                    background-color: var.$charcoal;
+                    
+                    a {
+                        color: var.$off-white;
+                    }
+                }
             }
         }
     }
 }
 
 
-// FOOTER
+/* FOOTER */
 
 #footer-component-wrapper {
     width: 100vw;

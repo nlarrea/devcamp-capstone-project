@@ -24,7 +24,7 @@ const userEditSchema = yup.object().shape({
             /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_-])[A-Za-z\d@$!%*?&_-]{8,30}$/,
             'At least 1 upper, 1 lower and 1 special char.'
         )
-        .required("The old password is required!"),
+        .required("Required to update user data!"),
     newPassword: yup.string()
         .min(nChars.password.min, `Min ${nChars.password.min} characters!`)
         .max(nChars.password.max, `Max ${nChars.password.max} characters!`)
@@ -155,7 +155,9 @@ const UserEditPage = () => {
                     id='edit-user-data-page-wrapper'
                     className='container'
                 >
-                    <main> {/* this should be the form */}
+                    <h3>Enter your updated data</h3>
+                    
+                    <main>
                         <section>
                             <div className='input-label-wrapper'>
                                 <Field
@@ -163,7 +165,7 @@ const UserEditPage = () => {
                                     name='username'
                                     className={`input-field ${errors.username ? 'input-error' : ''}`}
                                     type='text'
-                                    placeholder='YourUsername'
+                                    placeholder='NewUsername'
                                     onChange={e => {
                                         handleChange(e);
                                         setFieldTouched('username', true, false);
@@ -194,7 +196,7 @@ const UserEditPage = () => {
                                     name='email'
                                     className={`input-field ${errors.email ? 'input-error' : ''}`}
                                     type='email'
-                                    placeholder='your_email@example.com'
+                                    placeholder='new_email@example.com'
                                     value={values.email}
                                     onChange={e => {
                                         handleChange(e);
