@@ -49,7 +49,6 @@ const UserEditPage = () => {
     const [editImgMode, setEditImgMode] = useState(false);
 
     // Passwords
-    const [oldPasswordValue, setOldPasswordValue] = useState('');
     const [viewOldPass, setViewOldPass] = useState(false);
     const [viewPass1, setViewPass1] = useState(false);
     const [viewPass2, setViewPass2] = useState(false);
@@ -119,18 +118,17 @@ const UserEditPage = () => {
     }
 
 
-    const handleRemoveAccount = (event) => {
+    const handleRemoveAccount = async (event) => {
         event.preventDefault();
 
-        AuthService.removeAccount(
-            oldPasswordValue
-        ).then(() => {
+        await AuthService.removeAccount().then(() => {
             setUser({});
             setIsAuthenticated(false);
             localStorage.removeItem('token');
             history('/');
         }).catch(error => {
             showApiErrors(error);
+            console.error(error)
         })
     }
 
@@ -229,7 +227,6 @@ const UserEditPage = () => {
                                     type={viewOldPass ? 'text' : "password"}
                                     placeholder='1234ABcd_'
                                     onChange={e => {
-                                        setOldPasswordValue(e.target.value);
                                         handleChange(e);
                                         setFieldTouched('oldPassword', true, false);
                                     }}

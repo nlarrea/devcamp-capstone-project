@@ -86,7 +86,6 @@ async def auth_user(token: str = Depends(oauth2_login)):
     try:
         # Get username from token
         username = jwt.decode(token, SECRET, algorithms=[ALGORITHM]).get("sub")
-
         if username is None:
             raise exception
         

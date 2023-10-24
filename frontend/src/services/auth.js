@@ -28,6 +28,22 @@ const login = async ({ email, password }) => {
 };
 
 
+const logout = () => {
+    localStorage.removeItem('token');
+};
+
+
+const getCurrentUser = () => {
+    const storedToken = localStorage.getItem('token');
+
+    return axios.get(
+        API_URL + 'me', {
+            headers: { Authorization: `Bearer ${storedToken}` }
+        }
+    );
+};
+
+
 const updateUser = async ({
     username,
     email,
@@ -52,31 +68,17 @@ const updateUser = async ({
 };
 
 
-const logout = () => {
-    localStorage.removeItem('token');
-};
-
-
-const getCurrentUser = () => {
-    const storedToken = localStorage.getItem('token');
-
-    return axios.get(
-        API_URL + 'me', {
-            headers: { Authorization: `Bearer ${storedToken}` }
-        }
-    );
-};
-
-
 const removeAccount = async () => {
     const storedToken = localStorage.getItem('token');
 
-    return await axios.delete(
+    await axios.delete(
         API_URL + 'remove-account', {
-            headers: { Authorization: `Bearer ${storedToken}` }
+            headers: {
+                'Authorization': `Bearer ${storedToken}`
+            }
         }
     );
-}
+};
 
 
 const AuthService = {

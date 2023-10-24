@@ -235,7 +235,7 @@ function App() {
             setIsAuthenticated(false);
             setUser({});
             setUserBlogs([]);
-            history('/login');
+            history('/');
           }} />
         </UserBlogsContext.Provider>
         </UserContext.Provider>
