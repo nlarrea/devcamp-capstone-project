@@ -136,14 +136,13 @@ nav#navbar-component-wrapper {
                     padding: 8px 0;
                     border: none;
                     transition: all 0.5s;
+                    color: inherit;
                 }
 
-                &:hover {
+                &:hover,
+                &:has(a.active) {
                     background-color: var.$charcoal;
-                    
-                    a {
-                        color: var.$off-white;
-                    }
+                    color: var.$off-white;    
                 }
             }
         }

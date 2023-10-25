@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 
 import { AuthContext } from '../../../context/authContext';
@@ -13,6 +13,11 @@ const NavBar = ({ user }) => {
     const { isAuthenticated } = useContext(AuthContext);
     const [open, setOpen] = useState(false);
 
+
+    useEffect (() => {
+        setOpen(false);
+    }, [location.pathname]);
+
     
     // Don't show NavBar when user in BlogPage
     const regex = /[\/blogs\/]+(\d+)$/g;    // eslint-disable-line
@@ -20,14 +25,17 @@ const NavBar = ({ user }) => {
         return (<></>);
     }
 
-    const handleModalState = () => setOpen(!open);
+    const handleMenuState = () => setOpen(!open);
 
 
     return (
         <nav id='navbar-component-wrapper'>
             <>
                 {/* Only visible with small screens */}
-                <NavHamburger openModal={handleModalState} />
+                <NavHamburger
+                    isOpen={open}
+                    handleMenuState={handleMenuState}
+                />
 
 
                 {/* Only visible with larger screens */}
@@ -35,7 +43,7 @@ const NavBar = ({ user }) => {
                     isAuthenticated={isAuthenticated}
                     isOpen={open}
                     user={user}
-                    handleModalState={handleModalState}
+                    handleModalState={handleMenuState}
                 />
             </>
 
