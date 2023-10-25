@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { NavLink, useNavigate } from 'react-router-dom';
@@ -7,6 +7,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { nChars } from '../../models/constants';
 
 
+/**
+ * The Yup login schema. It defines all the inputs from the login form.
+ */
 const loginSchema = Yup.object().shape({
     email: Yup.string()
         .email('Invalid email format.')
@@ -23,9 +26,12 @@ const loginSchema = Yup.object().shape({
 
 
 const LoginForm = ({ handleSubmit, setMessage, message }) => {
+    // Constants
     const history = useNavigate();
+    // States
     const [viewPass, setViewPass] = useState(false);
 
+    // Formik initial values
     const initialCredentials = {
         email: '',
         password: ''

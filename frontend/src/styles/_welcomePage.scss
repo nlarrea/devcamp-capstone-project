@@ -157,8 +157,17 @@
             }
     
             .welcome-button {
-                @include btn.text-btn;
+                @include btn.text-btn(
+                    $color: var.$oxford-blue,
+                    $bg-color: var.$gold,
+                    $hover-bg-color: var.$gold
+                );
+                
                 align-self: flex-end;
+
+                &:hover {
+                    filter: brightness(90%);
+                }
             }
         }
 

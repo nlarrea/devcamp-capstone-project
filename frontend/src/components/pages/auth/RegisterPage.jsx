@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { AuthContext, UserContext } from '../../../context/authContext';
@@ -8,14 +8,20 @@ import RegisterForm from '../../forms/RegisterForm';
 
 
 const RegisterPage = () => {
-    // History and contexts
+    // Constants
     const history = useNavigate();
-
-    const [message, setMessage] = useState('');
+    // Contexts
     const { setIsAuthenticated } = useContext(AuthContext);
     const { setUser } = useContext(UserContext);
+    // State
+    const [message, setMessage] = useState('');
     
 
+    /**
+     * Sends the form data to the API through the AuthService and if the API
+     * returns an OK, logs in the user and stores its data.
+     * @param {*} values Input values from the register form.
+     */
     const handleSubmit = async (values) => {
         setMessage('');
 

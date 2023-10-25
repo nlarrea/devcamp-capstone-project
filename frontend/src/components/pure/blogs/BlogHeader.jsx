@@ -1,9 +1,12 @@
-import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 
+/**
+ * A skewed image with a nav to go back in history or to the home page.
+ */
 const BlogHeader = ({ blogData }) => {
+    // Constants
     const history = useNavigate();
 
 

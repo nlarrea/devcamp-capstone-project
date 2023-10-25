@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import { useState, useContext } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as yup from 'yup';
 import { NavLink, useNavigate } from 'react-router-dom';
@@ -11,6 +11,10 @@ import FileBase64 from '../../pure/FileBase64';
 import { nChars } from '../../../models/constants';
 
 
+/**
+ * The Yup schema from edit user form. It defines all the inputs from the edit
+ * user form.
+ */
 const userEditSchema = yup.object().shape({
     username: yup.string()
         .min(nChars.username.min, `Min ${nChars.username.min} characters!`)
@@ -38,11 +42,12 @@ const userEditSchema = yup.object().shape({
 
 
 const UserEditPage = () => {
-    // Contexts & global variable's state
+    // Constants
     const history = useNavigate();
+    // Contexts
     const { setIsAuthenticated } = useContext(AuthContext);
     const { user, setUser } = useContext(UserContext);
-    
+
     // Image states and values
     const originalImg = user?.image || null;
     const [image, setImage] = useState(originalImg ? originalImg : null);
@@ -57,6 +62,7 @@ const UserEditPage = () => {
     const [message, setMessage] = useState('');
 
 
+    // Formik initial values
     const initialCredentials = {
         username: '',
         email: '',
@@ -66,18 +72,30 @@ const UserEditPage = () => {
     };
 
 
+    /**
+     * Removes the current image from the state, and allows user to enter a new
+     * image.
+     */
     const handleRemoveImg = () => {
         setEditImgMode(true);
         setImage(null);
     }
 
 
+    /**
+     * Resets the image to the original value and sets to false the edit mode.
+     */
     const handleCancelImg = () => {
         setEditImgMode(false);
         setImage(originalImg);
     }
 
 
+    /**
+     * Sets the error message into the message state so that it can be
+     * displayed on the app.
+     * @param {*} error Error from API
+     */
     const showApiErrors = (error) => {
         const resMessage = (
             error.response &&
@@ -92,6 +110,11 @@ const UserEditPage = () => {
     }
 
 
+    /**
+     * Sends the updated user data to database through AuthService and if an OK
+     * is returned from API, updates the current user data in the app.
+     * @param {*} values Values from the input fields.
+     */
     const handleSubmit = async (values) => {
         setMessage('');
 
@@ -118,6 +141,10 @@ const UserEditPage = () => {
     }
 
 
+    /**
+     * Sends the DELETE request to the API through the AuthService.
+     * @param {*} event Clicking button event.
+     */
     const handleRemoveAccount = async (event) => {
         event.preventDefault();
 

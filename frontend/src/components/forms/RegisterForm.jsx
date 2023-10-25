@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { NavLink, useNavigate } from 'react-router-dom';
@@ -7,6 +7,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { nChars } from '../../models/constants';
 
 
+/**
+ * The Yup register schema. It defines all the inputs from the register form.
+ */
 const registerSchema = Yup.object().shape({
     username: Yup.string()
         .min(nChars.username.min, `Min ${nChars.username.min} characters!`)
@@ -29,10 +32,13 @@ const registerSchema = Yup.object().shape({
 
 
 const RegisterForm = ({ handleSubmit, setMessage, message }) => {
+    // Constants
     const history = useNavigate();
+    // States
     const [viewPass1, setViewPass1] = useState(false);
     const [viewPass2, setViewPass2] = useState(false);
 
+    // Formik initial values
     const initialCredentials = {
         username: '',
         email: '',

@@ -1,10 +1,15 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const FileBase64 = ({ inputId='image-input', multiple=false, onDone }) => {
+    // State
     const [files, setFiles] = useState([]);
 
 
+    /**
+     * Function to encode the received image to base64.
+     * @param {*} event The on change event from the input.
+     */
     const handleChange = (event) => {
         // Get the files
         setFiles(event.target.files);

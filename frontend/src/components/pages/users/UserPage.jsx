@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
@@ -6,7 +6,7 @@ import DataService from '../../../services/data';
 import { AuthContext, UserContext } from '../../../context/authContext';
 import { UserBlogsContext } from '../../../context/blogsContext';
 import { TYPES } from '../../../models/constants';
-import BlogItem from '../../pure/BlogItem';
+import BlogItem from '../../pure/blogs/BlogItem';
 import { LogoutButton } from '../../pure/LogLinks';
 import { getApiErrorMsg } from '../../../models/auxFunctions';
 

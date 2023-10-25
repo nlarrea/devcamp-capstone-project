@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import AuthService from '../../../services/auth';
@@ -8,14 +8,20 @@ import loginImg from '../../../static/images/forms/login.svg';
 
 
 const LoginPage = () => {
+    // Constants
     const history = useNavigate();
+    // Contexts
     const { setIsAuthenticated } = useContext(AuthContext);
     const { setUser } = useContext(UserContext);
-
     // States
     const [message, setMessage] = useState('');
 
 
+    /**
+     * Sends the data to the API through the AuthService and authenticates the
+     * user if the API returns an OK.
+     * @param {*} values Input values from the form.
+     */
     const handleSubmit = async (values) => {
         setMessage('');
         

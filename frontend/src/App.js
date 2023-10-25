@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import {
@@ -28,9 +28,13 @@ import {
   faNewspaper,
 } from '@fortawesome/free-solid-svg-icons';
 
+// Services and auxiliaries
 import AuthService from "./services/auth";
+import AuthVerify from "./models/authVerify";
+// Contexts
 import { AuthContext, UserContext } from "./context/authContext";
 import { UserBlogsContext } from "./context/blogsContext";
+// Components
 import NavBar from "./components/pure/nav/NavBar";
 import WelcomePage from "./components/pages/WelcomePage";
 import NotFoundPage from "./components/pages/NotFoundPage";
@@ -42,7 +46,6 @@ import WriteBlog from "./components/pages/blogs/WriteBlog";
 import UserPage from "./components/pages/users/UserPage";
 import UserEditPage from "./components/pages/users/UserEditPage";
 import PageLoader from "./components/pure/PageLoader";
-import AuthVerify from "./models/authVerify";
 
 library.add(
   // Page Icon
@@ -72,13 +75,20 @@ library.add(
 )
 
 function App() {
+  // Constants
   const history = useNavigate();
+  // Context initial values
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState({});
+  // States
   const [userBlogs, setUserBlogs] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
 
+  /**
+   * When app refresh, checks if there is an authenticated user by reading the
+   * token from localStorage.
+   */
   useEffect (() => {
     const loginUser = async () => {
       setIsLoading(true);

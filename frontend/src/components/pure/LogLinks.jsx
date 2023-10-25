@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { AuthContext, UserContext } from '../../context/authContext';
@@ -7,6 +7,7 @@ import { DISPLAY_TYPE } from '../../models/constants';
 import { UserBlogsContext } from '../../context/blogsContext';
 
 export const LoginButton = ({ type=TYPES.text }) => {
+    // Constants
     const history = useNavigate();
 
     return (
@@ -22,11 +23,17 @@ export const LoginButton = ({ type=TYPES.text }) => {
 };
 
 export const LogoutButton = ({ type=TYPES.textIcon, addClass='' }) => {
+    // Constants
     const history = useNavigate();
+    // Contexts
     const { setIsAuthenticated } = useContext(AuthContext);
     const { setUser } = useContext(UserContext);
     const { setUserBlogs } = useContext(UserBlogsContext);
 
+
+    /**
+     * Logs the user out when the button is clicked.
+     */
     const handleLogout = () => {
         localStorage.removeItem('token');
         setIsAuthenticated(false);

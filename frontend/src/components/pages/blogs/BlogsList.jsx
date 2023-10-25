@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
-import BlogItem from '../../pure/BlogItem';
+import BlogItem from '../../pure/blogs/BlogItem';
 import DataService from '../../../services/data';
 import { getApiErrorMsg } from '../../../models/auxFunctions';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const BlogsList = () => {
+    // States
     const [blogList, setBlogList] = useState([]);
     const [totalOfBlogs, setTotalOfBlogs] = useState(0);
     const [message, setMessage] = useState('');

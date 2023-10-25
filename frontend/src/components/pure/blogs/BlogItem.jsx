@@ -1,14 +1,18 @@
-import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
+
+/**
+ * Blog item to display the banner image, the title and a little bit of the
+ * content from the given blog.
+ */
 const BlogItem = ({ blog, handleDeleteBlog }) => {
+    // Constants
     const location = useLocation();
     const {
         id,
         title,
         content,
-        // user_id, // not being used
         banner_img
     } = blog;
     
@@ -29,10 +33,6 @@ const BlogItem = ({ blog, handleDeleteBlog }) => {
                 <div className='blogItem-content' dangerouslySetInnerHTML={{__html: content}} />
             
                 <nav>
-                    {/* <NavLink to={`/blogs/${userId}`} className='icon-btn'>
-                        <FontAwesomeIcon icon='user' />
-                    </NavLink> */}
-
                     {
                         location.pathname === '/users/me' &&
 

@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 import { NavLink } from 'react-router-dom';
 
 import { AuthContext } from '../../context/authContext';
@@ -6,14 +6,14 @@ import { TYPES } from '../../models/constants';
 import { LoginButton, LogoutButton } from './LogLinks';
 
 const Footer = () => {
+    // Context
     const { isAuthenticated } = useContext(AuthContext);
-    const getYear = new Date().getUTCFullYear();
 
     return (
         <footer id='footer-component-wrapper'>
             <header>
                 <h2>Blog Voyage</h2>
-                <p>Copyright &copy; {getYear} Blog Voyage, Inc.</p>
+                <p>Let your imagination fly!</p>
             </header>
 
             <nav>

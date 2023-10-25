@@ -1,19 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
-import BlogHeader from '../../pure/BlogHeader';
+import BlogHeader from '../../pure/blogs/BlogHeader';
 import DataService from '../../../services/data';
 import { getApiErrorMsg } from '../../../models/auxFunctions';
 import PageLoader from '../../pure/PageLoader';
 
 
+/**
+ * Single Blog page. It shows a banner image at the very top of the page, the
+ * blog title and the blog content as it is.
+ */
 const BlogPage = () => {
+    // Constants
     const params = useParams();
+    // States
     const [blogData, setBlogData] = useState('');
     const [message, setMessage] = useState('');
     const [isLoading, setIsLoading] = useState(true);
 
     
+    /**
+     * Get the blog data.
+     */
     useEffect (() => {
         const getBlogData = async () => {
             await DataService.getSingleBlog(blogId).then(response => {
