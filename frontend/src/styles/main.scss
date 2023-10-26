@@ -74,6 +74,12 @@ body, .App {
     @include btn.icon-text-btn();
 }
 
+.api-error-message {
+    color: var.$warning;
+    font-weight: bold;
+    text-wrap: nowrap;
+}
+
 
 div.input-label-wrapper {
     @include mix.input-icon-label();

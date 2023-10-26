@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 import BlogHeader from '../../pure/blogs/BlogHeader';
 import DataService from '../../../services/data';
 import { getApiErrorMsg } from '../../../models/auxFunctions';
-import PageLoader from '../../pure/PageLoader';
+import Loader from '../../pure/Loader';
 
 
 /**
@@ -40,7 +40,7 @@ const BlogPage = () => {
 
 
     if (isLoading) {
-        return <PageLoader text='Loading blog content...' />
+        return <Loader text='Loading blog content...' />
     }
 
     

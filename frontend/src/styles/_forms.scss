@@ -109,11 +109,7 @@
             }
 
             .api-error-message {
-                color: var.$warning;
                 font-size: 0.8rem;
-                font-weight: bold;
-                text-wrap: nowrap;
-    
                 position: absolute;
                 top: -15px;
                 left: 0;

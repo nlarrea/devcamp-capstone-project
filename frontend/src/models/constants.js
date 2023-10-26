@@ -1,10 +1,13 @@
-import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import welcomeSvg1 from '../static/images/welcomePage/welcomeSvg1.svg';
 import welcomeSvg3 from '../static/images/welcomePage/welcomeSvg3.svg';
 import welcomeSvg4 from '../static/images/welcomePage/welcomeSvg4.svg';
 
+
+/**
+ * The content that is going to be displayed in the app's home page's carousel.
+ */
 export const HOME_CONTENT = [
     {
         image: welcomeSvg1,
@@ -20,6 +23,10 @@ export const HOME_CONTENT = [
     }
 ];
 
+
+/**
+ * Different ways to display buttons content.
+ */
 export const TYPES = {
     text: 'text',
     textIcon: 'textIcon',
@@ -27,6 +34,14 @@ export const TYPES = {
     icon: 'icon'
 };
 
+
+/**
+ * Gets the text and the icon to be displayed in a span and icon pair. The icon
+ * is not mandatory.
+ * @param {String} textToDisplay 
+ * @param {String} iconName 
+ * @returns Object with the different React component distribution.
+ */
 export const DISPLAY_TYPE = (textToDisplay, iconName='') => {
     return {
         textIcon: (
@@ -47,6 +62,9 @@ export const DISPLAY_TYPE = (textToDisplay, iconName='') => {
 }
 
 
+/**
+ * The amount of allowed chars for usernames and passwords.
+ */
 export const nChars = {
     username: {
         min: 6,
@@ -56,4 +74,13 @@ export const nChars = {
         min: 8,
         max: 30
     }
+};
+
+
+/**
+ * The different types of loaders used in this app.
+ */
+export const LOADER_TYPES = {
+    page: 'page-loader',
+    content: 'content-loader'
 };

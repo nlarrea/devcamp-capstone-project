@@ -45,7 +45,7 @@ import BlogPage from './components/pages/blogs/BlogPage';
 import WriteBlog from "./components/pages/blogs/WriteBlog";
 import UserPage from "./components/pages/users/UserPage";
 import UserEditPage from "./components/pages/users/UserEditPage";
-import PageLoader from "./components/pure/PageLoader";
+import Loader from "./components/pure/Loader";
 
 library.add(
   // Page Icon
@@ -119,7 +119,7 @@ function App() {
 
 
   if (isLoading) {
-    return <PageLoader />
+    return <Loader />
   };
 
 

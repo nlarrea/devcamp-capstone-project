@@ -12,7 +12,7 @@ db_user = os.environ.get("DB_USER")
 db_password = os.environ.get("DB_PASSWORD")
 
 
-def get_total_of_blogs() -> int | None:
+def get_total_of_blogs(user_id: int | None = None) -> int | None:
     # Connect to the database
     conn = psycopg2.connect(
         host=db_host,
@@ -25,8 +25,14 @@ def get_total_of_blogs() -> int | None:
     # Create a cursor object
     cur = conn.cursor()
 
-    cur.execute("SELECT COUNT(*) FROM blogs;")
-    result = cur.fetchone()
+    if not user_id:
+        cur.execute("SELECT COUNT(*) FROM blogs;")
+        result = cur.fetchone()
+    else:
+        cur.execute(
+            f"SELECT COUNT(*) FROM blogs where blogs_users_id = {user_id}"
+        )
+        result = cur.fetchone()
 
     if result:
         return result[0]
@@ -34,7 +40,7 @@ def get_total_of_blogs() -> int | None:
     return None
 
 
-def get_blogs(offset: int, limit: int):
+def get_blogs(offset: int, limit: int, user_id: int | None = None):
     # Connect to the database
     conn = psycopg2.connect(
         host=db_host,
@@ -48,11 +54,19 @@ def get_blogs(offset: int, limit: int):
     cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
     # Execute a query
-    cur.execute(
-        f"""SELECT * FROM blogs
-        ORDER BY blogs_id DESC
-        LIMIT {limit} OFFSET {offset}"""
-    )
+    if not user_id:
+        cur.execute(
+            f"""SELECT * FROM blogs
+            ORDER BY blogs_id DESC
+            LIMIT {limit} OFFSET {offset}"""
+        )
+    else:
+        cur.execute(
+            f"""SELECT * FROM blogs
+            WHERE blogs_users_id = {user_id}
+            ORDER BY blogs_id DESC
+            LIMIT {limit} OFFSET {offset}"""
+        )
 
     # Fetch the results
     results = cur.fetchall()

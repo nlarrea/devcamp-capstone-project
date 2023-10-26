@@ -3,7 +3,8 @@ import { useState, useEffect } from 'react';
 import BlogItem from '../../pure/blogs/BlogItem';
 import DataService from '../../../services/data';
 import { getApiErrorMsg } from '../../../models/auxFunctions';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Loader from '../../pure/Loader';
+import { LOADER_TYPES } from '../../../models/constants';
 
 const BlogsList = () => {
     // States
@@ -113,10 +114,7 @@ const BlogsList = () => {
             </main>
             {
                 isLoading && (
-                    <div className='content-loader'>
-                        <FontAwesomeIcon icon='spinner' fixedWidth spin />
-                        <span>Loading blogs...</span>
-                    </div>
+                    <Loader text='Loading Blogs...' type={LOADER_TYPES.content} />
                 )
             }
         </div>

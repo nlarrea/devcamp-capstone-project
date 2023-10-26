@@ -17,11 +17,11 @@ const createBlog = async (newBlog) => {
 };
 
 
-const getUserBlogs = async (userId) => {
+const getUserBlogs = async (userId, page) => {
     const storedToken = localStorage.getItem('token');
 
     const userBlogs = await axios.get(
-        API_URL + `user/${userId}`, {
+        API_URL + `user/${userId}?page=${page}`, {
             headers: { Authorization: `Bearer ${storedToken}` }
         }
     );

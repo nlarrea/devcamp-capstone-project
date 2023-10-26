@@ -148,20 +148,28 @@ async def new_blog(blog: Blog, request: Request):
 
 
 # Get one user's blogs -> GET
-@router.get("/user/{user_id}", response_model=list[Blog] | list, status_code=status.HTTP_200_OK)
-async def my_blogs(user_id: int):
+@router.get("/user/{user_id}", response_model=dict | list, status_code=status.HTTP_200_OK)
+async def my_blogs(user_id: int, page: int):
     if not type(user_id) == int:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="The blog ID must be an integer!"
         )
     
-    blogs = find_users_blogs(user_id)
+    limit = 10
+    offset = (page * limit) - limit
+    blogs = get_blogs(offset, limit, user_id)
 
     if not blogs:
-        return []
+        return {
+            "blogs": [],
+            "total": 0
+        }
 
-    return blogs_schema(blogs)
+    return {
+        "blogs": blogs_schema(blogs),
+        "total": get_total_of_blogs(user_id)
+    }
 
 
 # Get one single blog by its ID -> GET
@@ -199,16 +207,6 @@ async def get_all_blogs(page: int = 1):
         "blogs": blogs_schema(blog_list),
         "total": get_total_of_blogs()
     }
-
-
-# @router.get("/blogs-quantity", response_model=int, status_code=status.HTTP_200_OK)
-# async def get_blogs_quantity():
-#     qty = get_total_of_blogs()
-
-#     if qty:
-#         return qty
-    
-#     return 0
 
 
 # Update one blog's data / content -> PUT
