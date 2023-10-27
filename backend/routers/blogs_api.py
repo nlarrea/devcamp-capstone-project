@@ -6,7 +6,7 @@ import re
 
 from db.models.blog import Blog
 from db.schemas.blog import blog_schema, blogs_schema
-from db.blogs_database import get_blogs, create_blog, find_blog, find_users_blogs, update_blog, delete_blog, get_total_of_blogs
+from db.blogs_database import get_total_of_blogs, get_blogs, find_blog, find_users_blogs, create_blog, update_blog, delete_blog
 
 ALGORITHM = "HS256"
 SECRET = os.environ.get("SECRET")
@@ -57,7 +57,7 @@ def search_blog_by_id(blog_id: int) -> Blog:
     return Blog(**blog_schema(blog))
 
 
-def validate_token(request: Request):
+def validate_token(request: Request) -> str:
     """ Checks if the request has a header called "Authorization" with the
      access token. If so, checks if the token did not expire.
     
@@ -97,7 +97,7 @@ def validate_token(request: Request):
         return username
     
 
-def process_base64_images(base64_image):
+def process_base64_images(base64_image) -> bytes:
     def decode_base64(data, alt_chars=b"+/"):
         """ Decode base64, padding being optional.
 
@@ -130,6 +130,16 @@ def process_base64_images(base64_image):
 
 @router.post("/new-blog", status_code=status.HTTP_201_CREATED)
 async def new_blog(blog: Blog, request: Request):
+    """ Posts a new blog in the database.
+    
+     Parameters:
+        - blog (`Blog`): The new blog to be posted in the database.
+        - request (`Request`): The HTTP request.
+
+     Returns:
+        - (`blog`): The latest blog of the logged user.
+    """
+
     # Check if access token is valid
     validate_token(request)
 
@@ -150,6 +160,18 @@ async def new_blog(blog: Blog, request: Request):
 # Get one user's blogs -> GET
 @router.get("/user/{user_id}", response_model=dict | list, status_code=status.HTTP_200_OK)
 async def my_blogs(user_id: int, page: int):
+    """ Gets the blogs from a user. It uses a limit so it doesn't return all
+     the existing blogs at once.
+     
+     Parameters:
+        - user_id (`int`): The current user's ID.
+        - page (`int`): A counter to know which blogs should be requested.
+    
+     Returns:
+        - (`dict`): A dictionary containing a list of blogs and the amount of
+        those blogs that are returned.
+    """
+
     if not type(user_id) == int:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -175,6 +197,15 @@ async def my_blogs(user_id: int, page: int):
 # Get one single blog by its ID -> GET
 @router.get("/single-blog/{blog_id}", response_model=Blog | None, status_code=status.HTTP_200_OK)
 async def single_blog(blog_id: int):
+    """ Finds a single blog by its ID.
+
+     Parameters:
+        - blog_id (`int`): The ID of the blog to be find.
+
+     Returns:
+        - (`Blog`): The blog that matched the received blog ID.
+    """
+
     if not type(blog_id) == int:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -194,6 +225,18 @@ async def single_blog(blog_id: int):
 
 @router.get("/all-blogs", response_model=dict, status_code=status.HTTP_200_OK)
 async def get_all_blogs(page: int = 1):
+    """ Gets all the blogs from database. It uses a limit and an offset to
+     avoid returning all the blogs at once.
+    
+     Parameters:
+        - page (`int`): The current page to calculate the range of blogs that
+        are going to be requested to the database.
+
+     Returns:
+        - (`dict`): A dictionary containing a list of blogs and the amount of
+        blogs.
+    """
+
     offset = (page * 10) - 10
     blog_list = get_blogs(offset, limit=10)
 
@@ -212,6 +255,16 @@ async def get_all_blogs(page: int = 1):
 # Update one blog's data / content -> PUT
 @router.put("/edit-blog", response_model=Blog, status_code=status.HTTP_201_CREATED)
 async def edit_blog(blog: Blog, request: Request):
+    """ Updates an already existing blog.
+    
+     Parameters:
+        - blog (`Blog`): The blog to be updated.
+        - request (`Request`): The HTTP request.
+
+     Returns:
+        - (`Blog`): The updated blog with the new data on it.
+    """
+
     validate_token(request)
 
     blog_dict = dict(blog)
@@ -228,6 +281,16 @@ async def edit_blog(blog: Blog, request: Request):
 # Delete blog -> DELETE
 @router.delete("/remove-blog/{blog_id}", response_model=int, status_code=status.HTTP_200_OK)
 async def remove_blog(blog_id: int, request: Request):
+    """ Deletes a blog.
+    
+     Parameters:
+        - blog_id (`int`): The ID of the blog that is going to be removed.
+        - request (`Request`): The HTTP request.
+    
+     Returns:
+        - (`int`): The removed blog's ID.
+    """
+
     validate_token(request)
     delete_blog(blog_id)
 

@@ -1,6 +1,7 @@
 import os
 import psycopg2
 import psycopg2.extras
+from operator import itemgetter
 
 from db.models.blog import Blog
 
@@ -12,7 +13,9 @@ db_user = os.environ.get("DB_USER")
 db_password = os.environ.get("DB_PASSWORD")
 
 
-def get_total_of_blogs(user_id: int | None = None) -> int | None:
+def database_connect() -> dict:
+    """ Creates the connection and cursor to the database and returns them. """
+
     # Connect to the database
     conn = psycopg2.connect(
         host=db_host,
@@ -22,8 +25,34 @@ def get_total_of_blogs(user_id: int | None = None) -> int | None:
         password=db_password,
         sslmode="require"
     )
+
     # Create a cursor object
-    cur = conn.cursor()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+    return {
+        "conn": conn, 
+        "cur": cur
+    }
+
+
+def database_disconnect(conn, cur):
+    """ Disconnect from database. """
+
+    cur.close()
+    conn.close()
+
+
+def get_total_of_blogs(user_id: int | None = None) -> int | None:
+    """ Requests to the database the amount of blogs.
+    
+     Parameters:
+        - user_id (`int`): User's ID to search its amount of blogs.
+
+     Returns:
+        - (`int` | `None`): The total count of found blogs.
+    """
+
+    conn, cur = itemgetter("conn", "cur")(database_connect())
 
     if not user_id:
         cur.execute("SELECT COUNT(*) FROM blogs;")
@@ -34,24 +63,29 @@ def get_total_of_blogs(user_id: int | None = None) -> int | None:
         )
         result = cur.fetchone()
 
+    database_disconnect(conn, cur)
+
     if result:
         return result[0]
     
     return None
 
 
-def get_blogs(offset: int, limit: int, user_id: int | None = None):
-    # Connect to the database
-    conn = psycopg2.connect(
-        host=db_host,
-        port=db_port,
-        database=db_name,
-        user=db_user,
-        password=db_password,
-        sslmode="require"
-    )
-    # Create a cursor object
-    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+def get_blogs(offset: int, limit: int, user_id: int | None = None) -> list[dict] | None:
+    """ Gets a specified range of blogs.
+    
+     Parameters:
+        - offset (`int`): The first blog position in the database to be
+        returned.
+        - limit (`int`): The quantity of blogs to be requested.
+        - user_id (`int` | `None`): The current user's ID.
+
+     Returns:
+        - (`list` | `None`): If blogs are found, returns a list of blogs, else
+        it returns `None`.
+    """
+
+    conn, cur = itemgetter("conn", "cur")(database_connect())
 
     # Execute a query
     if not user_id:
@@ -72,8 +106,7 @@ def get_blogs(offset: int, limit: int, user_id: int | None = None):
     results = cur.fetchall()
 
     # Close the cursor and connection
-    cur.close()
-    conn.close()
+    database_disconnect(conn, cur)
 
     if results:
         # Create a list of objects
@@ -84,25 +117,23 @@ def get_blogs(offset: int, limit: int, user_id: int | None = None):
 
 
 def find_blog(blog_id: int) -> dict:
-    # Connect to the database
-    conn = psycopg2.connect(
-        host=db_host,
-        port=db_port,
-        database=db_name,
-        user=db_user,
-        password=db_password,
-        sslmode="require"
-    )
-    # Create a cursor object
-    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    """ Finds a single blog by its ID.
+
+     Parameters:
+        - blog_id (`int`): The ID of the blog to be requested.
+    
+     Returns:
+        - (`dict`): The blog that matches the received blog ID.
+    """
+
+    conn, cur = itemgetter("conn", "cur")(database_connect())
 
     cur.execute(
         f"SELECT * FROM blogs WHERE blogs_id = {blog_id}"
     )
     result = cur.fetchone()
 
-    cur.close()
-    conn.close()
+    database_disconnect(conn, cur)
 
     if result:
         return dict(result)
@@ -110,25 +141,23 @@ def find_blog(blog_id: int) -> dict:
     return None
 
 
-def find_users_blogs(user_id: int) -> list:
-    # Connect to the database
-    conn = psycopg2.connect(
-        host=db_host,
-        port=db_port,
-        database=db_name,
-        user=db_user,
-        password=db_password,
-        sslmode="require"
-    )
-    # Create a cursor object
-    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+def find_users_blogs(user_id: int) -> list[dict] | None:
+    """ Returns all the blogs of a specified user.
+
+     Parameters:
+        - user_id (`int`): The ID of the user.
+
+     Returns:
+        - (`list` | `None`): If blogs are found, returns a list of blogs, else
+        it returns `None`.
+    """
+
+    conn, cur = itemgetter("conn", "cur")(database_connect())
 
     cur.execute(f"SELECT * FROM blogs WHERE blogs_users_id = {user_id} ORDER BY blogs_id DESC")
     results = cur.fetchall()
 
-
-    cur.close()
-    conn.close()
+    database_disconnect(conn, cur)
 
     if results:
         # Create a list of objects
@@ -139,18 +168,14 @@ def find_users_blogs(user_id: int) -> list:
     return None
 
 
-def create_blog(blog: dict):
-    # Connect to the database
-    conn = psycopg2.connect(
-        host=db_host,
-        port=db_port,
-        database=db_name,
-        user=db_user,
-        password=db_password,
-        sslmode="require"
-    )
-    # Create a cursor object
-    cur = conn.cursor()
+def create_blog(blog: dict) -> None:
+    """ Inserts the received blog into the database.
+    
+     Parameters:
+        - blog (`dict`): The blog that has to be inserted into the database.
+    """
+
+    conn, cur = itemgetter("conn", "cur")(database_connect())
 
     if blog["banner_img"]:
         insert_image = psycopg2.Binary(blog["banner_img"])
@@ -170,22 +195,18 @@ def create_blog(blog: dict):
     conn.commit()
 
     # Close the cursor and connection
-    cur.close()
-    conn.close()
+    database_disconnect(conn, cur)
 
 
 def update_blog(blog: dict, blog_id: int):
-    # Connect to the database
-    conn = psycopg2.connect(
-        host=db_host,
-        port=db_port,
-        database=db_name,
-        user=db_user,
-        password=db_password,
-        sslmode="require"
-    )
-    # Create a cursor object
-    cur = conn.cursor()
+    """ Updates a blog replacing its content with the received blog data.
+    
+     Parameters:
+        - blog (`dict`): The blog's new data.
+        - blog_id (`int`): The ID of the blog that has to be updated.
+    """
+
+    conn, cur = itemgetter("conn", "cur")(database_connect())
 
     if blog["banner_img"]:
         cur.execute(
@@ -212,22 +233,17 @@ def update_blog(blog: dict, blog_id: int):
     conn.commit()
 
     # CLose the cursor and connection
-    cur.close()
-    conn.close()
+    database_disconnect(conn, cur)
 
 
 def delete_blog(blog_id: int):
-    # Connect to the database
-    conn = psycopg2.connect(
-        host=db_host,
-        port=db_port,
-        database=db_name,
-        user=db_user,
-        password=db_password,
-        sslmode="require"
-    )
-    # Create a cursor object
-    cur = conn.cursor()
+    """ Removes a blog from the database.
+    
+     Parameters:
+        - blog_id (`int`): The ID of the blog that is going to be removed.
+    """
+
+    conn, cur = itemgetter("conn", "cur")(database_connect())
 
     cur.execute(
         f"DELETE FROM blogs WHERE blogs_id = {blog_id}"
@@ -235,5 +251,4 @@ def delete_blog(blog_id: int):
     conn.commit()
 
     # Close the cursor and connection
-    cur.close()
-    conn.close()
+    database_disconnect(conn, cur)

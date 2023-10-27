@@ -10,7 +10,7 @@ import re
 from db.models.user import User, UserDB
 from db.models.form import LoginForm, EditForm
 from db.schemas.user import user_schema
-from db.users_database import create_user, find_user_conditional, update_user, delete_user
+from db.users_database import create_user, find_user, update_user, delete_user
 
 
 ALGORITHM = "HS256"
@@ -29,18 +29,40 @@ crypt = CryptContext(schemes=["bcrypt"])
 # AUXILIARY FUNCTIONS
 
 
-def search_user(field: str, key):
+def search_user(field: str, value) -> User | dict:
+    """ Search a user by a specific field and its value.
+    
+     Parameters:
+        - field (`str`): The field name to find the user.
+        - value (`any`): The field value to find the user.
+
+     Returns:
+        - (`User` | `dict`): User if the user has been found. If any error
+        occurred, returns a `dict`.
+    """
+
     try:
-        user = find_user_conditional(field, key)
+        user = find_user(field, value)
         return User(**user_schema(user))
     
     except:
         return {"error": "User is not found!"}
     
 
-def search_user_db(field: str, key):
+def search_user_db(field: str, value) -> UserDB | dict:
+    """ Search a user by a specific field and its value.
+    
+     Parameters:
+        - field (`str`): The field name to find the user.
+        - value (`any`): The field value to find the user.
+
+     Returns:
+        - (`User` | `dict`): User if the user has been found. If any error
+        occurred, returns a `dict`.
+    """
+
     try:
-        user_db = find_user_conditional(field, key)
+        user_db = find_user(field, value)
         return UserDB(**user_schema(user_db))
     
     except:
@@ -48,8 +70,17 @@ def search_user_db(field: str, key):
     
 
 def check_allowed_data_field(field: str, new_user: EditForm, current_user: User) -> bool:
+    """ Checks if the given field can be set into the database or if it already
+     exists to avoid rewriting other's data.
+     
+     Parameters:
+        - field (`str`): The data name to be checked in the database.
+        - new_user (`EditForm`): The user's updated data.
+        - current_user (`User`): The current user's data.
+    """
+
     user_dict = dict(new_user)
-    user = find_user_conditional(field, user_dict[field])
+    user = find_user(field, user_dict[field])
 
     if not user:
         # There's no user in DB with that field -> it can be set to the new one
@@ -63,6 +94,14 @@ def check_allowed_data_field(field: str, new_user: EditForm, current_user: User)
 
 
 def check_allowed_data(new_user: EditForm, logged_user: User) -> bool:
+    """ Checks if the given data can be set into the database or if it already
+     exists to avoid rewriting other's data.
+     
+     Parameters:
+        - new_user (`EditForm`): The user's updated data.
+        - current_user (`User`): The current user's data.
+    """
+
     # Check if user can use the username
     allow_username = check_allowed_data_field("username", new_user, logged_user)
 
@@ -77,6 +116,12 @@ def check_allowed_data(new_user: EditForm, logged_user: User) -> bool:
     
 
 async def auth_user(token: str = Depends(oauth2_login)):
+    """ Checks if the current user is authenticated.
+    
+     Parameters:
+        - token (`str`): The token of the logged user.
+    """
+
     exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Not valid credentials!",
@@ -95,14 +140,14 @@ async def auth_user(token: str = Depends(oauth2_login)):
     return search_user("username", username)
 
 
-def decode_base64(data, alt_chars=b"+/"):
+def decode_base64(data, alt_chars=b"+/") -> bytes:
     """ Decode base64, padding being optional.
 
     Parameters:
         - data: base64 data as an ASCII byte string.
     
     Returns:
-        - The decoded byte sting.
+        - (`bytes`): The decoded byte sting.
     """
 
     # Normalize
@@ -120,6 +165,16 @@ def decode_base64(data, alt_chars=b"+/"):
 # Create a new user -> REGISTER
 @router.post("/register", response_model=User, status_code=status.HTTP_201_CREATED)
 async def user(user: UserDB):
+    """ Creates a new user into the database. First hashes the user's password
+     before it is stored.
+     
+     Parameters:
+        - user (`UserDB`): The user data to be stored into the database.
+
+     Returns:
+        - (`User`): The user that has been stored into the database.
+    """
+    
     if type(search_user("username", user.username)) == User:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -158,6 +213,16 @@ async def user(user: UserDB):
 # Set a user -> LOGIN (get access token)
 @router.post("/login", status_code=status.HTTP_200_OK)
 async def login(form: LoginForm):
+    """ Validates the form's credentials and returns the user's access token.
+    
+     Parameters:
+        - form (`LoginForm`): The login form data.
+
+     Returns:
+        - (`dict`): A dictionary containing the access token and the type of
+        this token.
+    """
+
     user_db = search_user_db("email", form.email)
 
     # Check if email exists
@@ -195,11 +260,27 @@ async def login(form: LoginForm):
 # Get current user -> GET (current user)
 @router.get("/me")
 async def me(user: User = Depends(auth_user)):
+    """ Returns the logged user's data.
+    
+     Returns:
+        - user (`User`): The current user's data.
+    """
+
     return user
 
 
 @router.put("/update-me", status_code=status.HTTP_201_CREATED)
 async def update_user_data(new_user: EditForm, logged_user: User = Depends(auth_user)):
+    """ Updates the current user's data.
+    
+     Parameters:
+        - new_user (`EditForm`): The updated data from the user.
+
+     Returns:
+        - (`dict`): A dictionary containing the access token and the type of
+        the token.
+    """
+
     if not check_allowed_data(new_user, logged_user):
         return False
     
@@ -248,4 +329,6 @@ async def update_user_data(new_user: EditForm, logged_user: User = Depends(auth_
 
 @router.delete("/remove-account", status_code=status.HTTP_200_OK)
 async def remove_current_user(user: User = Depends(auth_user)):
+    """ Removes the current user from the database. """
+
     delete_user(user.id)

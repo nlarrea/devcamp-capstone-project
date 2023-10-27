@@ -1,6 +1,7 @@
 import os
 import psycopg2
 import psycopg2.extras
+from operator import itemgetter
 
 from db.models.user import UserDB
 
@@ -12,7 +13,9 @@ db_user = os.environ.get("DB_USER")
 db_password = os.environ.get("DB_PASSWORD")
 
 
-def get_all_users():
+def database_connect() -> dict:
+    """ Creates the connection and cursor to the database and returns them. """
+
     # Connect to the database
     conn = psycopg2.connect(
         host=db_host,
@@ -22,108 +25,51 @@ def get_all_users():
         password=db_password,
         sslmode="require"
     )
+
     # Create a cursor object
     cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-    # Execute a query
-    cur.execute("SELECT * FROM users LIMIT 10")
+    return {
+        "conn": conn, 
+        "cur": cur
+    }
 
-    # Fetch the results
-    results = cur.fetchall()
 
-    # Close the cursor and connection
+def database_disconnect(conn, cur):
+    """ Disconnect from database. """
+
     cur.close()
     conn.close()
 
-    # Return the results
-    return results
 
-
-def get_all_users_conditional(field: str, key) -> list | None:
-    conn = psycopg2.connect(
-        host=db_host,
-        port=db_port,
-        database=db_name,
-        user=db_user,
-        password=db_password,
-        sslmode="require"
-    )
-    # Create a cursor object
-    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-
-    if type(key) == str:
-        cur.execute(
-            f"SELECT * FROM users WHERE users_{field} = '{key}'"
-        )
-
-    else:       
-        cur.execute(
-            f"SELECT * FROM users WHERE users_{field} = {key}"
-        )
-
-    results = cur.fetchall()
-
-    if results:
-        results = [dict(record) for record in results]
-        return results
-    
-    return None
-
-
-def find_user(table_field: str, value) -> dict | None:
+def find_user(field: str, value) -> dict | None:
     """ Receives a field and the value of the received field and returns the
-     database info if it finds the data on it. """
-    
-    # Connect to the database
-    conn = psycopg2.connect(
-        host=db_host,
-        port=db_port,
-        database=db_name,
-        user=db_user,
-        password=db_password,
-        sslmode="require"
-    )
-    # Create a cursor object
-    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+     database info if it finds the data on it.
+     
+     Parameters:
+        - table_field (`str`): The name of the field to be requested to the
+        database.
+        - value (`any`): The value of the given field.
 
-    # Execute a query
-    cur.execute(f"SELECT * FROM users WHERE users_{table_field} = '{value}'")
-    record = cur.fetchone()
+     Returns:
+        - (`dict` | `None`): A dictionary that contains the found user's data.
+    """
 
-    # Close the cursor and connection
-    cur.close()
-    conn.close()
+    conn, cur = itemgetter("conn", "cur")(database_connect())
 
-    # Return the result
-    if record:
-        return dict(record)
-    
-    return None
-
-
-def find_user_conditional(field: str, key) -> dict | None:
-    conn = psycopg2.connect(
-        host=db_host,
-        port=db_port,
-        database=db_name,
-        user=db_user,
-        password=db_password,
-        sslmode="require"
-    )
-    # Create a cursor object
-    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-
-    if type(key) == str:
+    if type(value) == str:
         cur.execute(
-            f"SELECT * FROM users WHERE users_{field} = '{key}'"
+            f"SELECT * FROM users WHERE users_{field} = '{value}'"
         )
 
     else:       
         cur.execute(
-            f"SELECT * FROM users WHERE users_{field} = {key}"
+            f"SELECT * FROM users WHERE users_{field} = {value}"
         )
 
     result = cur.fetchone()
+
+    database_disconnect(conn, cur)
 
     if result:
         return dict(result)
@@ -131,21 +77,15 @@ def find_user_conditional(field: str, key) -> dict | None:
     return None
 
 
-def create_user(user: UserDB):
+def create_user(user: UserDB) -> None:
     """ Connects to the database and creates a new record (user) with the
-     received data. """
+     received data.
+     
+     Parameters:
+        - user (`UserDB`): The user to be created.
+    """
     
-    # Connect to the database
-    conn = psycopg2.connect(
-        host=db_host,
-        port=db_port,
-        database=db_name,
-        user=db_user,
-        password=db_password,
-        sslmode="require"
-    )
-    # Create a cursor object
-    cur = conn.cursor()
+    conn, cur = itemgetter("conn", "cur")(database_connect())
 
     # Insert the user into the database
     cur.execute(
@@ -155,21 +95,18 @@ def create_user(user: UserDB):
     conn.commit()
 
     # Close the cursor and connection
-    cur.close()
-    conn.close()
+    database_disconnect(conn, cur)
 
 
-def update_user(new_user: dict, logged_user_id: int):
-    conn = psycopg2.connect(
-        host=db_host,
-        port=db_port,
-        database=db_name,
-        user=db_user,
-        password=db_password,
-        sslmode="require"
-    )
-    # Create a cursor object
-    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+def update_user(new_user: dict, logged_user_id: int) -> None:
+    """ Updates a user's data by replacing the existing one with the new data.
+    
+     Parameters:
+        - new_user (`dict`): The user's updated data.
+        - logged_user_id (`int`): The current user's ID.
+    """
+
+    conn, cur = itemgetter("conn", "cur")(database_connect())
 
     if new_user["image"]:
         cur.execute(
@@ -195,21 +132,17 @@ def update_user(new_user: dict, logged_user_id: int):
 
     conn.commit()
 
-    cur.close()
-    conn.close()
+    database_disconnect(conn, cur)
 
 
-def delete_user(user_id: int):
-    conn = psycopg2.connect(
-        host=db_host,
-        port=db_port,
-        database=db_name,
-        user=db_user,
-        password=db_password,
-        sslmode="require"
-    )
-    # Create a cursor object
-    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+def delete_user(user_id: int) -> None:
+    """ Removes a user from database.
+    
+     Parameters:
+        - user_id (`int`): The ID of the user that has to be removed.
+    """
+
+    conn, cur = itemgetter("conn", "cur")(database_connect())
 
     # Remove current user's blogs to avoid FK error
     cur.execute(
@@ -223,5 +156,4 @@ def delete_user(user_id: int):
     )
     conn.commit()
 
-    cur.close()
-    conn.close()
+    database_disconnect(conn, cur)
