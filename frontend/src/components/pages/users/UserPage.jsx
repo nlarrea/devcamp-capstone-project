@@ -180,7 +180,7 @@ const UserPage = () => {
                                     />
                                 ))
                             ) : (
-                                !isLoading &&
+                                !isLoading && !message &&
                                 <p className='no-blogs-message'>
                                     You haven't written any Blog yet!
                                 </p>
