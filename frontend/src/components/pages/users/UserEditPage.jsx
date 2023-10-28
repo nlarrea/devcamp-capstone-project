@@ -117,6 +117,7 @@ const UserEditPage = () => {
      */
     const handleSubmit = async (values) => {
         setMessage('');
+        setEditImgMode(false);
 
         await AuthService.updateUser({
             username: values.username,
@@ -422,7 +423,7 @@ const UserEditPage = () => {
                                             type='button'
                                             onClick={handleRemoveImg}
                                             className='form-btn edit-btn'
-                                        >Edit</button>
+                                        >Remove</button>
                                     </>
                                 )
                             }

@@ -1,9 +1,9 @@
 import { useState, useContext, useEffect } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import DataService from '../../../services/data';
-import { AuthContext, UserContext } from '../../../context/authContext';
+import { UserContext } from '../../../context/authContext';
 import { UserBlogsContext } from '../../../context/blogsContext';
 import { LOADER_TYPES, TYPES } from '../../../models/constants';
 import BlogItem from '../../pure/blogs/BlogItem';
@@ -13,11 +13,8 @@ import Loader from '../../pure/Loader';
 
 
 const UserPage = () => {
-    // Constants
-    const history = useNavigate();
     // Contexts
-    const { user, setUser } = useContext(UserContext);
-    const { setIsAuthenticated } = useContext(AuthContext);
+    const { user } = useContext(UserContext);
     const { userBlogs, setUserBlogs } = useContext(UserBlogsContext);
     // States
     const [message, setMessage] = useState('');
@@ -33,15 +30,12 @@ const UserPage = () => {
      */
     const getBlogsData = async () => {
         await DataService.getUserBlogs(user.id, page).then(response => {
-            // const currentBlogs = userBlogs.filter(blog => blog.id !== response.data);
-            // setUserBlogs([...currentBlogs]);
             setTotalOfBlogs(response.data.total);
             setUserBlogs(prev => prev.concat(response.data.blogs));
             setIsLoading(false);
         }, (error) => {
             setMessage(getApiErrorMsg(error));
             setIsLoading(false);
-            console.error(error)
         });
 
         setScrollEnd(false);
@@ -115,15 +109,7 @@ const UserPage = () => {
             const currentBlogs = userBlogs.filter(blog => blog.id !== response.data);
             setUserBlogs([...currentBlogs]);
         }).catch(error => {
-            if (error.response.status === 401) {
-                localStorage.removeItem('token');
-                setUser({});
-                setIsAuthenticated(false);
-                setUserBlogs([]);
-                history('/login');
-            } else {
-                setMessage(getApiErrorMsg(error));
-            }
+            setMessage(getApiErrorMsg(error));
         });
 
         setIsLoading(false);
