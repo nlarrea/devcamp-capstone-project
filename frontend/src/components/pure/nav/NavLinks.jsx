@@ -2,12 +2,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 
-const NavLinks = ({ isAuthenticated, isOpen=false, user={}, handleModalState }) => {
+const NavLinks = ({ isAuthenticated, isOpen=false, user={} }) => {
     return (
-        <div
-            className={`left-nav-side ${isOpen ? 'open-modal' : ''}`}
-            onClick={handleModalState}
-        >
+        <div className={`left-nav-side ${isOpen ? 'open-modal' : ''}`}>
             <div className='link-wrapper'>
                 <NavLink to='/'>Home</NavLink>
             </div>

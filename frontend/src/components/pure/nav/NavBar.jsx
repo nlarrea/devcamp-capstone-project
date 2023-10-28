@@ -43,7 +43,6 @@ const NavBar = ({ user }) => {
                     isAuthenticated={isAuthenticated}
                     isOpen={open}
                     user={user}
-                    handleModalState={handleMenuState}
                 />
             </>
 
