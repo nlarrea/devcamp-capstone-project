@@ -31,7 +31,7 @@ crypt = CryptContext(schemes=["bcrypt"])
 
 def search_user(field: str, key):
     try:
-        user = db_client.local.users.find_one({field: key})
+        user = db_client.users.find_one({field: key})
         return User(**user_schema(user))
     except:
         return {"error": "User is not found!"}
@@ -39,7 +39,7 @@ def search_user(field: str, key):
 
 def search_user_db(field: str, key):
     try:
-        user_db = db_client.local.users.find_one({field: key})
+        user_db = db_client.users.find_one({field: key})
         return UserDB(**user_schema(user_db))
     except:
         return {"error": "User is not found!"}
@@ -173,11 +173,11 @@ async def user(user: UserDB):
     del user_dict["id"]
 
     # Insert the new username to database and get its ID
-    id = db_client.local.users.insert_one(user_dict).inserted_id
+    id = db_client.users.insert_one(user_dict).inserted_id
 
     # Check if the current user has been correctly inserted
     new_user = user_schema(
-        db_client.local.users.find_one({"_id": id})
+        db_client.users.find_one({"_id": id})
     )
 
     return User(**new_user)
@@ -285,7 +285,7 @@ async def update_user_data(new_user: EditForm, logged_user: User = Depends(auth_
 
     # Update the user
     try:
-        db_client.local.users.find_one_and_replace({"_id": ObjectId(logged_user.id)}, new_user_dict)
+        db_client.users.find_one_and_replace({"_id": ObjectId(logged_user.id)}, new_user_dict)
     except:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -309,7 +309,7 @@ async def remove_current_user(user: User = Depends(auth_user)):
     """ Removes the current user from the database. """
 
     # Remove the current user
-    found_user = db_client.local.users.find_one_and_delete({"_id": ObjectId(user.id)})
+    found_user = db_client.users.find_one_and_delete({"_id": ObjectId(user.id)})
 
     if not found_user:
         raise HTTPException(
@@ -318,4 +318,4 @@ async def remove_current_user(user: User = Depends(auth_user)):
         )
     
     # Remove the current user's blogs
-    db_client.local.blogs.delete_many({"user_id": user.id})
+    db_client.blogs.delete_many({"user_id": user.id})

@@ -32,7 +32,7 @@ def search_blog_by_id(blog_id: str) -> Blog:
         - (`Blog`): The blog with all the parameters saved in the database.
     """
 
-    blog = db_client.local.blogs.find_one({"_id": ObjectId(blog_id)})
+    blog = db_client.blogs.find_one({"_id": ObjectId(blog_id)})
 
     return Blog(**blog_schema(blog))
 
@@ -132,10 +132,10 @@ async def new_blog(blog: Blog, request: Request):
     if blog_dict["banner_img"]:
         blog_dict["banner_img"] = process_base64_images(blog_dict["banner_img"])
 
-    id = db_client.local.blogs.insert_one(blog_dict).inserted_id
+    id = db_client.blogs.insert_one(blog_dict).inserted_id
 
     new_blog = blog_schema(
-        db_client.local.blogs.find_one({"_id": id})
+        db_client.blogs.find_one({"_id": id})
     )
 
     return Blog(**new_blog)
@@ -158,7 +158,7 @@ async def my_blogs(user_id: str, page: int):
     limit = 10
     offset = (page * limit) - limit
     blogs = list(
-        db_client.local.blogs.find({"user_id": user_id})
+        db_client.blogs.find({"user_id": user_id})
         .skip(offset)
         .limit(limit)
     )
@@ -171,7 +171,7 @@ async def my_blogs(user_id: str, page: int):
     
     return {
         "blogs": blogs_schema(blogs),
-        "total": len(list(db_client.local.blogs.find({"user_id": user_id})))
+        "total": len(list(db_client.blogs.find({"user_id": user_id})))
     }
 
 
@@ -192,7 +192,7 @@ async def get_all_blogs(page: int = 1):
     limit = 10
     offset = (page * limit) - limit
     blogs_list = list(
-        db_client.local.blogs.find()
+        db_client.blogs.find()
         .skip(offset)
         .limit(limit)
     )
@@ -205,7 +205,7 @@ async def get_all_blogs(page: int = 1):
     
     return {
         "blogs": blogs_schema(blogs_list),
-        "total": len(list(db_client.local.blogs.find()))
+        "total": len(list(db_client.blogs.find()))
     }
 
 
@@ -220,7 +220,7 @@ async def single_blog(blog_id: str):
         - (`Blog`): The blog that matched the received blog ID.
     """
 
-    blog = db_client.local.blogs.find_one({"_id": ObjectId(blog_id)})
+    blog = db_client.blogs.find_one({"_id": ObjectId(blog_id)})
 
     if not blog:
         raise HTTPException(
@@ -252,14 +252,14 @@ async def edit_blog(blog: Blog, request: Request):
         blog_dict["banner_img"] = process_base64_images(blog_dict["banner_img"])
 
     try:
-        db_client.local.blogs.find_one_and_replace({"_id": ObjectId(blog.id)}, blog)
+        db_client.blogs.find_one_and_replace({"_id": ObjectId(blog.id)}, blog)
     except:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User couldn't be found!"
         )
     
-    return db_client.local.blogs.find_one({"_id": ObjectId(blog.id)})
+    return db_client.blogs.find_one({"_id": ObjectId(blog.id)})
 
 
 @router.delete("/remove-blog/{blog_id}", response_model=str, status_code=status.HTTP_200_OK)
@@ -275,7 +275,7 @@ async def remove_blog(blog_id: str, request: Request):
     """
 
     validate_token(request)
-    found = db_client.local.blogs.find_one_and_delete({"_id": ObjectId(blog_id)})
+    found = db_client.blogs.find_one_and_delete({"_id": ObjectId(blog_id)})
 
     if not found:
         raise HTTPException(
