@@ -308,10 +308,14 @@ async def update_user_data(new_user: EditForm, logged_user: User = Depends(auth_
 async def remove_current_user(user: User = Depends(auth_user)):
     """ Removes the current user from the database. """
 
-    found = db_client.local.users.find_one_and_delete({"_id": ObjectId(user.id)})
+    # Remove the current user
+    found_user = db_client.local.users.find_one_and_delete({"_id": ObjectId(user.id)})
 
-    if not found:
+    if not found_user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User not deleted!"
         )
+    
+    # Remove the current user's blogs
+    db_client.local.blogs.delete_many({"user_id": user.id})
