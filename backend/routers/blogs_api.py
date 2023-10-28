@@ -1,12 +1,13 @@
 import os
 from fastapi import APIRouter, HTTPException, status, Request
 from jose import jwt, JWTError
+from bson import ObjectId
 import base64
 import re
 
+from db.client import db_client
 from db.models.blog import Blog
 from db.schemas.blog import blog_schema, blogs_schema
-from db.blogs_database import get_total_of_blogs, get_blogs, find_blog, find_users_blogs, create_blog, update_blog, delete_blog
 
 ALGORITHM = "HS256"
 SECRET = os.environ.get("SECRET")
@@ -20,29 +21,8 @@ router = APIRouter(
 
 # AUXILIARY FUNCTIONS
 
-def search_blog_by_user(blog_to_find: Blog) -> Blog:
-    """ Searches a single blog based on a user ID from the blog to search in
-     the database.
-    
-     Parameters:
-        - blog_to_find (`Blog`): the blog to find and get its ID.
 
-     Returns:
-        - (`Blog`): The blog with all the parameters saved in the database.
-    """
-
-    blog = find_users_blogs(blog_to_find.user_id)[0]
-
-    if blog is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="The Blog you're searching for is not in Database."
-        )
-
-    return Blog(**blog_schema(blog))
-
-
-def search_blog_by_id(blog_id: int) -> Blog:
+def search_blog_by_id(blog_id: str) -> Blog:
     """ Searches a single blog by its ID.
      
      Parameters:
@@ -52,7 +32,7 @@ def search_blog_by_id(blog_id: int) -> Blog:
         - (`Blog`): The blog with all the parameters saved in the database.
     """
 
-    blog = find_blog(blog_id)
+    blog = db_client.local.blogs.find_one({"_id": ObjectId(blog_id)})
 
     return Blog(**blog_schema(blog))
 
@@ -124,9 +104,10 @@ def process_base64_images(base64_image) -> bytes:
     blog_encoded_image = base64_image
     blog_image = decode_base64(blog_encoded_image)
     return blog_image
-    
+
 
 # BLOGS DEFINITIONS
+
 
 @router.post("/new-blog", status_code=status.HTTP_201_CREATED)
 async def new_blog(blog: Blog, request: Request):
@@ -143,6 +124,7 @@ async def new_blog(blog: Blog, request: Request):
     # Check if access token is valid
     validate_token(request)
 
+    # INSERT BLOG INTO DATABASE
     blog_dict = dict(blog)
     del blog_dict["id"]
 
@@ -150,16 +132,17 @@ async def new_blog(blog: Blog, request: Request):
     if blog_dict["banner_img"]:
         blog_dict["banner_img"] = process_base64_images(blog_dict["banner_img"])
 
-    # Insert the blog into the database
-    create_blog(blog_dict)
+    id = db_client.local.blogs.insert_one(blog_dict).inserted_id
 
-    # Return the inserted blog
-    return search_blog_by_user(blog)
+    new_blog = blog_schema(
+        db_client.local.blogs.find_one({"_id": id})
+    )
+
+    return Blog(**new_blog)
 
 
-# Get one user's blogs -> GET
 @router.get("/user/{user_id}", response_model=dict | list, status_code=status.HTTP_200_OK)
-async def my_blogs(user_id: int, page: int):
+async def my_blogs(user_id: str, page: int):
     """ Gets the blogs from a user. It uses a limit so it doesn't return all
      the existing blogs at once.
      
@@ -172,55 +155,24 @@ async def my_blogs(user_id: int, page: int):
         those blogs that are returned.
     """
 
-    if not type(user_id) == int:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="The blog ID must be an integer!"
-        )
-    
     limit = 10
     offset = (page * limit) - limit
-    blogs = get_blogs(offset, limit, user_id)
-
+    blogs = list(
+        db_client.local.blogs.find({"user_id": user_id})
+        .skip(offset)
+        .limit(limit)
+    )
+    
     if not blogs:
         return {
             "blogs": [],
             "total": 0
         }
-
+    
     return {
         "blogs": blogs_schema(blogs),
-        "total": get_total_of_blogs(user_id)
+        "total": len(list(db_client.local.blogs.find({"user_id": user_id})))
     }
-
-
-# Get one single blog by its ID -> GET
-@router.get("/single-blog/{blog_id}", response_model=Blog | None, status_code=status.HTTP_200_OK)
-async def single_blog(blog_id: int):
-    """ Finds a single blog by its ID.
-
-     Parameters:
-        - blog_id (`int`): The ID of the blog to be find.
-
-     Returns:
-        - (`Blog`): The blog that matched the received blog ID.
-    """
-
-    if not type(blog_id) == int:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="The blog ID must be an integer!"
-        )
-
-    blog = find_blog(blog_id)
-
-    if not blog:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"No blog with ID = {blog_id} has been found!"
-        )
-
-    return Blog(**blog_schema(blog))
 
 
 @router.get("/all-blogs", response_model=dict, status_code=status.HTTP_200_OK)
@@ -237,22 +189,48 @@ async def get_all_blogs(page: int = 1):
         blogs.
     """
 
-    offset = (page * 10) - 10
-    blog_list = get_blogs(offset, limit=10)
-
-    if not blog_list:
+    limit = 10
+    offset = (page * limit) - limit
+    blogs_list = list(
+        db_client.local.blogs.find()
+        .skip(offset)
+        .limit(limit)
+    )
+    
+    if not blogs_list:
         return {
             "blogs": [],
             "total": 0
         }
     
     return {
-        "blogs": blogs_schema(blog_list),
-        "total": get_total_of_blogs()
+        "blogs": blogs_schema(blogs_list),
+        "total": len(list(db_client.local.blogs.find()))
     }
 
 
-# Update one blog's data / content -> PUT
+@router.get("/single-blog/{blog_id}", response_model=Blog | None, status_code=status.HTTP_200_OK)
+async def single_blog(blog_id: str):
+    """ Finds a single blog by its ID.
+
+     Parameters:
+        - blog_id (`int`): The ID of the blog to be find.
+
+     Returns:
+        - (`Blog`): The blog that matched the received blog ID.
+    """
+
+    blog = db_client.local.blogs.find_one({"_id": ObjectId(blog_id)})
+
+    if not blog:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"No blog with ID = {blog_id} has been found!"
+        )
+    
+    return Blog(**blog_schema(blog))
+
+
 @router.put("/edit-blog", response_model=Blog, status_code=status.HTTP_201_CREATED)
 async def edit_blog(blog: Blog, request: Request):
     """ Updates an already existing blog.
@@ -273,14 +251,19 @@ async def edit_blog(blog: Blog, request: Request):
     if blog_dict["banner_img"]:
         blog_dict["banner_img"] = process_base64_images(blog_dict["banner_img"])
 
-    update_blog(blog_dict, blog.id)
+    try:
+        db_client.local.blogs.find_one_and_replace({"_id": ObjectId(blog.id)}, blog)
+    except:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User couldn't be found!"
+        )
+    
+    return db_client.local.blogs.find_one({"_id": ObjectId(blog.id)})
 
-    return search_blog_by_id(blog.id)
 
-
-# Delete blog -> DELETE
-@router.delete("/remove-blog/{blog_id}", response_model=int, status_code=status.HTTP_200_OK)
-async def remove_blog(blog_id: int, request: Request):
+@router.delete("/remove-blog/{blog_id}", response_model=str, status_code=status.HTTP_200_OK)
+async def remove_blog(blog_id: str, request: Request):
     """ Deletes a blog.
     
      Parameters:
@@ -292,6 +275,12 @@ async def remove_blog(blog_id: int, request: Request):
     """
 
     validate_token(request)
-    delete_blog(blog_id)
+    found = db_client.local.blogs.find_one_and_delete({"_id": ObjectId(blog_id)})
 
-    return blog_id
+    if not found:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Blog Not Deleted"
+        )
+    
+    return str(found["_id"])

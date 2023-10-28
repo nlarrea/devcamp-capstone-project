@@ -4,13 +4,14 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
+from bson import ObjectId
 import base64
 import re
 
+from db.client import db_client
 from db.models.user import User, UserDB
 from db.models.form import LoginForm, EditForm
 from db.schemas.user import user_schema
-from db.users_database import create_user, find_user, update_user, delete_user
 
 
 ALGORITHM = "HS256"
@@ -28,43 +29,18 @@ crypt = CryptContext(schemes=["bcrypt"])
 
 # AUXILIARY FUNCTIONS
 
-
-def search_user(field: str, value) -> User | dict:
-    """ Search a user by a specific field and its value.
-    
-     Parameters:
-        - field (`str`): The field name to find the user.
-        - value (`any`): The field value to find the user.
-
-     Returns:
-        - (`User` | `dict`): User if the user has been found. If any error
-        occurred, returns a `dict`.
-    """
-
+def search_user(field: str, key):
     try:
-        user = find_user(field, value)
+        user = db_client.local.users.find_one({field: key})
         return User(**user_schema(user))
-    
     except:
         return {"error": "User is not found!"}
     
 
-def search_user_db(field: str, value) -> UserDB | dict:
-    """ Search a user by a specific field and its value.
-    
-     Parameters:
-        - field (`str`): The field name to find the user.
-        - value (`any`): The field value to find the user.
-
-     Returns:
-        - (`User` | `dict`): User if the user has been found. If any error
-        occurred, returns a `dict`.
-    """
-
+def search_user_db(field: str, key):
     try:
-        user_db = find_user(field, value)
+        user_db = db_client.local.users.find_one({field: key})
         return UserDB(**user_schema(user_db))
-    
     except:
         return {"error": "User is not found!"}
     
@@ -80,13 +56,13 @@ def check_allowed_data_field(field: str, new_user: EditForm, current_user: User)
     """
 
     user_dict = dict(new_user)
-    user = find_user(field, user_dict[field])
+    user = search_user(field, user_dict[field])
 
-    if not user:
+    if type(user) != User:
         # There's no user in DB with that field -> it can be set to the new one
         return True
     
-    elif user["users_id"] == current_user.id:
+    elif user.id == current_user.id:
         # The field is not modified in new user
         return True
     
@@ -116,12 +92,6 @@ def check_allowed_data(new_user: EditForm, logged_user: User) -> bool:
     
 
 async def auth_user(token: str = Depends(oauth2_login)):
-    """ Checks if the current user is authenticated.
-    
-     Parameters:
-        - token (`str`): The token of the logged user.
-    """
-
     exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Not valid credentials!",
@@ -136,7 +106,7 @@ async def auth_user(token: str = Depends(oauth2_login)):
         
     except JWTError:
         raise exception
-
+    
     return search_user("username", username)
 
 
@@ -162,7 +132,7 @@ def decode_base64(data, alt_chars=b"+/") -> bytes:
 
 # USERS DEFINITION
 
-# Create a new user -> REGISTER
+
 @router.post("/register", response_model=User, status_code=status.HTTP_201_CREATED)
 async def user(user: UserDB):
     """ Creates a new user into the database. First hashes the user's password
@@ -174,7 +144,7 @@ async def user(user: UserDB):
      Returns:
         - (`User`): The user that has been stored into the database.
     """
-    
+
     if type(search_user("username", user.username)) == User:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -183,6 +153,7 @@ async def user(user: UserDB):
                 "message": "This username already exists!"
             }
         )
+    
     elif type(search_user("email", user.email)) == User:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -191,26 +162,27 @@ async def user(user: UserDB):
                 "message": "This email already exists!"
             }
         )
-
+    
     # Hash the password
     hashed_password = crypt.hash(user.password)
 
     # Create a user dictionary with the hashed password
     user_dict = dict(user)
     user_dict["password"] = hashed_password
-    del user_dict["id"]     # no necesario porque no lo uso en create_user
+    user_dict["image"] = b""
+    del user_dict["id"]
 
-    # Insert the user into the database
-    create_user(user_dict)
+    # Insert the new username to database and get its ID
+    id = db_client.local.users.insert_one(user_dict).inserted_id
 
-    # Create new user based on the schema to generate a User object
-    new_user = search_user("username", user.username)
+    # Check if the current user has been correctly inserted
+    new_user = user_schema(
+        db_client.local.users.find_one({"_id": id})
+    )
 
-    # Return the new user's data
-    return new_user
+    return User(**new_user)
 
 
-# Set a user -> LOGIN (get access token)
 @router.post("/login", status_code=status.HTTP_200_OK)
 async def login(form: LoginForm):
     """ Validates the form's credentials and returns the user's access token.
@@ -225,7 +197,7 @@ async def login(form: LoginForm):
 
     user_db = search_user_db("email", form.email)
 
-    # Check if email exists
+    # Check if the email exists
     if not type(user_db) == UserDB:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -244,7 +216,7 @@ async def login(form: LoginForm):
                 "message": "The password is not correct!"
             }
         )
-
+    
     # Token parameters
     access_token = {
         "sub": user_db.username,
@@ -257,7 +229,6 @@ async def login(form: LoginForm):
     }
 
 
-# Get current user -> GET (current user)
 @router.get("/me")
 async def me(user: User = Depends(auth_user)):
     """ Returns the logged user's data.
@@ -284,7 +255,7 @@ async def update_user_data(new_user: EditForm, logged_user: User = Depends(auth_
     if not check_allowed_data(new_user, logged_user):
         return False
     
-    # Get logged user's all data:
+    # Get logged user's all data
     user_db = search_user_db("username", logged_user.username)
 
     if type(user_db) != UserDB:
@@ -292,13 +263,13 @@ async def update_user_data(new_user: EditForm, logged_user: User = Depends(auth_
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Logged user is not found in database!"
         )
-
+    
     new_user_dict = dict(new_user)
 
-    # If new user has modified the password, crypt it
+    # If updated user has modified the password, crypt it
     if new_user_dict["new_password"] and new_user_dict["new_password"] != "":
         new_user_dict["new_password"] = crypt.hash(new_user_dict["new_password"])
-    
+
     # Set data to new_user if it doesn't exist to avoid removing data from DB
     new_user_dict["password"] = new_user_dict["new_password"]
     del new_user_dict["new_password"]
@@ -306,14 +277,20 @@ async def update_user_data(new_user: EditForm, logged_user: User = Depends(auth_
 
     if new_user_dict["image"]:
         new_user_dict["image"] = decode_base64(new_user_dict["image"])
-
+    
     for field in new_user_dict.keys():
         if ((not new_user_dict[field] or new_user_dict[field] == "")
             and field != "image"):
             new_user_dict[field] = dict(user_db)[field]
 
-    # Update user
-    update_user(new_user_dict, user_db.id)
+    # Update the user
+    try:
+        db_client.local.users.find_one_and_replace({"_id": ObjectId(logged_user.id)}, new_user_dict)
+    except:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User couldn't be found!"
+        )
     
     # Update access token
     access_token = {
@@ -323,7 +300,7 @@ async def update_user_data(new_user: EditForm, logged_user: User = Depends(auth_
 
     return {
         "access_token": jwt.encode(access_token, SECRET, algorithm=ALGORITHM),
-        "token_type": "bearer"
+        "token_type": "Bearer"
     }
 
 
@@ -331,4 +308,10 @@ async def update_user_data(new_user: EditForm, logged_user: User = Depends(auth_
 async def remove_current_user(user: User = Depends(auth_user)):
     """ Removes the current user from the database. """
 
-    delete_user(user.id)
+    found = db_client.local.users.find_one_and_delete({"_id": ObjectId(user.id)})
+
+    if not found:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not deleted!"
+        )

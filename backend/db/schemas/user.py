@@ -1,15 +1,15 @@
 import base64
 
 def user_schema(user) -> dict:
-    if user["users_image"]:
-        user["users_image"] = base64.b64encode(user["users_image"])
+    if user["image"]:
+        user["image"] = base64.b64encode(user["image"])
         
     return {
-        "id": user["users_id"],
-        "username":  user["users_username"],
-        "email": user["users_email"],
-        "password": user["users_password"],
-        "image": user["users_image"]
+        "id": str(user["_id"]),
+        "username":  user["username"],
+        "email": user["email"],
+        "password": user["password"],
+        "image": user["image"]
     }
 
 
