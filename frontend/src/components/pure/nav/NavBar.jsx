@@ -20,7 +20,7 @@ const NavBar = ({ user }) => {
 
     
     // Don't show NavBar when user in BlogPage
-    const regex = /[\/blogs\/]+(\d+)$/g;    // eslint-disable-line
+    const regex = /[\/blogs\/]+[a-f\d]{24}$/g;    // eslint-disable-line
     if (location.pathname.match(regex)) {
         return (<></>);
     }
