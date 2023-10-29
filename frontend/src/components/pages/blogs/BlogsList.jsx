@@ -105,7 +105,7 @@ const BlogsList = () => {
                             />
                         ))
                     ) : (
-                        !isLoading &&
+                        !isLoading && !message &&
                         <p className='no-blogs-message'>
                             No Blog has been written yet!
                         </p>

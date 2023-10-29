@@ -22,7 +22,7 @@ const NavHamburger = ({ isOpen, handleMenuState }) => {
                 onClick={handleMenuState}
             />
             
-            <div>
+            <div className='lines-wrapper'>
                 <span className="line-1" />
                 <span className="line-2" />
                 <span className="line-3" />

@@ -34,7 +34,7 @@ const userEditSchema = yup.object().shape({
         .max(nChars.password.max, `Max ${nChars.password.max} characters!`)
         .matches(
             /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_-])[A-Za-z\d@$!%*?&_-]{8,30}$/,
-            'At least 1 uppercase, 1 lowercase and 1 special character.'
+            'At least 1 upper, 1 lower and 1 special char.'
         ),
     confirmPassword: yup.string()
         .oneOf([yup.ref('newPassword'), null], 'Both passwords must be equals!')

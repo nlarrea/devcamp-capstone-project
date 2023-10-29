@@ -97,6 +97,15 @@ nav#navbar-component-wrapper {
     nav#navbar-component-wrapper {
         .left-nav-side.switch {
             display: block;
+
+            .nav-triangle-up {
+                width: 0;
+                height: 0;
+                border-left: 16px solid transparent;
+                border-right: 16px solid transparent;
+
+                border-bottom: 16px solid var.$oxford-blue;
+            }
         }
 
         .left-nav-side:not(.switch),
@@ -118,7 +127,8 @@ nav#navbar-component-wrapper {
             left: 0;
             z-index: 9;
 
-            background-color: var.$grey;
+            color: var.$off-white;
+            background-color: var.$menu-bg;
             font-weight: bold;
 
             box-shadow: 0 0 8px rgba(var.$charcoal, 0.3);
@@ -135,15 +145,27 @@ nav#navbar-component-wrapper {
                     height: 100%;
                     padding: 8px 0;
                     border: none;
-                    transition: all 0.5s;
                     color: inherit;
+                    transition: none;
                 }
 
                 &:hover,
                 &:has(a.active) {
-                    background-color: var.$charcoal;
-                    color: var.$off-white;    
+                    background-color: var.$menu-detail;
+                    color: var.$menu-bg;
                 }
+            }
+
+            .nav-triangle-up {
+                position: absolute;
+                top: -16px;
+                left: 30px;
+                width: 0;
+                height: 0;
+                border-left: 16px solid transparent;
+                border-right: 16px solid transparent;
+
+                border-bottom: 16px solid var.$oxford-blue;
             }
         }
     }
