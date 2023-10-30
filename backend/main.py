@@ -17,7 +17,7 @@ origins = [
     "http://localhost:3000",
     "http:127.0.0.1:3000",
     "localhost:3000",
-    "https://nlarrea.github.io/blog-voyage/"
+    "https://nlarrea.github.io"
 ]
 
 # Routers
