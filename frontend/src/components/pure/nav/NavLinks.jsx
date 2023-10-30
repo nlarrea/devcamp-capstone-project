@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { NavLink } from 'react-router-dom';
+import PATHS from '../../../models/paths';
 
 const NavLinks = ({ isAuthenticated, isOpen=false, user={} }) => {
     const [isSmallMedia, setIsSmallMedia] = useState(window.innerWidth <= 775);
@@ -36,24 +37,24 @@ const NavLinks = ({ isAuthenticated, isOpen=false, user={} }) => {
             <span className="nav-triangle-up"></span>
 
             <div className='link-wrapper'>
-                <NavLink to='/'>Home</NavLink>
+                <NavLink to={PATHS.welcome}>Home</NavLink>
             </div>
 
             <div className='link-wrapper'>
-                <NavLink to='/blogs'>Blogs</NavLink>
+                <NavLink to={PATHS.blogs}>Blogs</NavLink>
             </div>
             
             {
                 isAuthenticated && (
                     <div className='link-wrapper'>
-                        <NavLink to='/new-blog'>New Blog</NavLink>
+                        <NavLink to={PATHS.newBlog}>New Blog</NavLink>
                     </div>
                 ) 
             }
             {
                 isAuthenticated && isSmallMedia && (
                     <div className='link-wrapper nav-username-link'>
-                        <NavLink to='/users/me'>
+                        <NavLink to={PATHS.currentUser}>
                             <FontAwesomeIcon icon='user' fixedWidth />
                             {user?.username}
                         </NavLink>

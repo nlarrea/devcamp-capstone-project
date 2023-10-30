@@ -10,6 +10,7 @@ import BlogItem from '../../pure/blogs/BlogItem';
 import { LogoutButton } from '../../pure/LogLinks';
 import { getApiErrorMsg } from '../../../models/auxFunctions';
 import Loader from '../../pure/Loader';
+import PATHS from '../../../models/paths';
 
 
 const UserPage = () => {
@@ -131,12 +132,12 @@ const UserPage = () => {
 
 
                     <nav>
-                        <NavLink className='icon-text-btn' to='/new-blog'>
+                        <NavLink className='icon-text-btn' to={PATHS.newBlog}>
                             <FontAwesomeIcon icon='paper-plane' />
                             <span>Create new blog</span>
                         </NavLink>
 
-                        <NavLink className='icon-text-btn' to='/users/me/edit'>
+                        <NavLink className='icon-text-btn' to={PATHS.editUser}>
                             <FontAwesomeIcon icon='gear' />
                             <span>Configuration</span>
                         </NavLink>

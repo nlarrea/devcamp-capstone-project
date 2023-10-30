@@ -2,10 +2,11 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 
 import avatar from '../../../static/images/avatars/user_avatar.svg';
+import PATHS from '../../../models/paths';
 
 const UserAvatar = ({ user }) => {
     return (
-        <NavLink to={`/users/me`} className='nav-user-data-wrapper'>
+        <NavLink to={PATHS.currentUser} className='nav-user-data-wrapper'>
             <div className='nav-user-img-wrapper'>
                 <span className='nav-user-circle-out' />
                 <span className='nav-user-circle-in' />

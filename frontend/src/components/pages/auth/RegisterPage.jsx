@@ -5,6 +5,7 @@ import { AuthContext, UserContext } from '../../../context/authContext';
 import registerImg from '../../../static/images/forms/register.svg';
 import AuthService from '../../../services/auth';
 import RegisterForm from '../../forms/RegisterForm';
+import PATHS from '../../../models/paths';
 
 
 const RegisterPage = () => {
@@ -45,7 +46,7 @@ const RegisterPage = () => {
 
             setUser(obtainedUser);
             setIsAuthenticated(true);
-            history('/');
+            history(PATHS.welcome);
         }).catch(error => {
             const resMessage = (
                 error.response &&

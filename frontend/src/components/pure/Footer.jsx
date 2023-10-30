@@ -4,6 +4,7 @@ import { NavLink } from 'react-router-dom';
 import { AuthContext } from '../../context/authContext';
 import { TYPES } from '../../models/constants';
 import { LoginButton, LogoutButton } from './LogLinks';
+import PATHS from '../../models/paths';
 
 const Footer = () => {
     // Context
@@ -18,7 +19,7 @@ const Footer = () => {
 
             <nav>
                 <div className='link-wrapper'>
-                    <NavLink to='/blogs'>Blogs</NavLink>
+                    <NavLink to={PATHS.blogs}>Blogs</NavLink>
                 </div>
 
                 <div className='link-wrapper'>

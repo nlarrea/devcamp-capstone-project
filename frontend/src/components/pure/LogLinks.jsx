@@ -5,6 +5,7 @@ import { AuthContext, UserContext } from '../../context/authContext';
 import { TYPES } from '../../models/constants';
 import { DISPLAY_TYPE } from '../../models/constants';
 import { UserBlogsContext } from '../../context/blogsContext';
+import PATHS from '../../models/paths';
 
 export const LoginButton = ({ type=TYPES.text }) => {
     // Constants
@@ -12,7 +13,7 @@ export const LoginButton = ({ type=TYPES.text }) => {
 
     return (
         <button
-            onClick={() => history('/login')}
+            onClick={() => history(PATHS.login)}
             className={'login-btn'}
         >
             {
@@ -39,7 +40,7 @@ export const LogoutButton = ({ type=TYPES.textIcon, addClass='' }) => {
         setIsAuthenticated(false);
         setUser({});
         setUserBlogs([]);
-        history('/');
+        history(PATHS.welcome);
     }
 
     return (

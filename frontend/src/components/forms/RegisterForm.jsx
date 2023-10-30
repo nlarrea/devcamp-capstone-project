@@ -5,6 +5,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { nChars } from '../../models/constants';
+import PATHS from '../../models/paths';
 
 
 /**
@@ -23,7 +24,7 @@ const registerSchema = Yup.object().shape({
         .max(nChars.password.max, `Max ${nChars.password.max} characters!`)
         .matches(
             /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_-])[A-Za-z\d@$!%*?&_-]{8,30}$/,
-            'At least 1 uppercase, 1 lowercase and 1 special character.'
+            'Min: 1 number, upper, lower and special char.'
         )
         .required('Password is required.'),
     confirmPassword: Yup.string()
@@ -69,7 +70,7 @@ const RegisterForm = ({ handleSubmit, setMessage, message }) => {
                     <button
                         type='button'
                         className='icon-button go-back-button'
-                        onClick={() => history('/')}
+                        onClick={() => history(PATHS.welcome)}
                     >
                         <FontAwesomeIcon icon='chevron-left' fixedWidth />
                         Go Back
@@ -228,7 +229,7 @@ const RegisterForm = ({ handleSubmit, setMessage, message }) => {
 
                     <nav>
                         <p>
-                            Do you have an account? <NavLink to='/login'>Login</NavLink>
+                            Do you have an account? <NavLink to={PATHS.login}>Login</NavLink>
                         </p>
 
                         <button type='submit' disabled={isSubmitting}>

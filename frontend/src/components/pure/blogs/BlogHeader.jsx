@@ -1,5 +1,6 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import PATHS from '../../../models/paths';
 
 
 /**
@@ -30,7 +31,7 @@ const BlogHeader = ({ blogData }) => {
                 </button>
 
                 <div className='blog-link-wrapper'>
-                    <NavLink to='/'>Home</NavLink>
+                    <NavLink to={PATHS.welcome}>Home</NavLink>
                 </div>
             </nav>
         </header>

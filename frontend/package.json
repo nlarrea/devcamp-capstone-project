@@ -1,6 +1,7 @@
 {
-  "name": "frontend",
+  "name": "blog-voyage",
   "version": "0.1.0",
+  "homepage": "https://nlarrea.github.io/blog-voyage/#",
   "private": true,
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.4.2",
@@ -22,6 +23,8 @@
     "yup": "^1.3.2"
   },
   "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
@@ -44,5 +47,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "gh-pages": "^6.0.0"
   }
 }

@@ -1,5 +1,6 @@
 import { NavLink, useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import PATHS from '../../../models/paths';
 
 
 /**
@@ -20,7 +21,7 @@ const BlogItem = ({ blog, handleDeleteBlog }) => {
 
     return (
         <div className='blog-item-wrapper'>
-            <NavLink to={`/blogs/${id}`} className='text-btn'>
+            <NavLink to={PATHS.blogPage(id)} className='text-btn'>
                 Read Blog
             </NavLink>
             
@@ -42,7 +43,7 @@ const BlogItem = ({ blog, handleDeleteBlog }) => {
                             </button>
 
                             <NavLink 
-                                to={{ pathname: `/edit-blog/${id}` }}
+                                to={{ pathname: PATHS.editBlog(id) }}
                                 state= {{ from: blog }}
                                 className='icon-btn'
                             >

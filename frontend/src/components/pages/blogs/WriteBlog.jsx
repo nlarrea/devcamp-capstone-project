@@ -8,6 +8,7 @@ import { AuthContext, UserContext } from '../../../context/authContext';
 import { UserBlogsContext } from '../../../context/blogsContext';
 import FileBase64 from '../../pure/FileBase64';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import PATHS from '../../../models/paths';
 
 const WriteBlog = () => {
     // Constants
@@ -103,7 +104,7 @@ const WriteBlog = () => {
                     const restOfBlogs = userBlogs.filter(blog => blog.id !== parseInt(blogId));
                     return [response?.data, ...restOfBlogs];
                 });
-                history('/users/me');
+                history(PATHS.currentUser);
             }).catch(error => {
                 console.error('Updating error:', error);
 
@@ -114,7 +115,7 @@ const WriteBlog = () => {
                     setIsAuthenticated(false);
                     setUser({});
                     setUserBlogs({})
-                    history('/login');
+                    history(PATHS.login);
                 }
             }).finally(() => {
                 setIsLoading(false);
@@ -125,7 +126,7 @@ const WriteBlog = () => {
                 setUserBlogs(prevState => ([
                     response.data, ...prevState
                 ]));
-                history('/users/me');
+                history(PATHS.currentUser);
             }).catch(error => {
                 console.error('Create new blog error:', error);
 
@@ -134,7 +135,7 @@ const WriteBlog = () => {
                 if (errorType === 'expired') {
                     setIsAuthenticated(false);
                     setUser({});
-                    history('/login');
+                    history(PATHS.login);
                 }
             }).finally(() => {
                 setIsLoading(false);
@@ -246,7 +247,7 @@ const WriteBlog = () => {
                 </section>
 
                 <nav>
-                    <NavLink to='/users/me' className='cancel-form-submit'>
+                    <NavLink to={PATHS.currentUser} className='cancel-form-submit'>
                         Cancel
                     </NavLink>
 

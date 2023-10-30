@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { AuthContext } from '../../context/authContext';
 import { HOME_CONTENT } from '../../models/constants';
+import PATHS from '../../models/paths';
 
 const Carousel = () => {
     // Constants
@@ -57,9 +58,9 @@ const Carousel = () => {
      */
     const getStarted = () => {
         if (!isAuthenticated) {
-            history('/login');
+            history(PATHS.login);
         } else {
-            history('/new-blog')
+            history(PATHS.newBlog)
         }
     }
     

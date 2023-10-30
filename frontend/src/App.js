@@ -46,6 +46,7 @@ import WriteBlog from "./components/pages/blogs/WriteBlog";
 import UserPage from "./components/pages/users/UserPage";
 import UserEditPage from "./components/pages/users/UserEditPage";
 import Loader from "./components/pure/Loader";
+import PATHS from "./models/paths";
 
 library.add(
   // Page Icon
@@ -72,7 +73,8 @@ library.add(
   faMobile,
   faRocket,
   faNewspaper
-)
+);
+
 
 function App() {
   // Constants
@@ -132,11 +134,11 @@ function App() {
   const alwaysAuthorized = () => {
     return [
       {
-        path: '/blogs',
+        path: PATHS.blogs,
         element: <BlogsList />
       },
       {
-        path: '/blogs/:blogId',
+        path: PATHS.blogPage(':blogId'),
         element: <BlogPage />
       }
     ]
@@ -152,19 +154,19 @@ function App() {
   const authorizedWhenLogged = () => {
     return [
       {
-        path: '/users/me',
+        path: PATHS.currentUser,
         element: <UserPage />
       },
       {
-        path: '/users/me/edit',
+        path: PATHS.editUser,
         element: <UserEditPage />
       },
       {
-        path: '/new-blog',
+        path: PATHS.newBlog,
         element: <WriteBlog />
       },
       {
-        path: '/edit-blog/:blogId',
+        path: PATHS.editBlog(':blogId'),
         element: <WriteBlog />
       }
      
@@ -181,11 +183,11 @@ function App() {
   const authorizedWhenNotLogged = () => {
     return [
       {
-        path: '/login',
+        path: PATHS.login,
         element: <LoginPage />
       },
       {
-        path: '/register',
+        path: PATHS.register,
         element: <RegisterPage />
       }
     ]
@@ -208,7 +210,7 @@ function App() {
           <Routes>
             <Route
               exact
-              path='/'
+              path={PATHS.welcome}
               element={
                 <WelcomePage />
               }
@@ -245,7 +247,7 @@ function App() {
             setIsAuthenticated(false);
             setUser({});
             setUserBlogs([]);
-            history('/');
+            history(PATHS.welcome);
           }} />
         </UserBlogsContext.Provider>
         </UserContext.Provider>

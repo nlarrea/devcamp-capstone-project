@@ -5,6 +5,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { nChars } from '../../models/constants';
+import PATHS from '../../models/paths';
 
 
 /**
@@ -20,7 +21,7 @@ const loginSchema = Yup.object().shape({
         .max(nChars.password.max, `Max ${nChars.password.max} characters!`)
         .matches(
             /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_-])[A-Za-z\d@$!%*?&_-]{8,30}$/,
-            'At least 1 uppercase, 1 lowercase and 1 special character.'
+            'Min: 1 number, upper, lower and special char.'
         )
 });
 
@@ -60,7 +61,7 @@ const LoginForm = ({ handleSubmit, setMessage, message }) => {
                     <button
                         type='button'
                         className='icon-button go-back-button'
-                        onClick={() => history('/')}
+                        onClick={() => history(PATHS.welcome)}
                     >
                         <FontAwesomeIcon icon='chevron-left' fixedWidth />
                         Go Back
@@ -144,7 +145,7 @@ const LoginForm = ({ handleSubmit, setMessage, message }) => {
 
                     <nav>
                         <p>
-                            First time here? <NavLink to='/register'>Register</NavLink>
+                            First time here? <NavLink to={PATHS.register}>Register</NavLink>
                         </p>
 
                         <button type='submit' disabled={isSubmitting}>

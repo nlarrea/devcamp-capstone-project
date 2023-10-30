@@ -9,6 +9,7 @@ import { AuthContext, UserContext } from '../../../context/authContext';
 import avatar from '../../../static/images/avatars/user_avatar.svg';
 import FileBase64 from '../../pure/FileBase64';
 import { nChars } from '../../../models/constants';
+import PATHS from '../../../models/paths';
 
 
 /**
@@ -26,7 +27,7 @@ const userEditSchema = yup.object().shape({
         .max(nChars.password.max, `Max ${nChars.password.max} characters!`)
         .matches(
             /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_-])[A-Za-z\d@$!%*?&_-]{8,30}$/,
-            'At least 1 upper, 1 lower and 1 special char.'
+            'Min: 1 number, upper, lower and special char.'
         )
         .required("Required to update user data!"),
     newPassword: yup.string()
@@ -34,7 +35,7 @@ const userEditSchema = yup.object().shape({
         .max(nChars.password.max, `Max ${nChars.password.max} characters!`)
         .matches(
             /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_-])[A-Za-z\d@$!%*?&_-]{8,30}$/,
-            'At least 1 upper, 1 lower and 1 special char.'
+            'Min: 1 number, upper, lower and special char.'
         ),
     confirmPassword: yup.string()
         .oneOf([yup.ref('newPassword'), null], 'Both passwords must be equals!')
@@ -153,7 +154,7 @@ const UserEditPage = () => {
             setUser({});
             setIsAuthenticated(false);
             localStorage.removeItem('token');
-            history('/');
+            history(PATHS.welcome);
         }).catch(error => {
             showApiErrors(error);
             console.error(error)
@@ -431,7 +432,7 @@ const UserEditPage = () => {
                     </main>
 
                     <nav>
-                        <NavLink to='/users/me'>Cancel</NavLink>
+                        <NavLink to={PATHS.currentUser}>Cancel</NavLink>
 
                         <button
                             type='submit'

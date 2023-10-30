@@ -7,6 +7,7 @@ import { LoginButton, LogoutButton } from '../LogLinks';
 import NavHamburger from './NavHamburger';
 import NavLinks from './NavLinks';
 import UserAvatar from './UserAvatar';
+import PATHS from '../../../models/paths';
 
 const NavBar = ({ user }) => {
     const location = useLocation();
@@ -53,7 +54,7 @@ const NavBar = ({ user }) => {
                             <UserAvatar user={user} />
 
                             <div className='link-wrapper nav-username-link'>
-                                <NavLink to={'/users/me'}>
+                                <NavLink to={PATHS.currentUser}>
                                     {user?.username || 'my username'}
                                 </NavLink>
                             </div>

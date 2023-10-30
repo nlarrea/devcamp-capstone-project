@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router-dom';
+import PATHS from '../../models/paths';
 
 const NotFoundPage = () => {
     return (
@@ -10,7 +11,7 @@ const NotFoundPage = () => {
                     The page you are looking for might have been removed, had its 
                     name changed or is temporarily unavailable.
                 </p>
-                <NavLink to='/'>Go to homepage</NavLink>
+                <NavLink to={PATHS.welcome}>Go to homepage</NavLink>
             </main>
         </div>
     );

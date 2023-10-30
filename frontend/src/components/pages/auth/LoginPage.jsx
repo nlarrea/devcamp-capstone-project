@@ -5,6 +5,7 @@ import AuthService from '../../../services/auth';
 import { AuthContext, UserContext } from '../../../context/authContext';
 import LoginForm from '../../forms/LoginForm';
 import loginImg from '../../../static/images/forms/login.svg';
+import PATHS from '../../../models/paths';
 
 
 const LoginPage = () => {
@@ -41,7 +42,7 @@ const LoginPage = () => {
                 });
             }
 
-            history('/');
+            history(PATHS.welcome);
         }).catch(error => {
             const resMessage = (
                 error.response &&
