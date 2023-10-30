@@ -16,10 +16,8 @@ const NavLinks = ({ isAuthenticated, isOpen=false, user={} }) => {
             const windowWidth = window.innerWidth;
 
             if (windowWidth <= 775) {
-                console.log('width:', windowWidth, '. SMALL');
                 setIsSmallMedia(true);
             } else {
-                console.log('width:', windowWidth, '. BIG');
                 setIsSmallMedia(false);
             }
         }

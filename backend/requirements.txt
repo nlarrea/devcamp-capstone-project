@@ -1,7 +1,6 @@
 fastapi
+uvicorn[standard]
 python-jose
 passlib
 pymongo
 python-multipart
-bson
-dotenv

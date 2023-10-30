@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = 'http://127.0.0.1:8000/blogs/';
+const API_URL = 'https://blog-voyage-api-dev-femc.1.ie-1.fl0.io/blogs/';
 
 
 const createBlog = async (newBlog) => {
