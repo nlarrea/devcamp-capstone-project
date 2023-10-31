@@ -9,7 +9,8 @@ const createBlog = async (newBlog) => {
     const createdBlog = await axios.post(
         API_URL + 'new-blog',
         newBlog, {
-            headers: { Authorization: `Bearer ${storedToken}` }
+            headers: { Authorization: `Bearer ${storedToken}` },
+            withCredentials: true
         }
     );
 
@@ -22,7 +23,8 @@ const getUserBlogs = async (userId, page) => {
 
     const userBlogs = await axios.get(
         API_URL + `user/${userId}?page=${page}`, {
-            headers: { Authorization: `Bearer ${storedToken}` }
+            headers: { Authorization: `Bearer ${storedToken}` },
+            withCredentials: true
         }
     );
 
@@ -54,7 +56,8 @@ const updateBlog = async (updatedBlog) => {
     return await axios.put(
         API_URL + 'edit-blog',
         updatedBlog, {
-            headers: { Authorization: `Bearer ${storedToken}` }
+            headers: { Authorization: `Bearer ${storedToken}` },
+            withCredentials: true
         }
     );
 };
@@ -65,7 +68,8 @@ const deleteBlog = async (blogId) => {
 
     const removedBlogId = await axios.delete(
         API_URL + `remove-blog/${blogId}`, {
-            headers: { Authorization: `Bearer ${storedToken}` }
+            headers: { Authorization: `Bearer ${storedToken}` },
+            withCredentials: true
         }
     );
 

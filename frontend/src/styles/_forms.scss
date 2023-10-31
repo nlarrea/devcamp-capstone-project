@@ -134,6 +134,7 @@
 
         section {
             width: 100vw;
+            height: fit-content;
             min-height: 100vh;
             background: linear-gradient(rgba(var.$charcoal, 0.3), rgba(var.$charcoal, 0.3)), url('../static/images/forms/login.svg');
             background-repeat: no-repeat;
@@ -145,14 +146,9 @@
                 margin: 0 auto;
                 min-width: 350px;
                 width: 50%;
-                // height: calc(100vh - 80px);
                 background-color: var.$off-white;
 
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                
+                position: relative;
                 box-shadow: 0 0 25px rgba(var.$charcoal, 0.8);
 
                 header {

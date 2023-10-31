@@ -38,7 +38,8 @@ const getCurrentUser = () => {
 
     return axios.get(
         API_URL + 'me', {
-            headers: { Authorization: `Bearer ${storedToken}` }
+            headers: { Authorization: `Bearer ${storedToken}` },
+            withCredentials: true
         }
     );
 };
@@ -62,7 +63,8 @@ const updateUser = async ({
             new_password,
             image
         }, {
-            headers: { Authorization: `Bearer ${storedToken}`}
+            headers: { Authorization: `Bearer ${storedToken}`},
+            withCredentials: true
         }
     );
 };
@@ -73,9 +75,8 @@ const removeAccount = async () => {
 
     await axios.delete(
         API_URL + 'remove-account', {
-            headers: {
-                'Authorization': `Bearer ${storedToken}`
-            }
+            headers: { Authorization: `Bearer ${storedToken}` },
+            withCredentials: true
         }
     );
 };
