@@ -1,7 +1,7 @@
 import os
 from fastapi import APIRouter, HTTPException, status, Request
 from jose import jwt, JWTError
-from bson import ObjectId
+from bson import ObjectId, Binary
 import base64
 import re
 
@@ -170,7 +170,7 @@ async def my_blogs(user_id: str, page: int):
         }
     
     return {
-        "blogs": blogs_schema(blogs),
+        "blogs": blogs_schema(blogs)[::-1],
         "total": len(list(db_client.blogs.find({"user_id": user_id})))
     }
 
@@ -204,7 +204,7 @@ async def get_all_blogs(page: int = 1):
         }
     
     return {
-        "blogs": blogs_schema(blogs_list),
+        "blogs": blogs_schema(blogs_list)[::-1],
         "total": len(list(db_client.blogs.find()))
     }
 
@@ -231,7 +231,7 @@ async def single_blog(blog_id: str):
     return Blog(**blog_schema(blog))
 
 
-@router.put("/edit-blog", response_model=Blog, status_code=status.HTTP_201_CREATED)
+@router.put("/edit-blog", status_code=status.HTTP_201_CREATED)
 async def edit_blog(blog: Blog, request: Request):
     """ Updates an already existing blog.
     
@@ -252,14 +252,18 @@ async def edit_blog(blog: Blog, request: Request):
         blog_dict["banner_img"] = process_base64_images(blog_dict["banner_img"])
 
     try:
-        db_client.blogs.find_one_and_replace({"_id": ObjectId(blog.id)}, blog)
+        db_client.blogs.find_one_and_replace({"_id": ObjectId(blog.id)}, blog_dict)
     except:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="User couldn't be found!"
+            detail="Blog couldn't be found!"
         )
     
-    return db_client.blogs.find_one({"_id": ObjectId(blog.id)})
+    updated_blog = blog_schema(
+        db_client.blogs.find_one({"_id": ObjectId(blog.id)})
+    )
+
+    return Blog(**updated_blog)
 
 
 @router.delete("/remove-blog/{blog_id}", response_model=str, status_code=status.HTTP_200_OK)

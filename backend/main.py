@@ -4,7 +4,10 @@ from routers import users_auth_api, blogs_api
 
 app = FastAPI()
 
-origins = ["https://nlarrea.github.io"]
+origins = [
+    "http://localhost:3000",
+    "https://nlarrea.github.io"
+]
 
 # Routers
 app.include_router(users_auth_api.router)
