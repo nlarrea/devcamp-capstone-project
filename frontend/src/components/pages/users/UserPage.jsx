@@ -159,9 +159,9 @@ const UserPage = () => {
                         }
                         {
                             userBlogs.length > 0 ? (
-                                userBlogs.map(blog => (
+                                userBlogs.map((blog, index) => (
                                     <BlogItem
-                                        key={blog.id}
+                                        key={`${blog.id}${index}`}
                                         blog={blog}
                                         handleDeleteBlog={handleDeleteBlog}
                                     />
