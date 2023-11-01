@@ -106,8 +106,6 @@ const WriteBlog = () => {
                 });
                 history(PATHS.currentUser);
             }).catch(error => {
-                console.error('Updating error:', error);
-
                 const errorType = error.response?.data?.detail?.type
                 
                 if (errorType === 'expired') {
@@ -128,8 +126,6 @@ const WriteBlog = () => {
                 ]));
                 history(PATHS.currentUser);
             }).catch(error => {
-                console.error('Create new blog error:', error);
-
                 const errorType = error.response?.data?.detail?.type
                 
                 if (errorType === 'expired') {

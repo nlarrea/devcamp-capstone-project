@@ -253,6 +253,8 @@
         background-size: cover;
         background-position: center;
 
+        box-shadow: 0 0 15px rgba(var.$charcoal, 0.8);
+
         transform: skewY(-5deg);
         transform-origin: top left;
     }
@@ -276,13 +278,17 @@
         button.go-back-button {
             @include btn.icon-text-btn(
                 $color: var.$gold,
-                $bg-color: var.$oxford-blue,
                 $hover-bg-color: var.$gold,
                 $hover-text-color: var.$oxford-blue
             );
 
             font-weight: bold;
             padding-right: 12px;
+            box-shadow: 0 0 8px rgba(var.$charcoal, 0.4);
+        }
+
+        div.blog-link-wrapper a {
+            text-shadow: 0 0 8px rgba(var.$charcoal, 0.4);
         }
     }
 }
@@ -293,7 +299,7 @@
     main {
         max-width: 1000px;
         padding: 32px;
-        margin: 0 auto;
+        margin: 0 auto 32px;
 
         h1 {
             margin-bottom: 40px;

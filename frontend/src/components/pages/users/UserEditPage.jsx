@@ -157,7 +157,6 @@ const UserEditPage = () => {
             history(PATHS.welcome);
         }).catch(error => {
             showApiErrors(error);
-            console.error(error)
         })
     }
 

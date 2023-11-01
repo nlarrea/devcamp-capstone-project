@@ -105,8 +105,6 @@ function App() {
           setIsAuthenticated(false);
           setUser({});
         }
-      }).catch(error => {
-        console.error(error);
       });
 
       setIsLoading(false);
