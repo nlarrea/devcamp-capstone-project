@@ -134,7 +134,7 @@ def decode_base64(data, alt_chars=b"+/") -> bytes:
 
 
 @router.post("/register", response_model=User, status_code=status.HTTP_201_CREATED)
-async def user(user: UserDB):
+async def create_user(user: UserDB):
     """ Creates a new user into the database. First hashes the user's password
      before it is stored.
      
