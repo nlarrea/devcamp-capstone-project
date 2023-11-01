@@ -276,6 +276,7 @@
         button.go-back-button {
             @include btn.icon-text-btn(
                 $color: var.$gold,
+                $bg-color: var.$oxford-blue,
                 $hover-bg-color: var.$gold,
                 $hover-text-color: var.$oxford-blue
             );
@@ -299,6 +300,15 @@
             text-align: right;
             font-family: 'Gluten', open-sans;
             font-size: 3rem;
+        }
+    }
+}
+
+
+@media (max-width: 775px) {
+    #single-blog-page-wrapper {
+        main h1 {
+            font-size: 2rem;
         }
     }
 }
