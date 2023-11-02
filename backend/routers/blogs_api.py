@@ -1,7 +1,7 @@
 import os
 from fastapi import APIRouter, HTTPException, status, Request
 from jose import jwt, JWTError
-from bson import ObjectId, Binary
+from bson import ObjectId
 import base64
 import re
 
@@ -159,6 +159,7 @@ async def my_blogs(user_id: str, page: int):
     offset = (page * limit) - limit
     blogs = list(
         db_client.blogs.find({"user_id": user_id})
+        .sort(key_or_list="_id", direction=-1)
         .skip(offset)
         .limit(limit)
     )
@@ -170,7 +171,7 @@ async def my_blogs(user_id: str, page: int):
         }
     
     return {
-        "blogs": blogs_schema(blogs)[::-1],
+        "blogs": blogs_schema(blogs),
         "total": len(list(db_client.blogs.find({"user_id": user_id})))
     }
 
@@ -193,6 +194,7 @@ async def get_all_blogs(page: int = 1):
     offset = (page * limit) - limit
     blogs_list = list(
         db_client.blogs.find()
+        .sort(key_or_list="_id", direction=-1)
         .skip(offset)
         .limit(limit)
     )
@@ -204,14 +206,14 @@ async def get_all_blogs(page: int = 1):
         }
     
     return {
-        "blogs": blogs_schema(blogs_list)[::-1],
+        "blogs": blogs_schema(blogs_list),
         "total": len(list(db_client.blogs.find()))
     }
 
 
 @router.get("/single-blog/{blog_id}", response_model=Blog | None, status_code=status.HTTP_200_OK)
 async def single_blog(blog_id: str):
-    """ Finds a single blog by its ID.
+    """ Finds a single blog by its ID in the database and returns it.
 
      Parameters:
         - blog_id (`int`): The ID of the blog to be find.
@@ -233,7 +235,7 @@ async def single_blog(blog_id: str):
 
 @router.put("/edit-blog", status_code=status.HTTP_201_CREATED)
 async def edit_blog(blog: Blog, request: Request):
-    """ Updates an already existing blog.
+    """ Updates an already existing blog's data.
     
      Parameters:
         - blog (`Blog`): The blog to be updated.
@@ -275,7 +277,7 @@ async def remove_blog(blog_id: str, request: Request):
         - request (`Request`): The HTTP request.
     
      Returns:
-        - (`int`): The removed blog's ID.
+        - (`str`): The removed blog's ID.
     """
 
     validate_token(request)

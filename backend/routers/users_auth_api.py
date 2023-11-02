@@ -29,17 +29,43 @@ crypt = CryptContext(schemes=["bcrypt"])
 
 # AUXILIARY FUNCTIONS
 
-def search_user(field: str, key):
+def search_user(field: str, value) -> User | dict:
+    """ Searches for a user collection in the database based on a specific
+     field and its value.
+    
+     Parameters:
+        - field (`str`): The name of the field by which to find the user in the
+        database.
+        - value (`any`): The value of the given field.
+
+     Returns:
+        - (`User` | `dict`): Returns a `User` object if the user is found in
+        the database. Otherwise, it returns a `dict` with a error message.
+    """
+
     try:
-        user = db_client.users.find_one({field: key})
+        user = db_client.users.find_one({field: value})
         return User(**user_schema(user))
     except:
         return {"error": "User is not found!"}
     
 
-def search_user_db(field: str, key):
+def search_user_db(field: str, value) -> UserDB | dict:
+    """ Searches for a user collection in the database based on a specific
+     field and its value.
+    
+     Parameters:
+        - field (`str`): The name of the field by which to find the user in the
+        database.
+        - value (`any`): The value of the given field.
+
+     Returns:
+        - (`UserDB` | `dict`): Returns a `User` object if the user is found in
+        the database. Otherwise, it returns a `dict` with a error message.
+    """
+
     try:
-        user_db = db_client.users.find_one({field: key})
+        user_db = db_client.users.find_one({field: value})
         return UserDB(**user_schema(user_db))
     except:
         return {"error": "User is not found!"}
