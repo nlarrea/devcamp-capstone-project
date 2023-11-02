@@ -1,4 +1,4 @@
-import { useState, useRef, useContext } from 'react';
+import { useState, useRef, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
@@ -63,6 +63,15 @@ const Carousel = () => {
             history(PATHS.newBlog)
         }
     }
+
+
+    useEffect (() => {
+        const timer = setTimeout(() => {
+            nextIndex();
+        }, 5000);
+
+        return () => clearTimeout(timer);
+    });
     
 
     return (
