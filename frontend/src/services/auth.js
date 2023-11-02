@@ -1,11 +1,11 @@
 import axios from "axios";
 
-const API_URL = 'https://blog-voyage-api-dev-femc.1.ie-1.fl0.io/users/';
+import { API_PATHS } from "../models/paths";
 
 
 const register = async ({ username, email, password }) => {
     return await axios.post(
-        API_URL + 'register',
+        API_PATHS.users.register,
         {
             username,
             email,
@@ -17,7 +17,7 @@ const register = async ({ username, email, password }) => {
 
 const login = async ({ email, password }) => {
     const response = await axios.post(
-        API_URL + 'login',
+        API_PATHS.users.login,
         {
             email,
             password
@@ -37,7 +37,7 @@ const getCurrentUser = () => {
     const storedToken = localStorage.getItem('token');
 
     return axios.get(
-        API_URL + 'me', {
+        API_PATHS.users.me, {
             headers: { Authorization: `Bearer ${storedToken}` },
             withCredentials: true
         }
@@ -55,7 +55,7 @@ const updateUser = async ({
     const storedToken = localStorage.getItem('token');
 
     return await axios.put(
-        API_URL + 'update-me',
+        API_PATHS.users.updateMe,
         {
             username,
             email,
@@ -74,7 +74,7 @@ const removeAccount = async () => {
     const storedToken = localStorage.getItem('token');
 
     await axios.delete(
-        API_URL + 'remove-account', {
+        API_PATHS.users.removeAccount, {
             headers: { Authorization: `Bearer ${storedToken}` },
             withCredentials: true
         }

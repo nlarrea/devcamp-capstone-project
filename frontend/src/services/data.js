@@ -1,13 +1,13 @@
 import axios from "axios";
 
-const API_URL = 'https://blog-voyage-api-dev-femc.1.ie-1.fl0.io/blogs/';
+import { API_PATHS } from "../models/paths";
 
 
 const createBlog = async (newBlog) => {
     const storedToken = localStorage.getItem('token');
 
     const createdBlog = await axios.post(
-        API_URL + 'new-blog',
+        API_PATHS.blogs.newBlog,
         newBlog, {
             headers: { Authorization: `Bearer ${storedToken}` },
             withCredentials: true
@@ -22,7 +22,7 @@ const getUserBlogs = async (userId, page) => {
     const storedToken = localStorage.getItem('token');
 
     const userBlogs = await axios.get(
-        API_URL + `user/${userId}?page=${page}`, {
+        API_PATHS.blogs.getUserBlogs(userId, page), {
             headers: { Authorization: `Bearer ${storedToken}` },
             withCredentials: true
         }
@@ -34,7 +34,7 @@ const getUserBlogs = async (userId, page) => {
 
 const getSingleBlog = async (blogId) => {
     const obtainedBlog = await axios.get(
-        API_URL + `single-blog/${blogId}`
+        API_PATHS.blogs.getSingleBlog(blogId)
     );
 
     return obtainedBlog;
@@ -43,7 +43,7 @@ const getSingleBlog = async (blogId) => {
 
 const getAllBlogs = async (page) => {
     const obtainedBlogs = await axios.get(
-        API_URL + `all-blogs?page=${page}`
+        API_PATHS.blogs.getAllBlogs(page)
     );
 
     return obtainedBlogs;
@@ -54,7 +54,7 @@ const updateBlog = async (updatedBlog) => {
     const storedToken = localStorage.getItem('token');
 
     return await axios.put(
-        API_URL + 'edit-blog',
+        API_PATHS.blogs.updateBlog,
         updatedBlog, {
             headers: { Authorization: `Bearer ${storedToken}` },
             withCredentials: true
@@ -67,7 +67,7 @@ const deleteBlog = async (blogId) => {
     const storedToken = localStorage.getItem('token');
 
     const removedBlogId = await axios.delete(
-        API_URL + `remove-blog/${blogId}`, {
+        API_PATHS.blogs.deleteBlog(blogId), {
             headers: { Authorization: `Bearer ${storedToken}` },
             withCredentials: true
         }
