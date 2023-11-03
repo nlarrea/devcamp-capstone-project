@@ -39,7 +39,7 @@ const Carousel = () => {
     /**
      * Gets the new index and modifies the 'active' class of the carousel
      * indicator.
-     * @param {*} newIndex New value of the index.
+     * @param {Number} newIndex New value of the index.
      */
     const updateActiveIndicator = (newIndex) => {
         setIndex(newIndex);
@@ -102,18 +102,14 @@ const Carousel = () => {
                 </div>
                 
                 <div className='carousel-active-item-indicators' ref={carouselIndicatorRef}>
-                    <button
-                        className='carousel-indicator active-indicator'
-                        onClick={() => updateActiveIndicator(0)}
-                    />
-                    <button
-                        className='carousel-indicator'
-                        onClick={() => updateActiveIndicator(1)}
-                    />
-                    <button
-                        className='carousel-indicator'
-                        onClick={() => updateActiveIndicator(2)}
-                    />
+                    {
+                        HOME_CONTENT.map((_, idx) => (
+                            <button
+                                className={`carousel-indicator ${idx === index ? 'active-indicator' : ''}`}
+                                onClick={() => updateActiveIndicator(idx)}
+                            />
+                        ))
+                    }
                 </div>
                 
                 <button
